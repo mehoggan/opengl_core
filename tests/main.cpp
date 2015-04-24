@@ -31,6 +31,8 @@ int main(int argc, char *argv[])
     assert(di && opengl_core::x11_display::use_count() == 2 && (i + 1));
     opengl_core::x11_display::sync();
     opengl_core::x11_display::release();
+    // Because the display is still alive we can sync after release
+    opengl_core::x11_display::sync();
     assert(di && opengl_core::x11_display::use_count() == 1 && (i + 1));
   }
 
