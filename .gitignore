@@ -1,6 +1,6 @@
 results.txt
 runner*
-*.swp
+*.sw*
 *0
 *Debug*
 *Release*
