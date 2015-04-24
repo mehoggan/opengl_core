@@ -1,0 +1,14 @@
+lib_LTLIBRARIES = libopengl_core.la
+
+AM_CPPFLAGS = -I../includes -I../
+ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS} -I m4
+
+# List your sources
+libopengl_core_la_SOURCES = \
+	../src/x11_display.cpp
+
+# List version info and other linker flags.
+libopengl_core_la_LDFLAGS = -version-info 1:0:0 -L/usr/lib64/nvidia/xorg \
+	-lX11 -glX -pthread
+
+
