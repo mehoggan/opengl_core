@@ -101,7 +101,9 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am__dirstamp = $(am__leading_dot)dirstamp
-am_test_opengl_core_OBJECTS = ../main.$(OBJEXT)
+am_test_opengl_core_OBJECTS = ../main.$(OBJEXT) \
+	../test_x11_render_system.$(OBJEXT) \
+	../test_x11_display.$(OBJEXT)
 test_opengl_core_OBJECTS = $(am_test_opengl_core_OBJECTS)
 test_opengl_core_LDADD = $(LDADD)
 AM_V_lt = $(am__v_lt_$(V))
@@ -208,7 +210,7 @@ CPPFLAGS =
 CXX = g++
 CXXCPP = g++ -E
 CXXDEPMODE = depmode=gcc3
-CXXFLAGS = -g -O2
+CXXFLAGS = -g -O2 -std=gnu++11
 CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
 DEPDIR = .deps
@@ -218,10 +220,11 @@ DUMPBIN =
 ECHO_C = 
 ECHO_N = -n
 ECHO_T = 
-EGREP = /bin/grep -E
+EGREP = /usr/bin/grep -E
 EXEEXT = 
-FGREP = /bin/grep -F
-GREP = /bin/grep
+FGREP = /usr/bin/grep -F
+GREP = /usr/bin/grep
+HAVE_CXX11 = 
 INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
@@ -237,7 +240,7 @@ LN_S = ln -s
 LTLIBOBJS = 
 MAKEINFO = ${SHELL} /home/mhoggan/Devel/opengl_core/tests/build/missing makeinfo
 MANIFEST_TOOL = :
-MKDIR_P = /bin/mkdir -p
+MKDIR_P = /usr/bin/mkdir -p
 NM = /usr/bin/nm -B
 NMEDIT = 
 OBJDUMP = objdump
@@ -253,9 +256,9 @@ PACKAGE_URL =
 PACKAGE_VERSION = 0.1
 PATH_SEPARATOR = :
 RANLIB = ranlib
-SED = /bin/sed
+SED = /usr/bin/sed
 SET_MAKE = 
-SHELL = /bin/bash
+SHELL = /bin/sh
 STRIP = strip
 VERSION = 0.1
 abs_builddir = /home/mhoggan/Devel/opengl_core/tests/build
@@ -311,14 +314,16 @@ target_alias =
 top_build_prefix = 
 top_builddir = .
 top_srcdir = .
-AM_CPPFLAGS = -I../../includes -I../../
+AM_CPPFLAGS = -I../../includes -I../../ -I../
 ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS} -I m4
 AM_CXXFLAGS = -std=gnu++11
 test_opengl_core_LDFLAGS = -no-install \
-	-L$(abs_top_builddir)/../../build/.libs/ -lopengl_core -lX11
+	-L$(abs_top_builddir)/../../build/.libs/ -lopengl_core -lGL -lX11 -glx
 
 test_opengl_core_SOURCES = \
-	../main.cpp
+	../main.cpp \
+	../test_x11_render_system.cpp \
+	../test_x11_display.cpp
 
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
@@ -430,6 +435,10 @@ clean-binPROGRAMS:
 	@$(MKDIR_P) ../$(DEPDIR)
 	@: > ../$(DEPDIR)/$(am__dirstamp)
 ../main.$(OBJEXT): ../$(am__dirstamp) ../$(DEPDIR)/$(am__dirstamp)
+../test_x11_render_system.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../test_x11_display.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
 
 test_opengl_core$(EXEEXT): $(test_opengl_core_OBJECTS) $(test_opengl_core_DEPENDENCIES) $(EXTRA_test_opengl_core_DEPENDENCIES) 
 	@rm -f test_opengl_core$(EXEEXT)
@@ -443,6 +452,8 @@ distclean-compile:
 	-rm -f *.tab.c
 
 include ../$(DEPDIR)/main.Po
+include ../$(DEPDIR)/test_x11_display.Po
+include ../$(DEPDIR)/test_x11_render_system.Po
 
 .cpp.o:
 	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\

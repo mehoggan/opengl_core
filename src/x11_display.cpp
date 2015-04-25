@@ -1,5 +1,6 @@
 #include <core/x11_display.h>
 
+#include <cassert>
 #include <iostream>
 
 namespace opengl_core
