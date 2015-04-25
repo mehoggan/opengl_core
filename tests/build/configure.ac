@@ -16,8 +16,6 @@ AC_LANG([C++])
 AC_PROG_CXX
 AX_CXX_COMPILE_STDCXX_11
 
-CXXFLAGS = -std=gnu++11
-
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
 
