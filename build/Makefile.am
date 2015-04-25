@@ -2,6 +2,7 @@ lib_LTLIBRARIES = libopengl_core.la
 
 AM_CPPFLAGS = -I../includes -I../
 ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS} -I m4
+AM_CXXFLAGS = -std=gnu++11
 
 # List your sources
 libopengl_core_la_SOURCES = \
