@@ -12,7 +12,8 @@ namespace opengl_core
     static thread_local int m_minor_version;
 
   public:
-    static thread_local bool init(const int major, const int minor);
+    static thread_local bool init(const int requested_major,
+      const int requested_minor);
     static thread_local void destroy();
   };
 }

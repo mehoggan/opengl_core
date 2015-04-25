@@ -10,27 +10,28 @@
 
 namespace
 {
-  thread_local int g_glx_major;
-  thread_local int g_glx_minor;
 
-  thread_local Display *&g_display = opengl_core::x11_display::acquire();
 }
 
 namespace opengl_core
 {
-  bool render_system::init(const int major, const int minor)
+  bool render_system::init(const int requested_major,
+    const int requested_minor)
   {
-    if (glXQueryVersion(g_display, &g_glx_major, &g_glx_minor)) {
-      if (g_glx_major >= major) {
-        if (g_glx_minor >= minor) {
+    int glx_major, glx_minor;
+
+    Display *&display = opengl_core::x11_display::acquire();
+    if (glXQueryVersion(display, &glx_major, &glx_minor)) {
+      if (glx_major >= requested_major) {
+        if (glx_minor >= requested_minor) {
           // Accoring to https://www.opengl.org/sdk/docs/man2/xhtml/glXIntro.xml
           // glxQueryVersion returns both client and server. However, according
           // to https://www.opengl.org/sdk/docs/man2/xhtml/glXQueryVersion.xml
           // it only returns the server version string.
-          std::cout << "server glx version string " << g_glx_major << "." <<
-            g_glx_minor << std::endl;
-          std::cout << "client glx version string " << g_glx_major << "." <<
-            g_glx_minor << std::endl;
+          std::cout << "server glx version string " << glx_major << "." <<
+            glx_minor << std::endl;
+          std::cout << "client glx version string " << glx_major << "." <<
+            glx_minor << std::endl;
           return true;
         }
       }
