@@ -1,51 +1,25 @@
-#include <core/x11_display.h>
+#include <test_base.h>
+#include <test_x11_display.h>
+#include <test_render_system.h>
 
-#include <cassert>
-#include <chrono>
-#include <iostream>
-#include <system_error>
-#include <thread>
+#include <cstdint>
+#include <memory>
 
-void acquire_display1_hold_m()
-{
-  Display *&d = opengl_core::x11_display::acquire();
-  assert(d && opengl_core::x11_display::use_count() == 1);
-  opengl_core::x11_display::sync();
-  std::this_thread::sleep_for(std::chrono::seconds(1));
-  opengl_core::x11_display::release();
-  assert(!d && opengl_core::x11_display::use_count() == 0);
-}
+#include <X11/Xlib.h>
 
 int main(int argc, char *argv[])
 {
   XInitThreads();
 
-  Display *&d = opengl_core::x11_display::acquire();
-  assert(d && opengl_core::x11_display::use_count() == 1);
+  std::array<std::shared_ptr<test_base>, 2> tests = {
+    std::shared_ptr<test_base>(new test_render_system()),
+    std::shared_ptr<test_base>(new test_x11_display())
+  };
 
-  std::thread test_0(acquire_display1_hold_m);
-
-  assert(d && opengl_core::x11_display::use_count() == 1);
-
-  for (unsigned int i = 0; i < 4; ++i) {
-    Display *&di = opengl_core::x11_display::acquire();
-    assert(d && opengl_core::x11_display::use_count() == 2);
-    opengl_core::x11_display::sync();
-    opengl_core::x11_display::release();
-    opengl_core::x11_display::sync();
-    assert(d && opengl_core::x11_display::use_count() == 1);
+  for(std::size_t i = 0; i < tests.size(); ++i) {
+    std::cout << "Running " << tests[i]->name() << std::endl;
+    tests[i]->run();
   }
-
-  assert(d && opengl_core::x11_display::use_count() == 1);
-
-  opengl_core::x11_display::release();
-
-  assert(!d && opengl_core::x11_display::use_count() == 0);
-
-  std::cout << "Waiting on thread to join" << std::endl;
-  test_0.join();
-
-  assert(!d && opengl_core::x11_display::use_count() == 0);
 
   return 0;
 }

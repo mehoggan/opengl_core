@@ -5,8 +5,7 @@
 
 #include <X11/Xlib.h>
 
-#include <atomic>
-#include <cassert>
+#include <cstdint>
 
 namespace opengl_core
 {
