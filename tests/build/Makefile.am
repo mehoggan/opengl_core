@@ -9,5 +9,6 @@ test_opengl_core_LDFLAGS = -no-install \
 
 test_opengl_core_SOURCES = \
 	../main.cpp \
-	../test_x11_render_system.cpp \
-	../test_x11_display.cpp
+	../test_x11_display.cpp \
+	../test_x11_fb_config.cpp \
+	../test_x11_render_system.cpp

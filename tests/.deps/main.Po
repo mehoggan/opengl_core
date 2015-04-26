@@ -93,12 +93,9 @@
  /usr/include/c++/4.9.2/bits/locale_facets.tcc \
  /usr/include/c++/4.9.2/bits/basic_ios.tcc \
  /usr/include/c++/4.9.2/bits/ostream.tcc /usr/include/c++/4.9.2/istream \
- /usr/include/c++/4.9.2/bits/istream.tcc ../test_x11_display.h \
- ../../includes/core/x11_display.h ../../declspec.h \
- /usr/include/X11/Xlib.h /usr/include/X11/X.h \
- /usr/include/X11/Xfuncproto.h /usr/include/X11/Xosdefs.h \
- ../test_render_system.h ../../includes/core/render_system.h \
- /usr/include/c++/4.9.2/memory \
+ /usr/include/c++/4.9.2/bits/istream.tcc ../test_fb_config.h \
+ ../../includes/core/fb_config.h ../../declspec.h \
+ ../../includes/core/non_copyable.h /usr/include/c++/4.9.2/memory \
  /usr/include/c++/4.9.2/bits/stl_construct.h \
  /usr/include/c++/4.9.2/ext/alloc_traits.h \
  /usr/include/c++/4.9.2/bits/alloc_traits.h \
@@ -114,7 +111,11 @@
  /usr/include/c++/4.9.2/bits/shared_ptr.h \
  /usr/include/c++/4.9.2/bits/shared_ptr_base.h \
  /usr/include/c++/4.9.2/ext/aligned_buffer.h \
- /usr/include/c++/4.9.2/backward/auto_ptr.h
+ /usr/include/c++/4.9.2/backward/auto_ptr.h ../test_render_system.h \
+ ../../includes/core/render_system.h ../test_x11_display.h \
+ ../../includes/core/x11_display.h /usr/include/X11/Xlib.h \
+ /usr/include/X11/X.h /usr/include/X11/Xfuncproto.h \
+ /usr/include/X11/Xosdefs.h
 
 /usr/include/stdc-predef.h:
 
@@ -382,23 +383,13 @@
 
 /usr/include/c++/4.9.2/bits/istream.tcc:
 
-../test_x11_display.h:
+../test_fb_config.h:
 
-../../includes/core/x11_display.h:
+../../includes/core/fb_config.h:
 
 ../../declspec.h:
 
-/usr/include/X11/Xlib.h:
-
-/usr/include/X11/X.h:
-
-/usr/include/X11/Xfuncproto.h:
-
-/usr/include/X11/Xosdefs.h:
-
-../test_render_system.h:
-
-../../includes/core/render_system.h:
+../../includes/core/non_copyable.h:
 
 /usr/include/c++/4.9.2/memory:
 
@@ -441,3 +432,19 @@
 /usr/include/c++/4.9.2/ext/aligned_buffer.h:
 
 /usr/include/c++/4.9.2/backward/auto_ptr.h:
+
+../test_render_system.h:
+
+../../includes/core/render_system.h:
+
+../test_x11_display.h:
+
+../../includes/core/x11_display.h:
+
+/usr/include/X11/Xlib.h:
+
+/usr/include/X11/X.h:
+
+/usr/include/X11/Xfuncproto.h:
+
+/usr/include/X11/Xosdefs.h:
