@@ -5,7 +5,7 @@
 
 namespace opengl_core
 {
-  class render_system
+  class OPENGL_CORE_API render_system
   {
   private:
     static thread_local int m_major_version;
