@@ -13,6 +13,8 @@ namespace opengl_core
   bool render_system::init(const int requested_major,
     const int requested_minor)
   {
+    XInitThreads();
+
     Display *&display = opengl_core::x11_display::acquire();
 
     // Set to 0 because this would be the initial version.
@@ -41,8 +43,6 @@ namespace opengl_core
 
     fb_config fbc;
     fbc.choose_best(glx_major, glx_minor);
-
-    GLXFBConfig &config = *(static_cast<GLXFBConfig*>(fbc.impl()));
   }
 
   void render_system::destroy()

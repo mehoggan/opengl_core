@@ -103,7 +103,8 @@ PROGRAMS = $(bin_PROGRAMS)
 am__dirstamp = $(am__leading_dot)dirstamp
 am_test_opengl_core_OBJECTS = ../main.$(OBJEXT) \
 	../test_x11_display.$(OBJEXT) ../test_x11_fb_config.$(OBJEXT) \
-	../test_x11_render_system.$(OBJEXT)
+	../test_x11_render_system.$(OBJEXT) \
+	../test_x11_render_window.$(OBJEXT)
 test_opengl_core_OBJECTS = $(am_test_opengl_core_OBJECTS)
 test_opengl_core_LDADD = $(LDADD)
 AM_V_lt = $(am__v_lt_$(V))
@@ -206,11 +207,11 @@ CC = gcc
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2
 CPP = gcc -E
-CPPFLAGS = -DNDEBUG
+CPPFLAGS = -DDEBUG
 CXX = g++
 CXXCPP = g++ -E
 CXXDEPMODE = depmode=gcc3
-CXXFLAGS = -O3 -std=gnu++11
+CXXFLAGS = -g -O0 -std=gnu++11
 CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
 DEPDIR = .deps
@@ -324,7 +325,8 @@ test_opengl_core_SOURCES = \
 	../main.cpp \
 	../test_x11_display.cpp \
 	../test_x11_fb_config.cpp \
-	../test_x11_render_system.cpp
+	../test_x11_render_system.cpp \
+	../test_x11_render_window.cpp
 
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
@@ -442,6 +444,8 @@ clean-binPROGRAMS:
 	../$(DEPDIR)/$(am__dirstamp)
 ../test_x11_render_system.$(OBJEXT): ../$(am__dirstamp) \
 	../$(DEPDIR)/$(am__dirstamp)
+../test_x11_render_window.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
 
 test_opengl_core$(EXEEXT): $(test_opengl_core_OBJECTS) $(test_opengl_core_DEPENDENCIES) $(EXTRA_test_opengl_core_DEPENDENCIES) 
 	@rm -f test_opengl_core$(EXEEXT)
@@ -458,6 +462,7 @@ include ../$(DEPDIR)/main.Po
 include ../$(DEPDIR)/test_x11_display.Po
 include ../$(DEPDIR)/test_x11_fb_config.Po
 include ../$(DEPDIR)/test_x11_render_system.Po
+include ../$(DEPDIR)/test_x11_render_window.Po
 
 .cpp.o:
 	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\

@@ -129,7 +129,8 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 libopengl_core_la_LIBADD =
 am__dirstamp = $(am__leading_dot)dirstamp
 am_libopengl_core_la_OBJECTS = ../src/x11_display.lo \
-	../src/x11_fb_config.lo ../src/x11_render_system.lo
+	../src/x11_fb_config.lo ../src/x11_render_system.lo \
+	../src/x11_render_window.lo
 libopengl_core_la_OBJECTS = $(am_libopengl_core_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
@@ -231,11 +232,11 @@ CC = gcc
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2
 CPP = gcc -E
-CPPFLAGS = -DNDEBUG
+CPPFLAGS = -DDEBUG
 CXX = g++
 CXXCPP = g++ -E
 CXXDEPMODE = depmode=gcc3
-CXXFLAGS = -O3 -std=gnu++11
+CXXFLAGS = -g -O0 -std=gnu++11
 CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
 DEPDIR = .deps
@@ -348,7 +349,8 @@ AM_CXXFLAGS = -std=gnu++11
 libopengl_core_la_SOURCES = \
 	../src/x11_display.cpp \
 	../src/x11_fb_config.cpp \
-	../src/x11_render_system.cpp
+	../src/x11_render_system.cpp \
+	../src/x11_render_window.cpp
 
 
 # List version info and other linker flags.
@@ -456,6 +458,8 @@ clean-libLTLIBRARIES:
 	../src/$(DEPDIR)/$(am__dirstamp)
 ../src/x11_render_system.lo: ../src/$(am__dirstamp) \
 	../src/$(DEPDIR)/$(am__dirstamp)
+../src/x11_render_window.lo: ../src/$(am__dirstamp) \
+	../src/$(DEPDIR)/$(am__dirstamp)
 
 libopengl_core.la: $(libopengl_core_la_OBJECTS) $(libopengl_core_la_DEPENDENCIES) $(EXTRA_libopengl_core_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(libopengl_core_la_LINK) -rpath $(libdir) $(libopengl_core_la_OBJECTS) $(libopengl_core_la_LIBADD) $(LIBS)
@@ -471,6 +475,7 @@ distclean-compile:
 include ../src/$(DEPDIR)/x11_display.Plo
 include ../src/$(DEPDIR)/x11_fb_config.Plo
 include ../src/$(DEPDIR)/x11_render_system.Plo
+include ../src/$(DEPDIR)/x11_render_window.Plo
 
 .cpp.o:
 	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\

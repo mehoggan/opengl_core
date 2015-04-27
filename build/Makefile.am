@@ -8,7 +8,8 @@ AM_CXXFLAGS = -std=gnu++11
 libopengl_core_la_SOURCES = \
 	../src/x11_display.cpp \
 	../src/x11_fb_config.cpp \
-	../src/x11_render_system.cpp
+	../src/x11_render_system.cpp \
+	../src/x11_render_window.cpp
 
 # List version info and other linker flags.
 libopengl_core_la_LDFLAGS = -version-info 1:0:0 -L/usr/lib64/nvidia/xorg \

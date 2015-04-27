@@ -27,5 +27,4 @@ bool test_fb_config::run()
   // After we choose the best config the impl of a fb_config should not be 0
   OPENGL_CORE_ASSERT(memcmp(config_impl, &test, sizeof(GLXFBConfig)) != 0 &&
     "Choosing best frame buffer config for opengl_core::fb_config failed");
-
 }
