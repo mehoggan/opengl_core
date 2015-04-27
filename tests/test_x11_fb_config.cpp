@@ -1,5 +1,7 @@
 #include <test_fb_config.h>
 
+#include <core/fb_config.h>
+
 #include <cstring>
 #include <iostream>
 
@@ -22,7 +24,7 @@ bool test_fb_config::run()
   OPENGL_CORE_ASSERT(memcmp(config_impl, &test, sizeof(GLXFBConfig)) == 0 &&
     "Intilization of opengl_core::fb_config failed");
 
-  frame_buffer_conf.choose_best(1, 0);
+  frame_buffer_conf.choose_best();
 
   // After we choose the best config the impl of a fb_config should not be 0
   OPENGL_CORE_ASSERT(memcmp(config_impl, &test, sizeof(GLXFBConfig)) != 0 &&

@@ -27,6 +27,7 @@ namespace opengl_core
   void x11_display::release()
   {
     if (s_use_count == 1u) {
+      std::cout << "Closing display " << (&s_display) << std::endl;
       ::XCloseDisplay(s_display);
       s_display = 0;
     }
