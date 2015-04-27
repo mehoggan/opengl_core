@@ -42,7 +42,7 @@ namespace opengl_core
       glx_minor << std::endl;
 
     fb_config fbc;
-    fbc.choose_best(glx_major, glx_minor);
+    fbc.choose_best();
   }
 
   void render_system::destroy()

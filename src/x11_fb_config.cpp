@@ -45,7 +45,7 @@ namespace opengl_core
   fb_config::~fb_config()
   {}
 
-  void fb_config::choose_best(int major_ver, int minor_ver)
+  void fb_config::choose_best()
   {
     Display *&display = x11_display::acquire();
 

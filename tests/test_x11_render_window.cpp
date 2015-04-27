@@ -2,14 +2,17 @@
 
 #include <core/fb_config.h>
 #include <core/render_window.h>
+#include <core/x11_display.h>
 
 #include <chrono>
 #include <thread>
 
 bool test_render_window::run()
 {
+  opengl_core::x11_display::acquire();
+
   opengl_core::fb_config fbc;
-  fbc.choose_best(2, 0);
+  fbc.choose_best();
 
   opengl_core::render_window window;
   window.init(fbc);
@@ -22,4 +25,6 @@ bool test_render_window::run()
   std::cout << "Mapped window and Waited " << elapsed.count() << " ms\n";
 
   window.destroy();
+
+  opengl_core::x11_display::release();
 }

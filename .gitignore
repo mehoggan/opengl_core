@@ -20,6 +20,8 @@ a.exe
 *.dirstamp*
 *.lo
 *.o
+*.a
+*.la
 Makefile.in
 config.guess
 config.log
@@ -35,7 +37,6 @@ configure
 *aclocal.m4*
 *ar-lib*
 *autom4te.cache*
-*config.h*
 *config.h.in*
 *depcomp*
 *install-sh*

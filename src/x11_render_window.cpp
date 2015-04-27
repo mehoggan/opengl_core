@@ -53,13 +53,13 @@ namespace opengl_core
       CWBorderPixel|CWColormap|CWEventMask,
       &swa);
 
-    std::cout << "Created Window " << w << std::endl;
 
     XFree(vi);
     if (!m_impl->m_window) {
       x11_display::release();
       assert(m_impl->m_window && "Failed to create X11 window");
     }
+    std::cout << "Created Window " << m_impl->m_window << std::endl;
 
     x11_display::release();
   }
