@@ -3,6 +3,7 @@
 #include <core/x11_display.h>
 
 #include <cassert>
+#include <unistd.h>
 #include <iomanip>
 #include <iostream>
 
@@ -31,6 +32,7 @@ namespace opengl_core
   {
     Display *&display = x11_display::acquire();
     GLXFBConfig &config = *(static_cast<GLXFBConfig*>(fbc.impl()));
+    std::cout << "Acquired Display " << (&display) << std::endl;
 
     XVisualInfo *vi = glXGetVisualFromFBConfig(display, config);
     std::cout << "Chosen visual ID = 0x" << std::hex << std::setw(3)
@@ -53,13 +55,13 @@ namespace opengl_core
       CWBorderPixel|CWColormap|CWEventMask,
       &swa);
 
-    std::cout << "Created Window " << w << std::endl;
 
     XFree(vi);
     if (!m_impl->m_window) {
       x11_display::release();
       assert(m_impl->m_window && "Failed to create X11 window");
     }
+    std::cout << "Created Window " << m_impl->m_window << std::endl;
 
     x11_display::release();
   }
@@ -69,6 +71,7 @@ namespace opengl_core
     Display *&display = x11_display::acquire();
     std::cout << "Mapping Window " << m_impl->m_window << std::endl;
     XMapWindow(display, m_impl->m_window);
+    sleep(5);
     x11_display::release();
   }
 
