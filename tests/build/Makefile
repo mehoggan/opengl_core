@@ -103,6 +103,7 @@ PROGRAMS = $(bin_PROGRAMS)
 am__dirstamp = $(am__leading_dot)dirstamp
 am_test_opengl_core_OBJECTS = ../main.$(OBJEXT) \
 	../test_x11_display.$(OBJEXT) ../test_x11_fb_config.$(OBJEXT) \
+	../test_x11_render_context.$(OBJEXT) \
 	../test_x11_render_system.$(OBJEXT) \
 	../test_x11_render_window.$(OBJEXT)
 test_opengl_core_OBJECTS = $(am_test_opengl_core_OBJECTS)
@@ -211,7 +212,7 @@ CPPFLAGS = -DNDEBUG
 CXX = g++
 CXXCPP = g++ -E
 CXXDEPMODE = depmode=gcc3
-CXXFLAGS = -O3
+CXXFLAGS = -O3 -std=gnu++11
 CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
 DEPDIR = .deps
@@ -221,10 +222,11 @@ DUMPBIN =
 ECHO_C = 
 ECHO_N = -n
 ECHO_T = 
-EGREP = /bin/grep -E
+EGREP = /usr/bin/grep -E
 EXEEXT = 
-FGREP = /bin/grep -F
-GREP = /bin/grep
+FGREP = /usr/bin/grep -F
+GREP = /usr/bin/grep
+HAVE_CXX11 = 
 INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
@@ -240,7 +242,7 @@ LN_S = ln -s
 LTLIBOBJS = 
 MAKEINFO = ${SHELL} /home/mhoggan/Devel/opengl_core/tests/build/missing makeinfo
 MANIFEST_TOOL = :
-MKDIR_P = /bin/mkdir -p
+MKDIR_P = /usr/bin/mkdir -p
 NM = /usr/bin/nm -B
 NMEDIT = 
 OBJDUMP = objdump
@@ -256,9 +258,9 @@ PACKAGE_URL =
 PACKAGE_VERSION = 0.1
 PATH_SEPARATOR = :
 RANLIB = ranlib
-SED = /bin/sed
+SED = /usr/bin/sed
 SET_MAKE = 
-SHELL = /bin/bash
+SHELL = /bin/sh
 STRIP = strip
 VERSION = 0.1
 abs_builddir = /home/mhoggan/Devel/opengl_core/tests/build
@@ -324,6 +326,7 @@ test_opengl_core_SOURCES = \
 	../main.cpp \
 	../test_x11_display.cpp \
 	../test_x11_fb_config.cpp \
+	../test_x11_render_context.cpp \
 	../test_x11_render_system.cpp \
 	../test_x11_render_window.cpp
 
@@ -441,6 +444,8 @@ clean-binPROGRAMS:
 	../$(DEPDIR)/$(am__dirstamp)
 ../test_x11_fb_config.$(OBJEXT): ../$(am__dirstamp) \
 	../$(DEPDIR)/$(am__dirstamp)
+../test_x11_render_context.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
 ../test_x11_render_system.$(OBJEXT): ../$(am__dirstamp) \
 	../$(DEPDIR)/$(am__dirstamp)
 ../test_x11_render_window.$(OBJEXT): ../$(am__dirstamp) \
@@ -460,6 +465,7 @@ distclean-compile:
 include ../$(DEPDIR)/main.Po
 include ../$(DEPDIR)/test_x11_display.Po
 include ../$(DEPDIR)/test_x11_fb_config.Po
+include ../$(DEPDIR)/test_x11_render_context.Po
 include ../$(DEPDIR)/test_x11_render_system.Po
 include ../$(DEPDIR)/test_x11_render_window.Po
 

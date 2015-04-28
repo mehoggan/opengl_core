@@ -12,6 +12,7 @@
 
 namespace opengl_core
 {
+  thread_local render_context render_system::s_context;
   thread_local render_window render_system::s_window;
 
   bool render_system::init(const int requested_major,
@@ -50,11 +51,16 @@ namespace opengl_core
 
     s_window.init(fbc);
     s_window.map();
-    std::this_thread::sleep_for(std::chrono::seconds(5));
+
+    s_context.init(s_window, fbc, 2, 0);
+
+    s_context.make_current(s_window);
   }
 
   void render_system::destroy()
   {
+    s_context.make_not_current();
+    s_context.destroy();
     s_window.destroy();
     x11_display::release();
   }

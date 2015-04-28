@@ -6,8 +6,10 @@ AM_CXXFLAGS = -std=gnu++11
 
 # List your sources
 libopengl_core_la_SOURCES = \
+	../src/extension_checker.cpp \
 	../src/x11_display.cpp \
 	../src/x11_fb_config.cpp \
+	../src/x11_render_context.cpp \
 	../src/x11_render_system.cpp \
 	../src/x11_render_window.cpp
 

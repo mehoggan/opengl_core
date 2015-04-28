@@ -128,8 +128,9 @@ am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libopengl_core_la_LIBADD =
 am__dirstamp = $(am__leading_dot)dirstamp
-am_libopengl_core_la_OBJECTS = ../src/x11_display.lo \
-	../src/x11_fb_config.lo ../src/x11_render_system.lo \
+am_libopengl_core_la_OBJECTS = ../src/extension_checker.lo \
+	../src/x11_display.lo ../src/x11_fb_config.lo \
+	../src/x11_render_context.lo ../src/x11_render_system.lo \
 	../src/x11_render_window.lo
 libopengl_core_la_OBJECTS = $(am_libopengl_core_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
@@ -236,7 +237,7 @@ CPPFLAGS = -DNDEBUG
 CXX = g++
 CXXCPP = g++ -E
 CXXDEPMODE = depmode=gcc3
-CXXFLAGS = -O3
+CXXFLAGS = -O3 -std=gnu++11
 CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
 DEPDIR = .deps
@@ -246,10 +247,11 @@ DUMPBIN =
 ECHO_C = 
 ECHO_N = -n
 ECHO_T = 
-EGREP = /bin/grep -E
+EGREP = /usr/bin/grep -E
 EXEEXT = 
-FGREP = /bin/grep -F
-GREP = /bin/grep
+FGREP = /usr/bin/grep -F
+GREP = /usr/bin/grep
+HAVE_CXX11 = 
 INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
@@ -265,7 +267,7 @@ LN_S = ln -s
 LTLIBOBJS = 
 MAKEINFO = ${SHELL} /home/mhoggan/Devel/opengl_core/build/missing makeinfo
 MANIFEST_TOOL = :
-MKDIR_P = /bin/mkdir -p
+MKDIR_P = /usr/bin/mkdir -p
 NM = /usr/bin/nm -B
 NMEDIT = 
 OBJDUMP = objdump
@@ -281,9 +283,9 @@ PACKAGE_URL =
 PACKAGE_VERSION = 0.1
 PATH_SEPARATOR = :
 RANLIB = ranlib
-SED = /bin/sed
+SED = /usr/bin/sed
 SET_MAKE = 
-SHELL = /bin/bash
+SHELL = /bin/sh
 STRIP = strip
 VERSION = 0.1
 abs_builddir = /home/mhoggan/Devel/opengl_core/build
@@ -346,8 +348,10 @@ AM_CXXFLAGS = -std=gnu++11
 
 # List your sources
 libopengl_core_la_SOURCES = \
+	../src/extension_checker.cpp \
 	../src/x11_display.cpp \
 	../src/x11_fb_config.cpp \
+	../src/x11_render_context.cpp \
 	../src/x11_render_system.cpp \
 	../src/x11_render_window.cpp
 
@@ -451,9 +455,13 @@ clean-libLTLIBRARIES:
 ../src/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) ../src/$(DEPDIR)
 	@: > ../src/$(DEPDIR)/$(am__dirstamp)
+../src/extension_checker.lo: ../src/$(am__dirstamp) \
+	../src/$(DEPDIR)/$(am__dirstamp)
 ../src/x11_display.lo: ../src/$(am__dirstamp) \
 	../src/$(DEPDIR)/$(am__dirstamp)
 ../src/x11_fb_config.lo: ../src/$(am__dirstamp) \
+	../src/$(DEPDIR)/$(am__dirstamp)
+../src/x11_render_context.lo: ../src/$(am__dirstamp) \
 	../src/$(DEPDIR)/$(am__dirstamp)
 ../src/x11_render_system.lo: ../src/$(am__dirstamp) \
 	../src/$(DEPDIR)/$(am__dirstamp)
@@ -471,8 +479,10 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+include ../src/$(DEPDIR)/extension_checker.Plo
 include ../src/$(DEPDIR)/x11_display.Plo
 include ../src/$(DEPDIR)/x11_fb_config.Plo
+include ../src/$(DEPDIR)/x11_render_context.Plo
 include ../src/$(DEPDIR)/x11_render_system.Plo
 include ../src/$(DEPDIR)/x11_render_window.Plo
 

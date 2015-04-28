@@ -3,6 +3,7 @@
 
 #include <declspec.h>
 
+#include <core/render_context.h>
 #include <core/render_window.h>
 
 namespace opengl_core
@@ -10,6 +11,7 @@ namespace opengl_core
   class OPENGL_CORE_API render_system
   {
   private:
+    static thread_local render_context s_context;
     static thread_local render_window s_window;
 
   public:
