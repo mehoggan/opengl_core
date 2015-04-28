@@ -6,6 +6,8 @@
 #include <core/render_context.h>
 #include <core/render_window.h>
 
+// NOTE: thread_local on functions to my understanding is used to only denote
+// that the function accesses a thread_local static variable.
 namespace opengl_core
 {
   class OPENGL_CORE_API render_system
@@ -17,6 +19,9 @@ namespace opengl_core
   public:
     static thread_local bool init(const int requested_major,
       const int requested_minor);
+
+    static thread_local void run(bool threaded = true);
+
     static thread_local void destroy();
   };
 }

@@ -57,6 +57,13 @@ namespace opengl_core
     s_context.make_current(s_window);
   }
 
+  void render_system::run(bool threaded)
+  {
+    if (threaded) {
+    } else {
+    }
+  }
+
   void render_system::destroy()
   {
     s_context.make_not_current();
