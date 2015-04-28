@@ -3,13 +3,17 @@
 #include <core/fb_config.h>
 #include <core/x11_display.h>
 
+#include <chrono>
 #include <iostream>
+#include <thread>
 
 #include <X11/Xlib.h>
 #include <GL/glx.h>
 
 namespace opengl_core
 {
+  thread_local render_window render_system::s_window;
+
   bool render_system::init(const int requested_major,
     const int requested_minor)
   {
@@ -43,10 +47,15 @@ namespace opengl_core
 
     fb_config fbc;
     fbc.choose_best();
+
+    s_window.init(fbc);
+    s_window.map();
+    std::this_thread::sleep_for(std::chrono::seconds(5));
   }
 
   void render_system::destroy()
   {
+    s_window.destroy();
     x11_display::release();
   }
 }

@@ -1,0 +1,6 @@
+#ifndef RENDER_CONTEXT_H_INCLUDED
+#define RENDER_CONTEXT_H_INCLUDED
+
+
+
+#endif

@@ -3,13 +3,14 @@
 
 #include <declspec.h>
 
+#include <core/render_window.h>
+
 namespace opengl_core
 {
   class OPENGL_CORE_API render_system
   {
   private:
-    static thread_local int m_major_version;
-    static thread_local int m_minor_version;
+    static thread_local render_window s_window;
 
   public:
     static thread_local bool init(const int requested_major,

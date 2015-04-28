@@ -11,7 +11,7 @@ pushd `dirname $0` > /dev/null
     ../../tools/autotools_gen.sh && \
     ./configure CPPFLAGS=-DDEBUG CXXFLAGS="-g -O0" && \
     make clean all && \
-    valgrind ./test_opengl_core
+    valgrind --leak-check=full ./test_opengl_core
     if [[ ${?} != "0" ]]; then
       popd > /dev/null
       popd > /dev/null
@@ -37,7 +37,7 @@ pushd `dirname $0` > /dev/null
     ../../tools/autotools_gen.sh && \
     ./configure CPPFLAGS=-DNDEBUG CXXFLAGS="-O3" && \
     make clean all && \
-    valgrind ./test_opengl_core
+    valgrind --leak-check=full ./test_opengl_core
     if [[ ${?} != "0" ]]; then
       popd > /dev/null
       popd > /dev/null

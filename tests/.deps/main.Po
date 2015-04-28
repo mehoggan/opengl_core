@@ -104,10 +104,8 @@
  /usr/include/c++/4.8/bits/ostream.tcc /usr/include/c++/4.8/istream \
  /usr/include/c++/4.8/bits/istream.tcc ../test_fb_config.h \
  ../test_render_system.h ../../includes/core/render_system.h \
- ../../declspec.h ../test_render_window.h ../test_x11_display.h \
- ../../includes/core/x11_display.h /usr/include/X11/Xlib.h \
- /usr/include/X11/X.h /usr/include/X11/Xfuncproto.h \
- /usr/include/X11/Xosdefs.h /usr/include/c++/4.8/memory \
+ ../../declspec.h ../../includes/core/render_window.h \
+ ../../includes/core/fb_config.h /usr/include/c++/4.8/memory \
  /usr/include/c++/4.8/bits/stl_construct.h \
  /usr/include/c++/4.8/ext/alloc_traits.h \
  /usr/include/c++/4.8/bits/alloc_traits.h \
@@ -123,7 +121,11 @@
  /usr/include/c++/4.8/bits/unique_ptr.h \
  /usr/include/c++/4.8/bits/shared_ptr.h \
  /usr/include/c++/4.8/bits/shared_ptr_base.h \
- /usr/include/c++/4.8/backward/auto_ptr.h
+ /usr/include/c++/4.8/backward/auto_ptr.h \
+ ../../includes/core/non_copyable.h ../test_render_window.h \
+ ../test_x11_display.h ../../includes/core/x11_display.h \
+ /usr/include/X11/Xlib.h /usr/include/X11/X.h \
+ /usr/include/X11/Xfuncproto.h /usr/include/X11/Xosdefs.h
 
 /usr/include/stdc-predef.h:
 
@@ -403,19 +405,9 @@
 
 ../../declspec.h:
 
-../test_render_window.h:
+../../includes/core/render_window.h:
 
-../test_x11_display.h:
-
-../../includes/core/x11_display.h:
-
-/usr/include/X11/Xlib.h:
-
-/usr/include/X11/X.h:
-
-/usr/include/X11/Xfuncproto.h:
-
-/usr/include/X11/Xosdefs.h:
+../../includes/core/fb_config.h:
 
 /usr/include/c++/4.8/memory:
 
@@ -458,3 +450,19 @@
 /usr/include/c++/4.8/bits/shared_ptr_base.h:
 
 /usr/include/c++/4.8/backward/auto_ptr.h:
+
+../../includes/core/non_copyable.h:
+
+../test_render_window.h:
+
+../test_x11_display.h:
+
+../../includes/core/x11_display.h:
+
+/usr/include/X11/Xlib.h:
+
+/usr/include/X11/X.h:
+
+/usr/include/X11/Xfuncproto.h:
+
+/usr/include/X11/Xosdefs.h:
