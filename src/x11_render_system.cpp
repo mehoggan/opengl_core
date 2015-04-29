@@ -1,6 +1,7 @@
 #include <core/render_system.h>
 
 #include <core/fb_config.h>
+#include <core/gl_functions.h>
 #include <core/x11_display.h>
 
 #include <chrono>
@@ -20,6 +21,7 @@ namespace opengl_core
   {
     XInitThreads();
 
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
     Display *&display = opengl_core::x11_display::acquire();
 
     // Set to 0 because this would be the initial version.
@@ -27,13 +29,9 @@ namespace opengl_core
     int glx_major = 0;
     int glx_minor = 0;
     if (!glXQueryVersion(display, &glx_major, &glx_minor)) {
+      std::cerr << "Failed to query glx version" << std::endl;
       destroy();
       return false;
-    } else {
-      if (glx_major < requested_major) {
-        destroy();
-        return false;
-      }
     }
 
     // According to https://www.opengl.org/sdk/docs/man2/xhtml/
@@ -52,9 +50,10 @@ namespace opengl_core
     s_window.init(fbc);
     s_window.map();
 
-    s_context.init(s_window, fbc, 2, 0);
-
+    s_context.init(s_window, fbc, requested_major, requested_minor);
     s_context.make_current(s_window);
+
+    configure_gl_functions(requested_major, requested_minor);
   }
 
   void render_system::run(bool threaded)

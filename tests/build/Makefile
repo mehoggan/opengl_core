@@ -212,7 +212,7 @@ CPPFLAGS = -DNDEBUG
 CXX = g++
 CXXCPP = g++ -E
 CXXDEPMODE = depmode=gcc3
-CXXFLAGS = -O3
+CXXFLAGS = -O3 -std=gnu++11
 CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
 DEPDIR = .deps
@@ -222,10 +222,11 @@ DUMPBIN =
 ECHO_C = 
 ECHO_N = -n
 ECHO_T = 
-EGREP = /bin/grep -E
+EGREP = /usr/bin/grep -E
 EXEEXT = 
-FGREP = /bin/grep -F
-GREP = /bin/grep
+FGREP = /usr/bin/grep -F
+GREP = /usr/bin/grep
+HAVE_CXX11 = 
 INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
@@ -241,7 +242,7 @@ LN_S = ln -s
 LTLIBOBJS = 
 MAKEINFO = ${SHELL} /home/mhoggan/Devel/opengl_core/tests/build/missing makeinfo
 MANIFEST_TOOL = :
-MKDIR_P = /bin/mkdir -p
+MKDIR_P = /usr/bin/mkdir -p
 NM = /usr/bin/nm -B
 NMEDIT = 
 OBJDUMP = objdump
@@ -257,9 +258,9 @@ PACKAGE_URL =
 PACKAGE_VERSION = 0.1
 PATH_SEPARATOR = :
 RANLIB = ranlib
-SED = /bin/sed
+SED = /usr/bin/sed
 SET_MAKE = 
-SHELL = /bin/bash
+SHELL = /bin/sh
 STRIP = strip
 VERSION = 0.1
 abs_builddir = /home/mhoggan/Devel/opengl_core/tests/build
@@ -319,7 +320,8 @@ AM_CPPFLAGS = -I../../includes -I../../ -I../
 ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS} -I m4
 AM_CXXFLAGS = -std=gnu++11
 test_opengl_core_LDFLAGS = -no-install \
-	-L$(abs_top_builddir)/../../build/.libs/ -lopengl_core -lGL -lX11 -glx
+	-L$(abs_top_builddir)/../../build/.libs/ -L/usr/lib64/nvidia \
+	-lopengl_core -lGL -lX11 -glx
 
 test_opengl_core_SOURCES = \
 	../main.cpp \

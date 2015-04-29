@@ -14,8 +14,9 @@ namespace opengl_core
       s_display = ::XOpenDisplay(NULL); // Open local display only
       assert(s_display && "Failed to open XDisplay");
     }
-    std::cout << "Acquired display " << (&s_display) << std::endl;
+    std::cout << "Acquired display " << (&s_display);
     ++s_use_count;
+    std::cout << " -- Use count now " << s_use_count << std::endl;
 
     return s_display;
   }
@@ -31,7 +32,8 @@ namespace opengl_core
       ::XCloseDisplay(s_display);
       s_display = 0;
     }
-    std::cout << "Closing display " << (&s_display) << std::endl;
+    std::cout << "Closing display " << (&s_display);
     --s_use_count;
+    std::cout << " -- Use count now " << s_use_count << std::endl;
   }
 }
