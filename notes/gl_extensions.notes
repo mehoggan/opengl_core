@@ -1,11 +1,34 @@
 OpenGL 1.1
 GL_EXT_vertex_array
+  extern void APIENTRY glArrayElementEXT (GLint);
+  extern void APIENTRY glColorPointerEXT (GLint, GLenum, GLsizei, GLsizei, const GLvoid *);
+  extern void APIENTRY glDrawArraysEXT (GLenum, GLint, GLsizei);
+  extern void APIENTRY glEdgeFlagPointerEXT (GLsizei, GLsizei, const GLboolean *);
+  extern void APIENTRY glGetPointervEXT (GLenum, GLvoid* *);
+  extern void APIENTRY glIndexPointerEXT (GLenum, GLsizei, GLsizei, const GLvoid *);
+  extern void APIENTRY glNormalPointerEXT (GLenum, GLsizei, GLsizei, const GLvoid *);
+  extern void APIENTRY glTexCoordPointerEXT (GLint, GLenum, GLsizei, GLsizei, const GLvoid *);
+  extern void APIENTRY glVertexPointerEXT (GLint, GLenum, GLsizei, GLsizei, const GLvoid *);
 GL_EXT_polygon_offset
+  extern void APIENTRY glPolygonOffsetEXT (GLfloat, GLfloat);
 GL_EXT_blend_logic_op
 GL_EXT_texture
 GL_EXT_copy_texture
+  extern void APIENTRY glCopyTexImage1DEXT (GLenum, GLint, GLenum, GLint, GLint, GLsizei, GLint);
+  extern void APIENTRY glCopyTexImage2DEXT (GLenum, GLint, GLenum, GLint, GLint, GLsizei, GLsizei, GLint);
+  extern void APIENTRY glCopyTexSubImage1DEXT (GLenum, GLint, GLint, GLint, GLint, GLsizei);
+  extern void APIENTRY glCopyTexSubImage2DEXT (GLenum, GLint, GLint, GLint, GLint, GLint, GLsizei, GLsizei);
+  extern void APIENTRY glCopyTexSubImage3DEXT (GLenum, GLint, GLint, GLint, GLint, GLint, GLint, GLsizei, GLsizei);
 GL_EXT_subtexture
+  extern void APIENTRY glTexSubImage1DEXT (GLenum, GLint, GLint, GLsizei, GLenum, GLenum, const GLvoid *);
+  extern void APIENTRY glTexSubImage2DEXT (GLenum, GLint, GLint, GLint, GLsizei, GLsizei, GLenum, GLenum, const GLvoid *);
 GL_EXT_texture_object
+  extern GLboolean APIENTRY glAreTexturesResidentEXT (GLsizei, const GLuint *, GLboolean *);
+  extern void APIENTRY glBindTextureEXT (GLenum, GLuint);
+  extern void APIENTRY glDeleteTexturesEXT (GLsizei, const GLuint *);
+  extern void APIENTRY glGenTexturesEXT (GLsizei, GLuint *);
+  extern GLboolean APIENTRY glIsTextureEXT (GLuint);
+  extern void APIENTRY glPrioritizeTexturesEXT (GLsizei, const GLuint *, const GLclampf *);
 
 OpenGL 1.2
 GL_EXT_color_table
