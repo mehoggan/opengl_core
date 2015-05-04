@@ -1,5 +1,6 @@
 #include <core/render_system.h>
 
+#include <core/extension_registry.h>
 #include <core/fb_config.h>
 #include <core/gl_functions.h>
 #include <core/x11_display.h>
@@ -16,13 +17,14 @@ namespace opengl_core
   thread_local render_context render_system::s_context;
   thread_local render_window render_system::s_window;
 
-  bool render_system::init(const int requested_major,
-    const int requested_minor)
+  bool render_system::init()
   {
     XInitThreads();
 
-    std::cout << __FILE__ << " " << __LINE__ << std::endl;
     Display *&display = opengl_core::x11_display::acquire();
+
+    extension_registry func_reg;
+    func_reg.init();
 
     // Set to 0 because this would be the initial version.
     // Negagive numbers do not make since here.
@@ -50,10 +52,10 @@ namespace opengl_core
     s_window.init(fbc);
     s_window.map();
 
-    s_context.init(s_window, fbc, requested_major, requested_minor);
+    s_context.init(s_window, fbc);
     s_context.make_current(s_window);
 
-    configure_gl_functions(requested_major, requested_minor);
+    configure_gl_functions(s_context);
   }
 
   void render_system::run(bool threaded)

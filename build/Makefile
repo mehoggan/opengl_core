@@ -129,9 +129,10 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 libopengl_core_la_LIBADD =
 am__dirstamp = $(am__leading_dot)dirstamp
 am_libopengl_core_la_OBJECTS = ../src/extension_checker.lo \
-	../src/gl_functions.lo ../src/x11_display.lo \
-	../src/x11_fb_config.lo ../src/x11_render_context.lo \
-	../src/x11_render_system.lo ../src/x11_render_window.lo
+	../src/extension_registry.lo ../src/x11_gl_functions.lo \
+	../src/x11_display.lo ../src/x11_fb_config.lo \
+	../src/x11_render_context.lo ../src/x11_render_system.lo \
+	../src/x11_render_window.lo
 libopengl_core_la_OBJECTS = $(am_libopengl_core_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
@@ -233,11 +234,11 @@ CC = gcc
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2
 CPP = gcc -E
-CPPFLAGS = -DNDEBUG
+CPPFLAGS = -DDEBUG
 CXX = g++
 CXXCPP = g++ -E
 CXXDEPMODE = depmode=gcc3
-CXXFLAGS = -O3 -std=gnu++11
+CXXFLAGS = -g -O0 -std=gnu++11
 CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
 DEPDIR = .deps
@@ -349,7 +350,8 @@ AM_CXXFLAGS = -std=gnu++11
 # List your sources
 libopengl_core_la_SOURCES = \
 	../src/extension_checker.cpp \
-	../src/gl_functions.cpp \
+	../src/extension_registry.cpp \
+	../src/x11_gl_functions.cpp \
 	../src/x11_display.cpp \
 	../src/x11_fb_config.cpp \
 	../src/x11_render_context.cpp \
@@ -458,7 +460,9 @@ clean-libLTLIBRARIES:
 	@: > ../src/$(DEPDIR)/$(am__dirstamp)
 ../src/extension_checker.lo: ../src/$(am__dirstamp) \
 	../src/$(DEPDIR)/$(am__dirstamp)
-../src/gl_functions.lo: ../src/$(am__dirstamp) \
+../src/extension_registry.lo: ../src/$(am__dirstamp) \
+	../src/$(DEPDIR)/$(am__dirstamp)
+../src/x11_gl_functions.lo: ../src/$(am__dirstamp) \
 	../src/$(DEPDIR)/$(am__dirstamp)
 ../src/x11_display.lo: ../src/$(am__dirstamp) \
 	../src/$(DEPDIR)/$(am__dirstamp)
@@ -483,9 +487,10 @@ distclean-compile:
 	-rm -f *.tab.c
 
 include ../src/$(DEPDIR)/extension_checker.Plo
-include ../src/$(DEPDIR)/gl_functions.Plo
+include ../src/$(DEPDIR)/extension_registry.Plo
 include ../src/$(DEPDIR)/x11_display.Plo
 include ../src/$(DEPDIR)/x11_fb_config.Plo
+include ../src/$(DEPDIR)/x11_gl_functions.Plo
 include ../src/$(DEPDIR)/x11_render_context.Plo
 include ../src/$(DEPDIR)/x11_render_system.Plo
 include ../src/$(DEPDIR)/x11_render_window.Plo

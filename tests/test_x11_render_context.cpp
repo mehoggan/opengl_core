@@ -20,7 +20,7 @@ bool test_render_context::run()
   window.map();
 
   opengl_core::render_context context;
-  context.init(window, fbc, 2, 0);
+  context.init(window, fbc);
 
   context.make_current(window);
 

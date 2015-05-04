@@ -33,9 +33,13 @@ namespace opengl_core
   struct render_context::context_impl
   {
     GLXContext m_context;
+    GLint m_major;
+    GLint m_minor;
 
     context_impl() :
-      m_context(0)
+      m_context(0),
+      m_major(-1),
+      m_minor(-1)
     {}
   };
 
@@ -46,8 +50,7 @@ namespace opengl_core
   render_context::~render_context()
   {}
 
-  void render_context::init(render_window &window, fb_config &fbc,
-    const int major, const int minor)
+  void render_context::init(render_window &window, fb_config &fbc)
   {
     Display *&display = x11_display::acquire();
     GLXFBConfig &config = *(static_cast<GLXFBConfig*>(fbc.impl()));
@@ -64,58 +67,78 @@ namespace opengl_core
     const int screen = DefaultScreen(display);
     const char *glx_exts = glXQueryExtensionsString(display, screen);
 
-    glXCreateContextAttribsARBProc glXCreateContextAttribsARB =
-      (glXCreateContextAttribsARBProc)glXGetProcAddressARB(
-        (const GLubyte *)"glXCreateContextAttribsARB");
+    glXCreateContextAttribsARBProc glXCreateContextAttribsARB = NULL;
+    if (is_extension_supported(glx_exts, "GLX_ARB_get_proc_address")) {
+      std::cout << "Using glXGetProcAddressARB" << std::endl;
+      glXCreateContextAttribsARB = (glXCreateContextAttribsARBProc)
+        glXGetProcAddressARB((const GLubyte *)"glXCreateContextAttribsARB");
+    } else {
+      std::cout << "Using glXGetProcAddress" << std::endl;
+      glXCreateContextAttribsARB = (glXCreateContextAttribsARBProc)
+        glXGetProcAddress((const GLubyte *)"glXCreateContextAttribsARB");
+    }
 
     if (!is_extension_supported(glx_exts, "GLX_ARB_create_context" ) ||
       !glXCreateContextAttribsARB) {
-      if (major <= glx_default_major && minor <= glx_default_minor) {
-        x11_display::release();
-        assert(false && "No possible way to create a context provided input.");
-      } else {
-        std::cerr << "Returning default context" << std::endl;
-        m_impl->m_context = glXCreateNewContext(display, config, GLX_RGBA_TYPE,
-          NULL, True); // NULL -> No Sharing of Context
-        assert(m_impl->m_context && "Failed to create default context.");
-      }
+
+      std::cerr << "Returning default context" << std::endl;
+      m_impl->m_context = glXCreateNewContext(display, config, GLX_RGBA_TYPE,
+        NULL, True); // NULL -> No Sharing of Context
+      assert(m_impl->m_context && "Failed to create default context.");
+
     } else {
       XLockDisplay(display);
       int (*oldHandler)(Display*, XErrorEvent*) = XSetErrorHandler(
         &context_error_handler);
       XUnlockDisplay(display);
 
-      int context_attribs[] =
-      {
-        GLX_CONTEXT_MAJOR_VERSION_ARB, major,
-        GLX_CONTEXT_MINOR_VERSION_ARB, minor,
-        None
-      };
-      m_impl->m_context = glXCreateContextAttribsARB(display, config, NULL,
-        True, context_attribs); // NULL -> No Sharing of Context
+      GLint versions[][2] = {
+        {4,5}, {4,4}, {4,3}, {4,2}, {4,1}, {4,0},
+        {3,3}, {3,2}, {3,1}, {3,0},
+        {2,1}, {2,0},
+        {1,5}, {1,4}, {1,3}, {1,2}, {1,1}, {1,0}};
 
-      // Sync to ensure any errors generated are processed.
-      XSync(display, False);
-      if (!context_error && m_impl->m_context) {
-        std::cout << "Created a " << major << "." << minor << " GL Context."
-          << std::endl;
-      } else {
-        // Couldn't create requeted context.  Fall back to old-style 2.x
-        // context. When a context version below what is requested,
-        // implementations will return the newest context version compatible
-        // with OpenGL versions less than version requested.
-        context_attribs[1] = 1;
-        context_attribs[3] = 0;
-        context_error = false;
-        std::cerr << "Created a old-style GLX Context." << std::endl;
+      unsigned int count = sizeof(versions) / (2 * sizeof(GLint));
+      unsigned int i = 0;
+      for (; i < count; ++i) {
+        GLint major = versions[i][0];
+        GLint minor = versions[i][1];
+
+        std::cout << "Trying to acquire OpenGL " << major << "." << minor
+          << " versioned context" << std::endl;
+
+        int context_attribs[] =
+        {
+          GLX_CONTEXT_MAJOR_VERSION_ARB, major,
+          GLX_CONTEXT_MINOR_VERSION_ARB, minor,
+          None
+        };
+
         m_impl->m_context = glXCreateContextAttribsARB(display, config, NULL,
           True, context_attribs); // NULL -> No Sharing of Context
+
+        XSync(display, False);
+
+        if (!context_error && m_impl->m_context) {
+          std::cout << "Created a " << major << "." << minor << " GL Context."
+            << std::endl;
+          m_impl->m_major = major;
+          m_impl->m_minor = minor;
+          break;
+        } else {
+          context_error = false;
+        }
       }
 
-      if (!glXIsDirect(display, m_impl->m_context)) {
-        std::cout << "Indirect GLX rendering context obtained." << std::endl;
+      if (i != count) {
+        if (!glXIsDirect(display, m_impl->m_context)) {
+          std::cout << "Indirect GLX rendering context obtained." << std::endl;
+        } else {
+          std::cout << "Direct GLX rendering context obtained." << std::endl;
+        }
       } else {
-        std::cout << "Direct GLX rendering context obtained." << std::endl;
+        std::cerr << "Failed to create context" << std::endl;
+        assert(false && "Failed to create context");
       }
     }
 
@@ -126,7 +149,9 @@ namespace opengl_core
   {
     Display *&display = x11_display::acquire();
     Window &win = *(static_cast<Window*>(window.impl()));
-    glXMakeCurrent(display, win, m_impl->m_context);
+    std::cout << "Making context current" << std::endl;
+    assert(glXMakeCurrent(display, win, m_impl->m_context) &&
+      "Failed to make context current");
     x11_display::release();
   }
 
@@ -148,5 +173,15 @@ namespace opengl_core
 
   void *render_context::impl()
   {
+  }
+
+  int render_context::query_major_version() const
+  {
+    return m_impl->m_major;
+  }
+
+  int render_context::query_minor_version() const
+  {
+    return m_impl->m_minor;
   }
 }

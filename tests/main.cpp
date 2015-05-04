@@ -20,6 +20,7 @@ int main(int argc, char *argv[])
     std::shared_ptr<test_base>(new test_render_context())
   };
 
+  std::cout << "Going to run " << tests.size() << " tests." << std::endl;
   for(std::size_t i = 0; i < tests.size(); ++i) {
     std::cout << std::endl;
     std::cout << std::endl;

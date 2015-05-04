@@ -21,13 +21,15 @@ namespace opengl_core
     render_context();
     ~render_context();
 
-    void init(render_window &window, fb_config &fbc, const int major,
-      const int minor);
+    void init(render_window &window, fb_config &fbc);
     void make_current(render_window &window);
     void make_not_current();
     void destroy();
 
     void *impl();
+
+    int query_major_version() const;
+    int query_minor_version() const;
   };
 }
 

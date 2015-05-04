@@ -17,8 +17,7 @@ namespace opengl_core
     static thread_local render_window s_window;
 
   public:
-    static thread_local bool init(const int requested_major,
-      const int requested_minor);
+    static thread_local bool init();
 
     static thread_local void run(bool threaded = true);
 
