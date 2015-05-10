@@ -55,7 +55,7 @@ namespace opengl_core
     s_context.init(s_window, fbc);
     s_context.make_current(s_window);
 
-    configure_gl_functions(s_context);
+    gl_functions::configure(s_context);
   }
 
   void render_system::run(bool threaded)

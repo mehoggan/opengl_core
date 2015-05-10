@@ -2,28 +2,38 @@
 #define EXTENSION_REGISTRY_H_INCLUDED
 
 #include <core/non_copyable.h>
+#include <core/extension_checker.h>
+#include <core/render_context.h>
 
+#include <cstring>
 #include <functional>
-#include <unordered_set>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
 #include <GL/gl.h>
+#include <GL/glext.h>
 
 namespace opengl_core
 {
   struct registry_item
   {
-  public:
-    std::pair<GLshort, GLshort> m_major_minor;
-    std::vector<std::string> m_extensions;
+  private:
+    const char *m_extension;
+    bool m_loaded_gl_funcs;
 
   public:
-    registry_item(GLshort major, GLshort minor);
+    explicit registry_item(const char *extension);
+
+    const char *get_extension_name() const;
+
+    bool get_if_loaded_funcs() const;
+
+    void set_if_loaded_funcs(bool did_load);
 
     friend bool operator==(const registry_item &lhs, const registry_item &rhs)
     {
-      return lhs.m_major_minor == rhs.m_major_minor;
+      return (strcmp(lhs.m_extension, rhs.m_extension) == 0);
     }
   };
 }
@@ -35,21 +45,13 @@ namespace std
   {
     size_t operator()(const opengl_core::registry_item &i) const
     {
-      GLint x = i.m_major_minor.first;
-      x &= 0x0000ffff;
-      x = (x | (x << 8)) & 0x00ff00ff;
-      x = (x | (x << 4)) & 0x0f0f0f0f;
-      x = (x | (x << 2)) & 0x33333333;
-      x = (x | (x << 1)) & 0x55555555;
-
-      GLint y = i.m_major_minor.second;
-      y &= 0x0000ffff;
-      y = (y | (y << 8)) & 0x00ff00ff;
-      y = (y | (y << 4)) & 0x0f0f0f0f;
-      y = (y | (y << 2)) & 0x33333333;
-      y = (y | (y << 1)) & 0x55555555;
-
-      return (x | (y << 1));
+      const std::string s(i.get_extension_name());
+      size_t hash = 0;
+      size_t offset = 'a' - 1;
+      for(string::const_iterator it = s.begin(); it != s.end(); ++it) {
+        hash = hash << 1 | (*it - offset);
+      }
+      return hash;
     }
   };
 }
@@ -59,11 +61,21 @@ namespace opengl_core
   class extension_registry : public non_copyable
   {
   private:
-    std::unordered_set<registry_item> m_table;
+    typedef bool (*load_func)();
+    load_func m_func;
+
+    std::unordered_map<registry_item, load_func> m_table;
 
   public:
     void init();
+
+    bool has_extension_loaded(const char *extension) const;
+
+    bool load_extension(const char *extension);
   };
 }
+
+extern PFNGLDRAWARRAYSINSTANCEDEXTPROC glDrawArraysInstanced;
+extern PFNGLDRAWELEMENTSINSTANCEDEXTPROC glDrawElementsInstanced;
 
 #endif
