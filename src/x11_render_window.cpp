@@ -59,7 +59,6 @@ namespace opengl_core
       x11_display::release();
       assert(m_impl->m_window && "Failed to create X11 window");
     }
-    std::cout << "Created Window " << m_impl->m_window << std::endl;
 
     x11_display::release();
   }
@@ -67,7 +66,6 @@ namespace opengl_core
   void render_window::map()
   {
     Display *&display = x11_display::acquire();
-    std::cout << "Mapping Window " << m_impl->m_window << std::endl;
     XMapWindow(display, m_impl->m_window);
     x11_display::release();
   }
@@ -76,7 +74,6 @@ namespace opengl_core
   {
     Display *&display = x11_display::acquire();
     if (m_impl->m_window) {
-      std::cout << "Destroying Window " << m_impl->m_window << std::endl;
       XDestroyWindow(display, m_impl->m_window);
     }
     x11_display::release();

@@ -1,7 +1,12 @@
 #include <core/extension_registry.h>
 
+#include <core/extension_checker.h>
+#include <core/x11_display.h>
+
 #include <iostream>
 #include <iterator>
+
+#include <GL/glx.h>
 
 namespace opengl_core
 {
@@ -31,6 +36,37 @@ PFNGLDRAWELEMENTSINSTANCEDEXTPROC glDrawElementsInstanced = 0;
 
 namespace
 {
+  struct glx_which_proc
+  {
+  public:
+    enum class type
+    {
+      arb,
+      legacy,
+      unknown
+    };
+
+  public:
+    static bool use_arb()
+    {
+      static glx_which_proc::type type = glx_which_proc::type::unknown;
+
+      if (type == glx_which_proc::type::unknown) {
+        Display *&display = opengl_core::x11_display::acquire();
+        const int screen = DefaultScreen(display);
+        const char *glx_exts = glXQueryExtensionsString(display, screen);
+        if (opengl_core::is_extension_supported(glx_exts,
+          "GLX_ARB_get_proc_address")) {
+          type = glx_which_proc::type::arb;
+        } else {
+          type = glx_which_proc::type::legacy;
+        }
+      }
+
+      return (type == glx_which_proc::type::arb) ? true : false;
+    }
+  };
+
   /* Dependencies
    *   OpenGL 4.0 or ARB_draw_indirect is required.
    *   Written against the OpenGL 4.1 Specification, Core Profile,
@@ -60,7 +96,9 @@ namespace
    */
   bool GL_ARB_base_instance_load()
   {
-    return true;
+    if (glx_which_proc::use_arb()) {
+    } else {
+    }
   }
 
   bool GL_ARB_bindless_texture_load()
