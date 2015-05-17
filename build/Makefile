@@ -129,7 +129,7 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 libopengl_core_la_LIBADD =
 am__dirstamp = $(am__leading_dot)dirstamp
 am_libopengl_core_la_OBJECTS = ../src/extension_checker.lo \
-	../src/x11_extension_registry.lo ../src/x11_gl_functions.lo \
+	../src/posix_symbol_loader.lo ../src/x11_gl_functions.lo \
 	../src/x11_display.lo ../src/x11_fb_config.lo \
 	../src/x11_render_context.lo ../src/x11_render_system.lo \
 	../src/x11_render_window.lo
@@ -350,7 +350,7 @@ AM_CXXFLAGS = -std=gnu++11
 # List your sources
 libopengl_core_la_SOURCES = \
 	../src/extension_checker.cpp \
-	../src/x11_extension_registry.cpp \
+	../src/posix_symbol_loader.cpp \
 	../src/x11_gl_functions.cpp \
 	../src/x11_display.cpp \
 	../src/x11_fb_config.cpp \
@@ -460,7 +460,7 @@ clean-libLTLIBRARIES:
 	@: > ../src/$(DEPDIR)/$(am__dirstamp)
 ../src/extension_checker.lo: ../src/$(am__dirstamp) \
 	../src/$(DEPDIR)/$(am__dirstamp)
-../src/x11_extension_registry.lo: ../src/$(am__dirstamp) \
+../src/posix_symbol_loader.lo: ../src/$(am__dirstamp) \
 	../src/$(DEPDIR)/$(am__dirstamp)
 ../src/x11_gl_functions.lo: ../src/$(am__dirstamp) \
 	../src/$(DEPDIR)/$(am__dirstamp)
@@ -487,8 +487,8 @@ distclean-compile:
 	-rm -f *.tab.c
 
 include ../src/$(DEPDIR)/extension_checker.Plo
+include ../src/$(DEPDIR)/posix_symbol_loader.Plo
 include ../src/$(DEPDIR)/x11_display.Plo
-include ../src/$(DEPDIR)/x11_extension_registry.Plo
 include ../src/$(DEPDIR)/x11_fb_config.Plo
 include ../src/$(DEPDIR)/x11_gl_functions.Plo
 include ../src/$(DEPDIR)/x11_render_context.Plo

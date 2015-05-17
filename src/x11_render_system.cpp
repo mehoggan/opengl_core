@@ -1,6 +1,5 @@
 #include <core/render_system.h>
 
-#include <core/extension_registry.h>
 #include <core/fb_config.h>
 #include <core/gl_functions.h>
 #include <core/x11_display.h>
@@ -22,9 +21,6 @@ namespace opengl_core
     XInitThreads();
 
     Display *&display = opengl_core::x11_display::acquire();
-
-    extension_registry func_reg;
-    func_reg.init();
 
     // Set to 0 because this would be the initial version.
     // Negagive numbers do not make since here.

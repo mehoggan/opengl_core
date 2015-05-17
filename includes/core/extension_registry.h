@@ -1,81 +1,327 @@
 #ifndef EXTENSION_REGISTRY_H_INCLUDED
 #define EXTENSION_REGISTRY_H_INCLUDED
 
-#include <core/non_copyable.h>
-#include <core/extension_checker.h>
-#include <core/render_context.h>
-
-#include <cstring>
-#include <functional>
-#include <unordered_map>
-#include <utility>
-#include <vector>
-
 #include <GL/gl.h>
 #include <GL/glext.h>
 
-namespace opengl_core
-{
-  struct registry_item
-  {
-  private:
-    const char *m_extension;
-    bool m_loaded_gl_funcs;
+// OpenGL 1.2
+extern PFNGLMINMAXPROC glMinmax;
+extern PFNGLGETMINMAXPROC glGetMinmax;
+extern PFNGLHISTOGRAMPROC glHistogram;
+extern PFNGLBLENDCOLORPROC glBlendColor;
+extern PFNGLCOLORTABLEPROC glColorTable;
+extern PFNGLTEXIMAGE3DPROC glTexImage3D;
+extern PFNGLRESETMINMAXPROC glResetMinmax;
+extern PFNGLGETHISTOGRAMPROC glGetHistogram;
+extern PFNGLBLENDEQUATIONPROC glBlendEquation;
+extern PFNGLGETCOLORTABLEPROC glGetColorTable;
+extern PFNGLCOLORSUBTABLEPROC glColorSubTable;
+extern PFNGLTEXSUBIMAGE3DPROC glTexSubImage3D;
+extern PFNGLCOPYCOLORTABLEPROC glCopyColorTable;
+extern PFNGLRESETHISTOGRAMPROC glResetHistogram;
+extern PFNGLDRAWRANGEELEMENTSPROC glDrawRangeElements;
+extern PFNGLCOPYCOLORSUBTABLEPROC glCopyColorSubTable;
+extern PFNGLSEPARABLEFILTER2DPROC glSeparableFilter2D;
+extern PFNGLCOPYTEXSUBIMAGE3DPROC glCopyTexSubImage3D;
+extern PFNGLGETSEPARABLEFILTERPROC glGetSeparableFilter;
+extern PFNGLCONVOLUTIONFILTER1DPROC glConvolutionFilter1D;
+extern PFNGLCONVOLUTIONFILTER2DPROC glConvolutionFilter2D;
+extern PFNGLGETCONVOLUTIONFILTERPROC glGetConvolutionFilter;
+extern PFNGLGETMINMAXPARAMETERFVPROC glGetMinmaxParameterfv;
+extern PFNGLGETMINMAXPARAMETERIVPROC glGetMinmaxParameteriv;
+extern PFNGLCOLORTABLEPARAMETERFVPROC glColorTableParameterfv;
+extern PFNGLCOLORTABLEPARAMETERIVPROC glColorTableParameteriv;
+extern PFNGLCONVOLUTIONPARAMETERFPROC glConvolutionParameterf;
+extern PFNGLCONVOLUTIONPARAMETERIPROC glConvolutionParameteri;
+extern PFNGLCONVOLUTIONPARAMETERFVPROC glConvolutionParameterfv;
+extern PFNGLCONVOLUTIONPARAMETERIVPROC glConvolutionParameteriv;
+extern PFNGLCOPYCONVOLUTIONFILTER1DPROC glCopyConvolutionFilter1D;
+extern PFNGLCOPYCONVOLUTIONFILTER2DPROC glCopyConvolutionFilter2D;
+extern PFNGLGETHISTOGRAMPARAMETERFVPROC glGetHistogramParameterfv;
+extern PFNGLGETHISTOGRAMPARAMETERIVPROC glGetHistogramParameteriv;
+extern PFNGLGETCOLORTABLEPARAMETERFVPROC glGetColorTableParameterfv;
+extern PFNGLGETCOLORTABLEPARAMETERIVPROC glGetColorTableParameteriv;
+extern PFNGLGETCONVOLUTIONPARAMETERFVPROC glGetConvolutionParameterfv;
+extern PFNGLGETCONVOLUTIONPARAMETERIVPROC glGetConvolutionParameteriv;
 
-  public:
-    explicit registry_item(const char *extension);
+// OpenGL 1.3
+extern PFNGLACTIVETEXTUREPROC glActiveTexture;
+extern PFNGLSAMPLECOVERAGEPROC glSampleCoverage;
+extern PFNGLMULTITEXCOORD1DPROC glMultiTexCoord1d;
+extern PFNGLMULTITEXCOORD1FPROC glMultiTexCoord1f;
+extern PFNGLMULTITEXCOORD1IPROC glMultiTexCoord1i;
+extern PFNGLMULTITEXCOORD1SPROC glMultiTexCoord1s;
+extern PFNGLMULTITEXCOORD2DPROC glMultiTexCoord2d;
+extern PFNGLMULTITEXCOORD2FPROC glMultiTexCoord2f;
+extern PFNGLMULTITEXCOORD2IPROC glMultiTexCoord2i;
+extern PFNGLMULTITEXCOORD2SPROC glMultiTexCoord2s;
+extern PFNGLMULTITEXCOORD3DPROC glMultiTexCoord3d;
+extern PFNGLMULTITEXCOORD3FPROC glMultiTexCoord3f;
+extern PFNGLMULTITEXCOORD3IPROC glMultiTexCoord3i;
+extern PFNGLMULTITEXCOORD3SPROC glMultiTexCoord3s;
+extern PFNGLMULTITEXCOORD4DPROC glMultiTexCoord4d;
+extern PFNGLMULTITEXCOORD4FPROC glMultiTexCoord4f;
+extern PFNGLMULTITEXCOORD4IPROC glMultiTexCoord4i;
+extern PFNGLMULTITEXCOORD4SPROC glMultiTexCoord4s;
+extern PFNGLMULTITEXCOORD1DVPROC glMultiTexCoord1dv;
+extern PFNGLMULTITEXCOORD1FVPROC glMultiTexCoord1fv;
+extern PFNGLMULTITEXCOORD1IVPROC glMultiTexCoord1iv;
+extern PFNGLMULTITEXCOORD1SVPROC glMultiTexCoord1sv;
+extern PFNGLMULTITEXCOORD2DVPROC glMultiTexCoord2dv;
+extern PFNGLMULTITEXCOORD2FVPROC glMultiTexCoord2fv;
+extern PFNGLMULTITEXCOORD2IVPROC glMultiTexCoord2iv;
+extern PFNGLMULTITEXCOORD2SVPROC glMultiTexCoord2sv;
+extern PFNGLMULTITEXCOORD3DVPROC glMultiTexCoord3dv;
+extern PFNGLMULTITEXCOORD3FVPROC glMultiTexCoord3fv;
+extern PFNGLMULTITEXCOORD3IVPROC glMultiTexCoord3iv;
+extern PFNGLMULTITEXCOORD3SVPROC glMultiTexCoord3sv;
+extern PFNGLMULTITEXCOORD4DVPROC glMultiTexCoord4dv;
+extern PFNGLMULTITEXCOORD4FVPROC glMultiTexCoord4fv;
+extern PFNGLMULTITEXCOORD4IVPROC glMultiTexCoord4iv;
+extern PFNGLMULTITEXCOORD4SVPROC glMultiTexCoord4sv;
+extern PFNGLCLIENTACTIVETEXTUREPROC glClientActiveTexture;
+extern PFNGLLOADTRANSPOSEMATRIXFPROC glLoadTransposeMatrixf;
+extern PFNGLLOADTRANSPOSEMATRIXDPROC glLoadTransposeMatrixd;
+extern PFNGLMULTTRANSPOSEMATRIXFPROC glMultTransposeMatrixf;
+extern PFNGLMULTTRANSPOSEMATRIXDPROC glMultTransposeMatrixd;
+extern PFNGLCOMPRESSEDTEXIMAGE3DPROC glCompressedTexImage3D;
+extern PFNGLCOMPRESSEDTEXIMAGE2DPROC glCompressedTexImage2D;
+extern PFNGLCOMPRESSEDTEXIMAGE1DPROC glCompressedTexImage1D;
+extern PFNGLCOMPRESSEDTEXSUBIMAGE3DPROC glCompressedTexSubImage3D;
+extern PFNGLCOMPRESSEDTEXSUBIMAGE2DPROC glCompressedTexSubImage2D;
+extern PFNGLCOMPRESSEDTEXSUBIMAGE1DPROC glCompressedTexSubImage1D;
 
-    const char *get_extension_name() const;
+// OpenGL 1.4
+extern PFNGLFOGCOORDFPROC glFogCoordf;
+extern PFNGLFOGCOORDDPROC glFogCoordd;
+extern PFNGLFOGCOORDFVPROC glFogCoordfv;
+extern PFNGLFOGCOORDDVPROC glFogCoorddv;
+extern PFNGLWINDOWPOS2DPROC glWindowPos2d;
+extern PFNGLWINDOWPOS2FPROC glWindowPos2f;
+extern PFNGLWINDOWPOS2IPROC glWindowPos2i;
+extern PFNGLWINDOWPOS2SPROC glWindowPos2s;
+extern PFNGLWINDOWPOS3DPROC glWindowPos3d;
+extern PFNGLWINDOWPOS3FPROC glWindowPos3f;
+extern PFNGLWINDOWPOS3IPROC glWindowPos3i;
+extern PFNGLWINDOWPOS3SPROC glWindowPos3s;
+extern PFNGLWINDOWPOS2DVPROC glWindowPos2dv;
+extern PFNGLWINDOWPOS2FVPROC glWindowPos2fv;
+extern PFNGLWINDOWPOS2IVPROC glWindowPos2iv;
+extern PFNGLWINDOWPOS2SVPROC glWindowPos2sv;
+extern PFNGLWINDOWPOS3DVPROC glWindowPos3dv;
+extern PFNGLWINDOWPOS3FVPROC glWindowPos3fv;
+extern PFNGLWINDOWPOS3IVPROC glWindowPos3iv;
+extern PFNGLWINDOWPOS3SVPROC glWindowPos3sv;
+extern PFNGLFOGCOORDPOINTERPROC glFogCoordPointer;
+extern PFNGLMULTIDRAWARRAYSPROC glMultiDrawArrays;
+extern PFNGLPOINTPARAMETERFPROC glPointParameterf;
+extern PFNGLPOINTPARAMETERIPROC glPointParameteri;
+extern PFNGLPOINTPARAMETERFVPROC glPointParameterfv;
+extern PFNGLPOINTPARAMETERIVPROC glPointParameteriv;
+extern PFNGLSECONDARYCOLOR3BPROC glSecondaryColor3b;
+extern PFNGLSECONDARYCOLOR3DPROC glSecondaryColor3d;
+extern PFNGLSECONDARYCOLOR3FPROC glSecondaryColor3f;
+extern PFNGLSECONDARYCOLOR3IPROC glSecondaryColor3i;
+extern PFNGLSECONDARYCOLOR3SPROC glSecondaryColor3s;
+extern PFNGLBLENDFUNCSEPARATEPROC glBlendFuncSeparate;
+extern PFNGLMULTIDRAWELEMENTSPROC glMultiDrawElements;
+extern PFNGLSECONDARYCOLOR3BVPROC glSecondaryColor3bv;
+extern PFNGLSECONDARYCOLOR3DVPROC glSecondaryColor3dv;
+extern PFNGLSECONDARYCOLOR3FVPROC glSecondaryColor3fv;
+extern PFNGLSECONDARYCOLOR3IVPROC glSecondaryColor3iv;
+extern PFNGLSECONDARYCOLOR3SVPROC glSecondaryColor3sv;
+extern PFNGLSECONDARYCOLOR3UBPROC glSecondaryColor3ub;
+extern PFNGLSECONDARYCOLOR3UIPROC glSecondaryColor3ui;
+extern PFNGLSECONDARYCOLOR3USPROC glSecondaryColor3us;
+extern PFNGLSECONDARYCOLOR3UBVPROC glSecondaryColor3ubv;
+extern PFNGLSECONDARYCOLOR3UIVPROC glSecondaryColor3uiv;
+extern PFNGLSECONDARYCOLOR3USVPROC glSecondaryColor3usv;
+extern PFNGLSECONDARYCOLORPOINTERPROC glSecondaryColorPointer;
 
-    bool get_if_loaded_funcs() const;
+// OpenGL 1.5
+extern PFNGLISQUERYPROC glIsQuery;
+extern PFNGLENDQUERYPROC glEndQuery;
+extern PFNGLISBUFFERPROC glIsBuffer;
+extern PFNGLMAPBUFFERPROC glMapBuffer;
+extern PFNGLGENQUERIESPROC glGenQueries;
+extern PFNGLBEGINQUERYPROC glBeginQuery;
+extern PFNGLGETQUERYIVPROC glGetQueryiv;
+extern PFNGLBINDBUFFERPROC glBindBuffer;
+extern PFNGLGENBUFFERSPROC glGenBuffers;
+extern PFNGLBUFFERDATAPROC glBufferData;
+extern PFNGLUNMAPBUFFERPROC glUnmapBuffer;
+extern PFNGLDELETEQUERIESPROC glDeleteQueries;
+extern PFNGLDELETEBUFFERSPROC glDeleteBuffers;
+extern PFNGLBUFFERSUBDATAPROC glBufferSubData;
+extern PFNGLGETQUERYOBJECTIVPROC glGetQueryObjectiv;
+extern PFNGLGETBUFFERSUBDATAPROC glGetBufferSubData;
+extern PFNGLGETQUERYOBJECTUIVPROC glGetQueryObjectuiv;
+extern PFNGLGETBUFFERPOINTERVPROC glGetBufferPointerv;
+extern PFNGLGETBUFFERPARAMETERIVPROC glGetBufferParameteriv;
 
-    void set_if_loaded_funcs(bool did_load);
+// OpenGL 2.0
+extern PFNGLISSHADERPROC glIsShader;
+extern PFNGLISPROGRAMPROC glIsProgram;
+extern PFNGLUNIFORM1FPROC glUniform1f;
+extern PFNGLUNIFORM2FPROC glUniform2f;
+extern PFNGLUNIFORM3FPROC glUniform3f;
+extern PFNGLUNIFORM4FPROC glUniform4f;
+extern PFNGLUNIFORM1IPROC glUniform1i;
+extern PFNGLUNIFORM2IPROC glUniform2i;
+extern PFNGLUNIFORM3IPROC glUniform3i;
+extern PFNGLUNIFORM4IPROC glUniform4i;
+extern PFNGLUSEPROGRAMPROC glUseProgram;
+extern PFNGLUNIFORM1FVPROC glUniform1fv;
+extern PFNGLUNIFORM2FVPROC glUniform2fv;
+extern PFNGLUNIFORM3FVPROC glUniform3fv;
+extern PFNGLUNIFORM4FVPROC glUniform4fv;
+extern PFNGLUNIFORM1IVPROC glUniform1iv;
+extern PFNGLUNIFORM2IVPROC glUniform2iv;
+extern PFNGLUNIFORM3IVPROC glUniform3iv;
+extern PFNGLUNIFORM4IVPROC glUniform4iv;
+extern PFNGLDRAWBUFFERSPROC glDrawBuffers;
+extern PFNGLGETSHADERIVPROC glGetShaderiv;
+extern PFNGLLINKPROGRAMPROC glLinkProgram;
+extern PFNGLATTACHSHADERPROC glAttachShader;
+extern PFNGLCREATESHADERPROC glCreateShader;
+extern PFNGLDELETESHADERPROC glDeleteShader;
+extern PFNGLDETACHSHADERPROC glDetachShader;
+extern PFNGLGETPROGRAMIVPROC glGetProgramiv;
+extern PFNGLGETUNIFORMFVPROC glGetUniformfv;
+extern PFNGLGETUNIFORMIVPROC glGetUniformiv;
+extern PFNGLSHADERSOURCEPROC glShaderSource;
+extern PFNGLCOMPILESHADERPROC glCompileShader;
+extern PFNGLCREATEPROGRAMPROC glCreateProgram;
+extern PFNGLDELETEPROGRAMPROC glDeleteProgram;
+extern PFNGLVERTEXATTRIB1DPROC glVertexAttrib1d;
+extern PFNGLVERTEXATTRIB1FPROC glVertexAttrib1f;
+extern PFNGLVERTEXATTRIB1SPROC glVertexAttrib1s;
+extern PFNGLVERTEXATTRIB2DPROC glVertexAttrib2d;
+extern PFNGLVERTEXATTRIB2FPROC glVertexAttrib2f;
+extern PFNGLVERTEXATTRIB2SPROC glVertexAttrib2s;
+extern PFNGLVERTEXATTRIB3DPROC glVertexAttrib3d;
+extern PFNGLVERTEXATTRIB3FPROC glVertexAttrib3f;
+extern PFNGLVERTEXATTRIB3SPROC glVertexAttrib3s;
+extern PFNGLVERTEXATTRIB4DPROC glVertexAttrib4d;
+extern PFNGLVERTEXATTRIB4FPROC glVertexAttrib4f;
+extern PFNGLVERTEXATTRIB4SPROC glVertexAttrib4s;
+extern PFNGLGETACTIVEATTRIBPROC glGetActiveAttrib;
+extern PFNGLGETSHADERSOURCEPROC glGetShaderSource;
+extern PFNGLVALIDATEPROGRAMPROC glValidateProgram;
+extern PFNGLVERTEXATTRIB1DVPROC glVertexAttrib1dv;
+extern PFNGLVERTEXATTRIB1FVPROC glVertexAttrib1fv;
+extern PFNGLVERTEXATTRIB1SVPROC glVertexAttrib1sv;
+extern PFNGLVERTEXATTRIB2DVPROC glVertexAttrib2dv;
+extern PFNGLVERTEXATTRIB2FVPROC glVertexAttrib2fv;
+extern PFNGLVERTEXATTRIB2SVPROC glVertexAttrib2sv;
+extern PFNGLVERTEXATTRIB3DVPROC glVertexAttrib3dv;
+extern PFNGLVERTEXATTRIB3FVPROC glVertexAttrib3fv;
+extern PFNGLVERTEXATTRIB3SVPROC glVertexAttrib3sv;
+extern PFNGLVERTEXATTRIB4BVPROC glVertexAttrib4bv;
+extern PFNGLVERTEXATTRIB4DVPROC glVertexAttrib4dv;
+extern PFNGLVERTEXATTRIB4FVPROC glVertexAttrib4fv;
+extern PFNGLVERTEXATTRIB4IVPROC glVertexAttrib4iv;
+extern PFNGLVERTEXATTRIB4SVPROC glVertexAttrib4sv;
+extern PFNGLGETACTIVEUNIFORMPROC glGetActiveUniform;
+extern PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog;
+extern PFNGLUNIFORMMATRIX2FVPROC glUniformMatrix2fv;
+extern PFNGLUNIFORMMATRIX3FVPROC glUniformMatrix3fv;
+extern PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv;
+extern PFNGLVERTEXATTRIB4NBVPROC glVertexAttrib4Nbv;
+extern PFNGLVERTEXATTRIB4NIVPROC glVertexAttrib4Niv;
+extern PFNGLVERTEXATTRIB4NSVPROC glVertexAttrib4Nsv;
+extern PFNGLVERTEXATTRIB4NUBPROC glVertexAttrib4Nub;
+extern PFNGLVERTEXATTRIB4UBVPROC glVertexAttrib4ubv;
+extern PFNGLVERTEXATTRIB4UIVPROC glVertexAttrib4uiv;
+extern PFNGLVERTEXATTRIB4USVPROC glVertexAttrib4usv;
+extern PFNGLSTENCILOPSEPARATEPROC glStencilOpSeparate;
+extern PFNGLGETATTRIBLOCATIONPROC glGetAttribLocation;
+extern PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog;
+extern PFNGLGETVERTEXATTRIBDVPROC glGetVertexAttribdv;
+extern PFNGLGETVERTEXATTRIBFVPROC glGetVertexAttribfv;
+extern PFNGLGETVERTEXATTRIBIVPROC glGetVertexAttribiv;
+extern PFNGLVERTEXATTRIB4NUBVPROC glVertexAttrib4Nubv;
+extern PFNGLVERTEXATTRIB4NUIVPROC glVertexAttrib4Nuiv;
+extern PFNGLVERTEXATTRIB4NUSVPROC glVertexAttrib4Nusv;
+extern PFNGLBINDATTRIBLOCATIONPROC glBindAttribLocation;
+extern PFNGLGETATTACHEDSHADERSPROC glGetAttachedShaders;
+extern PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
+extern PFNGLSTENCILFUNCSEPARATEPROC glStencilFuncSeparate;
+extern PFNGLSTENCILMASKSEPARATEPROC glStencilMaskSeparate;
+extern PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
+extern PFNGLBLENDEQUATIONSEPARATEPROC glBlendEquationSeparate;
+extern PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray;
+extern PFNGLGETVERTEXATTRIBPOINTERVPROC glGetVertexAttribPointerv;
+extern PFNGLDISABLEVERTEXATTRIBARRAYPROC glDisableVertexAttribArray;
 
-    friend bool operator==(const registry_item &lhs, const registry_item &rhs)
-    {
-      return (strcmp(lhs.m_extension, rhs.m_extension) == 0);
-    }
-  };
-}
+// OpenGL 2.1
+extern PFNGLUNIFORMMATRIX2X3FVPROC glUniformMatrix2x3fv;
+extern PFNGLUNIFORMMATRIX3X2FVPROC glUniformMatrix3x2fv;
+extern PFNGLUNIFORMMATRIX2X4FVPROC glUniformMatrix2x4fv;
+extern PFNGLUNIFORMMATRIX4X2FVPROC glUniformMatrix4x2fv;
+extern PFNGLUNIFORMMATRIX3X4FVPROC glUniformMatrix3x4fv;
+extern PFNGLUNIFORMMATRIX4X3FVPROC glUniformMatrix4x3fv;
 
-namespace std
-{
-  template<>
-  struct hash<opengl_core::registry_item>
-  {
-    size_t operator()(const opengl_core::registry_item &i) const
-    {
-      const std::string s(i.get_extension_name());
-      size_t hash = 0;
-      size_t offset = 'a' - 1;
-      for(string::const_iterator it = s.begin(); it != s.end(); ++it) {
-        hash = hash << 1 | (*it - offset);
-      }
-      return hash;
-    }
-  };
-}
-
-namespace opengl_core
-{
-  class extension_registry : public non_copyable
-  {
-  private:
-    typedef bool (*load_func)();
-    load_func m_func;
-
-    std::unordered_map<registry_item, load_func> m_table;
-
-  public:
-    void init();
-
-    bool has_extension_loaded(const char *extension) const;
-
-    bool load_extension(const char *extension);
-  };
-}
-
-extern PFNGLDRAWARRAYSINSTANCEDEXTPROC glDrawArraysInstanced;
-extern PFNGLDRAWELEMENTSINSTANCEDEXTPROC glDrawElementsInstanced;
-
+// OpenGL 3.0
+// OpenGL 3.0 also reuses entry points from these extensions:
+//  ARB_framebuffer_object
+//  ARB_map_buffer_range
+//  ARB_vertex_array_object
+extern PFNGLENABLEIPROC glEnablei;
+extern PFNGLDISABLEIPROC glDisablei;
+extern PFNGLCOLORMASKIPROC glColorMaski;
+extern PFNGLISENABLEDIPROC glIsEnabledi;
+extern PFNGLCLAMPCOLORPROC glClampColor;
+extern PFNGLUNIFORM1UIPROC glUniform1ui;
+extern PFNGLUNIFORM2UIPROC glUniform2ui;
+extern PFNGLUNIFORM3UIPROC glUniform3ui;
+extern PFNGLUNIFORM4UIPROC glUniform4ui;
+extern PFNGLUNIFORM1UIVPROC glUniform1uiv;
+extern PFNGLUNIFORM2UIVPROC glUniform2uiv;
+extern PFNGLUNIFORM3UIVPROC glUniform3uiv;
+extern PFNGLUNIFORM4UIVPROC glUniform4uiv;
+extern PFNGLGETBOOLEANI_VPROC glGetBooleani_v;
+extern PFNGLGETINTEGERI_VPROC glGetIntegeri_v;
+extern PFNGLGETUNIFORMUIVPROC glGetUniformuiv;
+extern PFNGLCLEARBUFFERIVPROC glClearBufferiv;
+extern PFNGLCLEARBUFFERFVPROC glClearBufferfv;
+extern PFNGLCLEARBUFFERFIPROC glClearBufferfi;
+extern PFNGLBINDBUFFERBASEPROC glBindBufferBase;
+extern PFNGLCLEARBUFFERUIVPROC glClearBufferuiv;
+extern PFNGLBINDBUFFERRANGEPROC glBindBufferRange;
+extern PFNGLVERTEXATTRIBI1IPROC glVertexAttribI1i;
+extern PFNGLVERTEXATTRIBI2IPROC glVertexAttribI2i;
+extern PFNGLVERTEXATTRIBI3IPROC glVertexAttribI3i;
+extern PFNGLVERTEXATTRIBI4IPROC glVertexAttribI4i;
+extern PFNGLTEXPARAMETERIIVPROC glTexParameterIiv;
+extern PFNGLVERTEXATTRIBI1UIPROC glVertexAttribI1ui;
+extern PFNGLVERTEXATTRIBI2UIPROC glVertexAttribI2ui;
+extern PFNGLVERTEXATTRIBI3UIPROC glVertexAttribI3ui;
+extern PFNGLVERTEXATTRIBI4UIPROC glVertexAttribI4ui;
+extern PFNGLVERTEXATTRIBI1IVPROC glVertexAttribI1iv;
+extern PFNGLVERTEXATTRIBI2IVPROC glVertexAttribI2iv;
+extern PFNGLVERTEXATTRIBI3IVPROC glVertexAttribI3iv;
+extern PFNGLVERTEXATTRIBI4IVPROC glVertexAttribI4iv;
+extern PFNGLVERTEXATTRIBI4BVPROC glVertexAttribI4bv;
+extern PFNGLVERTEXATTRIBI4SVPROC glVertexAttribI4sv;
+extern PFNGLTEXPARAMETERIUIVPROC glTexParameterIuiv;
+extern PFNGLVERTEXATTRIBI1UIVPROC glVertexAttribI1uiv;
+extern PFNGLVERTEXATTRIBI2UIVPROC glVertexAttribI2uiv;
+extern PFNGLVERTEXATTRIBI3UIVPROC glVertexAttribI3uiv;
+extern PFNGLVERTEXATTRIBI4UIVPROC glVertexAttribI4uiv;
+extern PFNGLVERTEXATTRIBI4UBVPROC glVertexAttribI4ubv;
+extern PFNGLVERTEXATTRIBI4USVPROC glVertexAttribI4usv;
+extern PFNGLGETVERTEXATTRIBIIVPROC glGetVertexAttribIiv;
+extern PFNGLGETTEXPARAMETERIIVPROC glGetTexParameterIiv;
+extern PFNGLGETVERTEXATTRIBIUIVPROC glGetVertexAttribIuiv;
+extern PFNGLGETFRAGDATALOCATIONPROC glGetFragDataLocation;
+extern PFNGLGETTEXPARAMETERIUIVPROC glGetTexParameterIuiv;
+extern PFNGLENDTRANSFORMFEEDBACKPROC glEndTransformFeedback;
+extern PFNGLENDCONDITIONALRENDERPROC glEndConditionalRender;
+extern PFNGLVERTEXATTRIBIPOINTERPROC glVertexAttribIPointer;
+extern PFNGLBINDFRAGDATALOCATIONPROC glBindFragDataLocation;
+extern PFNGLBEGINTRANSFORMFEEDBACKPROC glBeginTransformFeedback;
+extern PFNGLBEGINCONDITIONALRENDERPROC glBeginConditionalRender;
+extern PFNGLTRANSFORMFEEDBACKVARYINGSPROC glTransformFeedbackVaryings;
+extern PFNGLGETTRANSFORMFEEDBACKVARYINGPROC glGetTransformFeedbackVarying;
 #endif

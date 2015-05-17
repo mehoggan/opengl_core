@@ -11,7 +11,7 @@
 
 namespace opengl_core
 {
-  class render_context : public non_copyable
+  class OPENGL_CORE_API render_context : public non_copyable
   {
   private:
     struct context_impl;
