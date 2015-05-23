@@ -3,21 +3,25 @@
 
 #include <declspec.h>
 
+#include <core/non_copyable.h>
+
 #include <memory>
 
 namespace opengl_core
 {
-  class OPENGL_CORE_API fb_config
+  class render_window;
+
+  class OPENGL_CORE_API fb_config : public non_copyable
   {
   private:
     struct fb_config_impl;
-    std::shared_ptr<fb_config_impl> m_impl;
+    fb_config_impl *m_impl;
 
   public:
     fb_config();
     ~fb_config();
 
-    void choose_best();
+    void choose_best(render_window *detail = nullptr);
 
     void *impl();
   };

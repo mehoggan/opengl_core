@@ -15,7 +15,7 @@ namespace opengl_core
   {
   private:
     struct context_impl;
-    std::shared_ptr<context_impl> m_impl;
+    context_impl *m_impl;
 
   public:
     render_context();

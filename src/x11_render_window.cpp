@@ -25,7 +25,9 @@ namespace opengl_core
   {}
 
   render_window::~render_window()
-  {}
+  {
+    delete m_impl;
+  }
 
   void render_window::init(fb_config &fbc)
   {

@@ -1,6 +1,10 @@
 #ifndef EXTENSION_REGISTRY_H_INCLUDED
 #define EXTENSION_REGISTRY_H_INCLUDED
 
+#if (defined WIN32) || (defined _WIN32) || (defined __WIN32__)
+  #include <Windows.h>
+#endif
+
 #include <GL/gl.h>
 #include <GL/glext.h>
 

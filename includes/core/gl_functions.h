@@ -21,19 +21,16 @@ namespace opengl_core
   struct OPENGL_CORE_API gl_functions
   {
   private:
-    thread_local static std::vector<std::string> s_extensions;
-
-  private:
-    thread_local static void load_1_2(symbol_loader *sym_loader);
-    thread_local static void load_1_3(symbol_loader *sym_loader);
-    thread_local static void load_1_4(symbol_loader *sym_loader);
-    thread_local static void load_1_5(symbol_loader *sym_loader);
-    thread_local static void load_2_0(symbol_loader *sym_loader);
-    thread_local static void load_2_1(symbol_loader *sym_loader);
-    thread_local static void load_3_0(symbol_loader *sym_loader);
+    static void load_1_2(symbol_loader *sym_loader);
+    static void load_1_3(symbol_loader *sym_loader);
+    static void load_1_4(symbol_loader *sym_loader);
+    static void load_1_5(symbol_loader *sym_loader);
+    static void load_2_0(symbol_loader *sym_loader);
+    static void load_2_1(symbol_loader *sym_loader);
+    static void load_3_0(symbol_loader *sym_loader);
 
   public:
-    thread_local static void configure(const render_context &context);
+    static void configure(const render_context &context);
   };
 }
 
