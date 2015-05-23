@@ -48,7 +48,9 @@ namespace opengl_core
   {}
 
   render_context::~render_context()
-  {}
+  {
+    delete m_impl;
+  }
 
   void render_context::init(render_window &window, fb_config &fbc)
   {
@@ -173,6 +175,7 @@ namespace opengl_core
 
   void *render_context::impl()
   {
+    return (void*)(&(m_impl->m_context));
   }
 
   int render_context::query_major_version() const

@@ -14,7 +14,7 @@ namespace opengl_core
   {
   private:
     struct window_impl;
-    std::shared_ptr<window_impl> m_impl;
+    window_impl *m_impl;
 
   public:
     render_window();

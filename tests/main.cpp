@@ -3,31 +3,36 @@
 #include <test_render_context.h>
 #include <test_render_system.h>
 #include <test_render_window.h>
-#include <test_x11_display.h>
 
+#define _CRTDBG_MAP_ALLOC
+#include <core/memory_leaks.h>
+
+#include <array>
 #include <cstdint>
 #include <memory>
 
-#include <X11/Xlib.h>
-
 int main(int argc, char *argv[])
 {
-  std::array<std::shared_ptr<test_base>, 5> tests = {
+  MEMORY_LEAK_DETECTION_START();
+  std::array<std::shared_ptr<test_base>, 4> tests = {
     std::shared_ptr<test_base>(new test_render_system()),
-    std::shared_ptr<test_base>(new test_x11_display()),
     std::shared_ptr<test_base>(new test_fb_config()),
     std::shared_ptr<test_base>(new test_render_window()),
     std::shared_ptr<test_base>(new test_render_context())
   };
 
   std::cout << "Going to run " << tests.size() << " tests." << std::endl;
-  for(std::size_t i = 0; i < tests.size(); ++i) {
+  for(auto test_ptr : tests) {
     std::cout << std::endl;
     std::cout << std::endl;
     std::cout << "==============================================" << std::endl;
-    std::cout << "Running " << tests[i]->name() << std::endl;
+    std::cout << "Running " << test_ptr->name() << std::endl;
     std::cout << "==============================================" << std::endl;
-    tests[i]->run();
+    test_ptr->run();
+  }
+
+  for (auto test_ptr : tests) {
+    test_ptr.reset();
   }
 
   return 0;

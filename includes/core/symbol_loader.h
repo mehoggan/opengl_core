@@ -19,7 +19,6 @@ namespace opengl_core
 
   public:
     explicit symbol_loader(const char *lib_name);
-
     ~symbol_loader();
 
     bool get_good() const { return m_good; }

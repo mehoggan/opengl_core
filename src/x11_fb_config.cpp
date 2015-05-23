@@ -43,7 +43,9 @@ namespace opengl_core
   {}
 
   fb_config::~fb_config()
-  {}
+  {
+    delete m_impl;
+  }
 
   void fb_config::choose_best()
   {

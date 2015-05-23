@@ -1,7 +1,5 @@
 #include <core/gl_functions.h>
 
-#include <core/x11_display.h>
-
 #include <algorithm>
 #include <cassert>
 #include <cstdio>
@@ -18,12 +16,12 @@ namespace opengl_core
 {
   void gl_functions::configure(const render_context &context)
   {
-    symbol_loader sym_loader("libGL.so");
-    assert(sym_loader.get_good() && "Failed to load libGL.so");
+    symbol_loader sym_loader("OpenGL32.dll");
+    assert(sym_loader.get_good() && "Failed to load OpenGL32.dll");
 
     // NOTE: glext.h from https://www.opengl.org/registry/api/GL/glext.h
-    // intitialy groups functions by versions. Then it groups by extensions.
-    // Some extensions are duplicated. Duplicates have the appropiate suffix.
+    // intitially groups functions by versions. Then it groups by extensions.
+    // Some extensions are duplicated. Duplicates have the appropriate suffix.
     // e.g. ARB, NV, ..., etc.
     typedef std::function<void(symbol_loader *)> load_func;
     std::pair<std::vector<int>, load_func> versions[] =
