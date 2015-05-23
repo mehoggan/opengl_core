@@ -13,9 +13,6 @@
 
 namespace opengl_core
 {
-  thread_local render_context render_system::s_context;
-  thread_local render_window render_system::s_window;
-
   bool render_system::init()
   {
     XInitThreads();
@@ -42,16 +39,15 @@ namespace opengl_core
     std::cout << "client glx version string " << glx_major << "." <<
       glx_minor << std::endl;
 
-    fb_config fbc;
-    fbc.choose_best();
+    m_fbc.choose_best();
 
-    s_window.init(fbc);
-    s_window.map();
+    m_window.init(m_fbc);
+    m_window.map();
 
-    s_context.init(s_window, fbc);
-    s_context.make_current(s_window);
+    m_context.init(m_window, m_fbc);
+    m_context.make_current(m_window);
 
-    gl_functions::configure(s_context);
+    gl_functions::configure(m_context);
   }
 
   void render_system::run(bool threaded)
@@ -63,9 +59,9 @@ namespace opengl_core
 
   void render_system::destroy()
   {
-    s_context.make_not_current();
-    s_context.destroy();
-    s_window.destroy();
+    m_context.make_not_current();
+    m_context.destroy();
+    m_window.destroy();
     x11_display::release();
   }
 }

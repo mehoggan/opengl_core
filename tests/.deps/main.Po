@@ -95,8 +95,8 @@
  /usr/include/c++/4.9.2/bits/istream.tcc ../test_fb_config.h \
  ../test_render_context.h ../test_render_system.h \
  ../../includes/core/render_system.h ../../declspec.h \
- ../../includes/core/render_context.h ../../includes/core/fb_config.h \
- /usr/include/c++/4.9.2/memory \
+ ../../includes/core/non_copyable.h ../../includes/core/render_context.h \
+ ../../includes/core/fb_config.h /usr/include/c++/4.9.2/memory \
  /usr/include/c++/4.9.2/bits/stl_construct.h \
  /usr/include/c++/4.9.2/ext/alloc_traits.h \
  /usr/include/c++/4.9.2/bits/alloc_traits.h \
@@ -113,11 +113,8 @@
  /usr/include/c++/4.9.2/bits/shared_ptr_base.h \
  /usr/include/c++/4.9.2/ext/aligned_buffer.h \
  /usr/include/c++/4.9.2/backward/auto_ptr.h \
- ../../includes/core/render_window.h ../../includes/core/non_copyable.h \
- ../test_render_window.h ../test_x11_display.h \
- ../../includes/core/x11_display.h /usr/include/X11/Xlib.h \
- /usr/include/X11/X.h /usr/include/X11/Xfuncproto.h \
- /usr/include/X11/Xosdefs.h
+ ../../includes/core/render_window.h ../test_render_window.h \
+ ../../includes/core/memory_leaks.h ../../includes/core/platform.h
 
 /usr/include/stdc-predef.h:
 
@@ -391,6 +388,8 @@
 
 ../../declspec.h:
 
+../../includes/core/non_copyable.h:
+
 ../../includes/core/render_context.h:
 
 ../../includes/core/fb_config.h:
@@ -439,18 +438,8 @@
 
 ../../includes/core/render_window.h:
 
-../../includes/core/non_copyable.h:
-
 ../test_render_window.h:
 
-../test_x11_display.h:
+../../includes/core/memory_leaks.h:
 
-../../includes/core/x11_display.h:
-
-/usr/include/X11/Xlib.h:
-
-/usr/include/X11/X.h:
-
-/usr/include/X11/Xfuncproto.h:
-
-/usr/include/X11/Xosdefs.h:
+../../includes/core/platform.h:

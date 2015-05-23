@@ -6,7 +6,7 @@
 
 bool test_render_system::run()
 {
-  opengl_core::render_system::init();
-  // If you do not destroy next test will fail.
-  opengl_core::render_system::destroy();
+  opengl_core::render_system render_system;
+  render_system.init();
+  render_system.destroy();
 }

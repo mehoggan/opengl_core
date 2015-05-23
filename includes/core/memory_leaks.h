@@ -11,17 +11,17 @@
     #define MEMORY_LEAK_DETECTION_START() do { \
         _CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF ); \
         _CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG); \
-      } while(false);
+      } while (false);
 
     #define MEMORY_LEAK_DETECTION_STOP() do { \
         _CrtDumpMemoryLeaks(); \
-      } while(false);
+      } while (false);
   #else
     #define MEMORY_LEAK_DETECTION_START() do { \
-      }
+      } while (false);
 
     #define MEMORY_LEAK_DETECTION_STOP() do { \
-      }
+      } while (false);
   #endif
 
 #endif

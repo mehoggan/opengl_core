@@ -1,5 +1,6 @@
 #include <core/fb_config.h>
 
+#include <core/render_window.h>
 #include <core/x11_display.h>
 
 #include <cassert>
@@ -47,7 +48,7 @@ namespace opengl_core
     delete m_impl;
   }
 
-  void fb_config::choose_best()
+  void fb_config::choose_best(render_window *)
   {
     Display *&display = x11_display::acquire();
 
