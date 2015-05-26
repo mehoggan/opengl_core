@@ -10,7 +10,7 @@
 
 namespace opengl_core
 {
-  class OPENGL_CORE_API render_window : public non_copyable
+  class render_window : public non_copyable
   {
   private:
     struct window_impl;

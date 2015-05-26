@@ -11,7 +11,7 @@ namespace opengl_core
 {
   class render_window;
 
-  class OPENGL_CORE_API fb_config : public non_copyable
+  class fb_config : public non_copyable
   {
   private:
     struct fb_config_impl;

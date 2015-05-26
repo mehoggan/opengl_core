@@ -3,6 +3,7 @@
 
 #include <test_base.h>
 #include <core/render_system.h>
+#include <core/gl_functions.h>
 
 class test_render_system : public test_base
 {

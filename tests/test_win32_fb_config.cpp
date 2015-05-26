@@ -1,13 +1,14 @@
 #include <test_fb_config.h>
 
 #include <core/fb_config.h>
+#include <core/render_window.h>
 
 #include <cstring>
 #include <iostream>
 
 bool test_fb_config::run()
 {
-  opengl_core::fb_config frame_buffer_conf;
-  frame_buffer_conf.choose_best();
+  // Because of a dependency on a context this test would be duplicated in
+  // render context test.
   return true;
 }

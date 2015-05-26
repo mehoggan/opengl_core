@@ -18,7 +18,7 @@ namespace opengl_core
    *  It should also be noted that this struct's public static function should
    *  be called by the thread who owns the context.
    */
-  struct OPENGL_CORE_API gl_functions
+  struct gl_functions
   {
   private:
     static void load_1_2(symbol_loader *sym_loader);

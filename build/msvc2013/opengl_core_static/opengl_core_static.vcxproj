@@ -36,7 +36,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\extension_checker.cpp" />
-    <ClCompile Include="..\..\..\src\win32_error_handler.cpp" />
     <ClCompile Include="..\..\..\src\win32_fb_config.cpp" />
     <ClCompile Include="..\..\..\src\win32_gl_functions.cpp" />
     <ClCompile Include="..\..\..\src\win32_hinstance.cpp" />
