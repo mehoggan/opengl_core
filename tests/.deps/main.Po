@@ -95,7 +95,9 @@
  /usr/include/c++/4.9.2/bits/istream.tcc ../test_fb_config.h \
  ../test_render_context.h ../test_render_system.h \
  ../../includes/core/render_system.h ../../declspec.h \
- ../../includes/core/non_copyable.h ../../includes/core/render_context.h \
+ ../../includes/core/non_copyable.h ../../includes/core/gl_functions.h \
+ ../../includes/core/extension_registry.h /usr/include/GL/gl.h \
+ /usr/include/GL/glext.h ../../includes/core/render_context.h \
  ../../includes/core/fb_config.h /usr/include/c++/4.9.2/memory \
  /usr/include/c++/4.9.2/bits/stl_construct.h \
  /usr/include/c++/4.9.2/ext/alloc_traits.h \
@@ -113,7 +115,13 @@
  /usr/include/c++/4.9.2/bits/shared_ptr_base.h \
  /usr/include/c++/4.9.2/ext/aligned_buffer.h \
  /usr/include/c++/4.9.2/backward/auto_ptr.h \
- ../../includes/core/render_window.h ../test_render_window.h \
+ ../../includes/core/render_window.h ../../includes/core/symbol_loader.h \
+ /usr/include/c++/4.9.2/map /usr/include/c++/4.9.2/bits/stl_tree.h \
+ /usr/include/c++/4.9.2/bits/stl_map.h \
+ /usr/include/c++/4.9.2/bits/stl_multimap.h /usr/include/c++/4.9.2/vector \
+ /usr/include/c++/4.9.2/bits/stl_vector.h \
+ /usr/include/c++/4.9.2/bits/stl_bvector.h \
+ /usr/include/c++/4.9.2/bits/vector.tcc ../test_render_window.h \
  ../../includes/core/memory_leaks.h ../../includes/core/platform.h
 
 /usr/include/stdc-predef.h:
@@ -390,6 +398,14 @@
 
 ../../includes/core/non_copyable.h:
 
+../../includes/core/gl_functions.h:
+
+../../includes/core/extension_registry.h:
+
+/usr/include/GL/gl.h:
+
+/usr/include/GL/glext.h:
+
 ../../includes/core/render_context.h:
 
 ../../includes/core/fb_config.h:
@@ -437,6 +453,24 @@
 /usr/include/c++/4.9.2/backward/auto_ptr.h:
 
 ../../includes/core/render_window.h:
+
+../../includes/core/symbol_loader.h:
+
+/usr/include/c++/4.9.2/map:
+
+/usr/include/c++/4.9.2/bits/stl_tree.h:
+
+/usr/include/c++/4.9.2/bits/stl_map.h:
+
+/usr/include/c++/4.9.2/bits/stl_multimap.h:
+
+/usr/include/c++/4.9.2/vector:
+
+/usr/include/c++/4.9.2/bits/stl_vector.h:
+
+/usr/include/c++/4.9.2/bits/stl_bvector.h:
+
+/usr/include/c++/4.9.2/bits/vector.tcc:
 
 ../test_render_window.h:
 

@@ -13,6 +13,22 @@
 
 namespace opengl_core
 {
+  struct render_system::render_system_impl
+  {
+    render_context m_context;
+    render_window m_window;
+    fb_config m_fbc;
+  };
+
+  render_system::render_system() :
+    m_impl(new render_system_impl)
+  {}
+
+  render_system::~render_system()
+  {
+    delete m_impl;
+  }
+
   bool render_system::init()
   {
     XInitThreads();
@@ -39,15 +55,15 @@ namespace opengl_core
     std::cout << "client glx version string " << glx_major << "." <<
       glx_minor << std::endl;
 
-    m_fbc.choose_best();
+    m_impl->m_fbc.choose_best();
 
-    m_window.init(m_fbc);
-    m_window.map();
+    m_impl->m_window.init(m_impl->m_fbc);
+    m_impl->m_window.map();
 
-    m_context.init(m_window, m_fbc);
-    m_context.make_current(m_window);
+    m_impl->m_context.init(m_impl->m_window, m_impl->m_fbc);
+    m_impl->m_context.make_current(m_impl->m_window);
 
-    gl_functions::configure(m_context);
+    gl_functions::configure(m_impl->m_context);
   }
 
   void render_system::run(bool threaded)
@@ -59,9 +75,9 @@ namespace opengl_core
 
   void render_system::destroy()
   {
-    m_context.make_not_current();
-    m_context.destroy();
-    m_window.destroy();
+    m_impl->m_context.make_not_current();
+    m_impl->m_context.destroy();
+    m_impl->m_window.destroy();
     x11_display::release();
   }
 }

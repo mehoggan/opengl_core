@@ -8,20 +8,7 @@
 
 bool test_render_window::run()
 {
-  opengl_core::fb_config fbc;
-  fbc.choose_best();
-
-  opengl_core::render_window window;
-  window.init(fbc);
-  window.map();
-
-  auto start = std::chrono::high_resolution_clock::now();
-  std::this_thread::sleep_for(std::chrono::seconds(2));
-  auto end = std::chrono::high_resolution_clock::now();
-  std::chrono::duration<double, std::milli> elapsed = end - start;
-  std::cout << "Mapped window and Waited " << elapsed.count() << " ms\n";
-
-  window.destroy();
-
+  // Because of a dependency on a context being current this test would be
+  // duplicated by render_context tests.
   return true;
 }

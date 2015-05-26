@@ -10,7 +10,7 @@
 
 namespace opengl_core
 {
-  class OPENGL_CORE_API win32_hinstance
+  class win32_hinstance
   {
   public:
     typedef HINSTANCE Win32_HInstance;

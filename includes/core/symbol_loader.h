@@ -10,7 +10,7 @@
 
 namespace opengl_core
 {
-  class OPENGL_CORE_API symbol_loader : public non_copyable
+  class symbol_loader : public non_copyable
   {
   private:
     void *m_handle;
