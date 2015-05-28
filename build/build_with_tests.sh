@@ -37,7 +37,7 @@ fi
 
 sleep 5
 
-if [[ ${REALEAS} == 'true' ]]; then
+if [[ ${RELEASE} == 'true' ]]; then
   for i in seq 1 5; do echo ""; done;
   echo "====================================================================="
   echo "Building release and testing in release."

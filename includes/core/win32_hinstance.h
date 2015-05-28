@@ -1,8 +1,6 @@
 #ifndef OPENGL_CORE_WIN32_HINSTANCE_H_INCLUDED
 #define OPENGL_CORE_WIN32_HINSTANCE_H_INCLUDED
 
-#include <declspec.h>
-
 #include <Windows.h>
 
 #include <cstdint>

@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\declspec.h" />
     <ClInclude Include="..\..\..\includes\core\extension_checker.h" />
     <ClInclude Include="..\..\..\includes\core\extension_registry.h" />
     <ClInclude Include="..\..\..\includes\core\fb_config.h" />

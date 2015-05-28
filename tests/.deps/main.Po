@@ -70,9 +70,10 @@
  /usr/include/sys/types.h /usr/include/sys/select.h \
  /usr/include/bits/select.h /usr/include/bits/sigset.h \
  /usr/include/sys/sysmacros.h /usr/include/alloca.h \
- /usr/include/bits/stdlib-float.h /usr/include/c++/4.9.2/cstdio \
- /usr/include/libio.h /usr/include/_G_config.h \
- /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
+ /usr/include/bits/stdlib-bsearch.h /usr/include/bits/stdlib-float.h \
+ /usr/include/c++/4.9.2/cstdio /usr/include/libio.h \
+ /usr/include/_G_config.h /usr/include/bits/stdio_lim.h \
+ /usr/include/bits/sys_errlist.h /usr/include/bits/stdio.h \
  /usr/include/c++/4.9.2/cerrno /usr/include/errno.h \
  /usr/include/bits/errno.h /usr/include/linux/errno.h \
  /usr/include/asm/errno.h /usr/include/asm-generic/errno.h \
@@ -96,9 +97,8 @@
  ../test_render_context.h ../test_render_system.h \
  ../../includes/core/render_system.h ../../declspec.h \
  ../../includes/core/non_copyable.h ../../includes/core/gl_functions.h \
- ../../includes/core/extension_registry.h /usr/include/GL/gl.h \
- /usr/include/GL/glext.h ../../includes/core/render_context.h \
- ../../includes/core/fb_config.h /usr/include/c++/4.9.2/memory \
+ ../../includes/core/render_context.h ../../includes/core/fb_config.h \
+ /usr/include/c++/4.9.2/memory \
  /usr/include/c++/4.9.2/bits/stl_construct.h \
  /usr/include/c++/4.9.2/ext/alloc_traits.h \
  /usr/include/c++/4.9.2/bits/alloc_traits.h \
@@ -324,6 +324,8 @@
 
 /usr/include/alloca.h:
 
+/usr/include/bits/stdlib-bsearch.h:
+
 /usr/include/bits/stdlib-float.h:
 
 /usr/include/c++/4.9.2/cstdio:
@@ -335,6 +337,8 @@
 /usr/include/bits/stdio_lim.h:
 
 /usr/include/bits/sys_errlist.h:
+
+/usr/include/bits/stdio.h:
 
 /usr/include/c++/4.9.2/cerrno:
 
@@ -399,12 +403,6 @@
 ../../includes/core/non_copyable.h:
 
 ../../includes/core/gl_functions.h:
-
-../../includes/core/extension_registry.h:
-
-/usr/include/GL/gl.h:
-
-/usr/include/GL/glext.h:
 
 ../../includes/core/render_context.h:
 

@@ -1,10 +1,9 @@
 #ifndef RENDER_WINDOW_H_INCLUDED
 #define RENDER_WINDOW_H_INCLUDED
 
-#include <declspec.h>
+#include <core/non_copyable.h>
 
 #include <core/fb_config.h>
-#include <core/non_copyable.h>
 
 #include <memory>
 

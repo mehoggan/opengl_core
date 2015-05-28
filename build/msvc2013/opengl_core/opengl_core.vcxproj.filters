@@ -51,6 +51,9 @@
     <ClInclude Include="..\..\..\includes\core\platform.h">
       <Filter>includes</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\declspec.h">
+      <Filter>includes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\win32_hinstance.cpp">

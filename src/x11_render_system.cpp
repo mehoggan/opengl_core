@@ -1,7 +1,8 @@
 #include <core/render_system.h>
 
-#include <core/fb_config.h>
 #include <core/gl_functions.h>
+
+#include <core/fb_config.h>
 #include <core/x11_display.h>
 
 #include <chrono>
