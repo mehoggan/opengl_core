@@ -1,11 +1,10 @@
 #ifndef RENDER_CONTEXT_H_INCLUDED
 #define RENDER_CONTEXT_H_INCLUDED
 
-#include <declspec.h>
+#include <core/non_copyable.h>
 
 #include <core/fb_config.h>
 #include <core/render_window.h>
-#include <core/non_copyable.h>
 
 #include <memory>
 

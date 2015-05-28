@@ -1,8 +1,6 @@
 #ifndef SYMBOL_LOADER_H_INCLUDED
 #define SYMBOL_LOADER_H_INCLUDED
 
-#include <declspec.h>
-
 #include <core/non_copyable.h>
 
 #include <iostream>

@@ -1,8 +1,6 @@
 #ifndef FB_CONFIG_H_INCLUDED
 #define FB_CONFIG_H_INCLUDED
 
-#include <declspec.h>
-
 #include <core/non_copyable.h>
 
 #include <memory>
