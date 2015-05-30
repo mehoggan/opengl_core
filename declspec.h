@@ -30,9 +30,12 @@
       #define OPENGL_CORE_API __declspec(dllimport)
       #define EXTERN_OPENGL_CORE_API extern __declspec(dllimport)
     #endif
-  #else
+  #elif defined(_USRSTATIC)
     #define OPENGL_CORE_API
     #define EXTERN_OPENGL_CORE_API extern
+  #else
+    #define OPENGL_CORE_API
+    #define EXTERN_OPENGL_CORE_API extern __declspec(dllimport)
   #endif
 
   #include <stdint.h>
