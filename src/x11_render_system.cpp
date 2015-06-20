@@ -67,13 +67,6 @@ namespace opengl_core
     gl_functions::configure(m_impl->m_context);
   }
 
-  void render_system::run(bool threaded)
-  {
-    if (threaded) {
-    } else {
-    }
-  }
-
   void render_system::destroy()
   {
     m_impl->m_context.make_not_current();
