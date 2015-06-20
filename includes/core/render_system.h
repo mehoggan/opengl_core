@@ -20,7 +20,6 @@ namespace opengl_core
     ~render_system();
 
     bool init();
-    void run(bool threaded = true);
     void destroy();
   };
 }
