@@ -4,6 +4,7 @@
 #include <core/render_system.h>
 #include <core/render_window.h>
 
+#define nop {int x = 0; x = x;}
 namespace opengl_core
 {
   LRESULT CALLBACK wnd_proc(HWND h_wnd, UINT message, WPARAM w_param,
@@ -21,6 +22,14 @@ namespace opengl_core
     switch (message) {
     case WM_CREATE: {
       int x = 0; x = x;
+    }
+      break;
+    case WM_DESTROY: {
+      ::PostQuitMessage(0);
+    }
+      break;
+    case WM_QUIT: {
+      nop
     }
       break;
     default: {

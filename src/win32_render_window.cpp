@@ -32,11 +32,17 @@ namespace opengl_core
     std::wstring cname = L"render_window";
     cname += ('0' + (wchar_t)(window_impl::s_window_count++));
     const wchar_t *class_name = cname.c_str();
-    m_impl->m_window_class.lpfnWndProc = wnd_proc;
-    m_impl->m_window_class.hInstance = win32_hinstance::acquire();
-    m_impl->m_window_class.hbrBackground = (HBRUSH)(COLOR_BACKGROUND);
+
+    m_impl->m_window_class.hCursor = NULL;
+    m_impl->m_window_class.lpszMenuName = NULL;
     m_impl->m_window_class.lpszClassName = (class_name);
-    m_impl->m_window_class.style = CS_OWNDC;
+    m_impl->m_window_class.hbrBackground = NULL;
+    m_impl->m_window_class.hInstance = win32_hinstance::acquire();
+    m_impl->m_window_class.style = (CS_BYTEALIGNCLIENT | CS_OWNDC);
+    m_impl->m_window_class.lpfnWndProc = wnd_proc;
+    m_impl->m_window_class.cbWndExtra = 0;
+    m_impl->m_window_class.cbClsExtra = 0;
+
     if (!::RegisterClass(&m_impl->m_window_class)) {
       print_last_error_and_assert();
     }
@@ -63,11 +69,17 @@ namespace opengl_core
     std::wstring cname = L"render_window";
     cname += ('0' + (wchar_t)(window_impl::s_window_count++));
     const wchar_t *class_name = cname.c_str();
-    m_impl->m_window_class.lpfnWndProc = wnd_proc;
-    m_impl->m_window_class.hInstance = win32_hinstance::acquire();
-    m_impl->m_window_class.hbrBackground = (HBRUSH)(COLOR_BACKGROUND);
+
+    m_impl->m_window_class.hCursor = NULL;
+    m_impl->m_window_class.lpszMenuName = NULL;
     m_impl->m_window_class.lpszClassName = (class_name);
-    m_impl->m_window_class.style = CS_OWNDC;
+    m_impl->m_window_class.hbrBackground = NULL;
+    m_impl->m_window_class.hInstance = win32_hinstance::acquire();
+    m_impl->m_window_class.style = (CS_BYTEALIGNCLIENT | CS_OWNDC);
+    m_impl->m_window_class.lpfnWndProc = wnd_proc;
+    m_impl->m_window_class.cbWndExtra = 0;
+    m_impl->m_window_class.cbClsExtra = 0;
+
     if (!::RegisterClass(&m_impl->m_window_class)) {
       print_last_error_and_assert();
     }
@@ -103,7 +115,7 @@ namespace opengl_core
     }
 
     if (!::DestroyWindow(m_impl->m_window)) {
-      print_last_error_and_assert();
+      print_last_error();
     }
 
     if (!::UnregisterClass(m_impl->m_window_class.lpszClassName,

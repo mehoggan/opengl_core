@@ -386,10 +386,7 @@ namespace opengl_core
   name = (type)wglGetProcAddress(#name); \
   if (name == nullptr || name == (void*)-1) { \
     print_last_error_and_assert(); \
-  } else { \
-    std::cout << "Successfully Loaded " << (#name) << " @" << std::hex \
-    << (&name) << std::dec << std::endl; \
-  }
+  } 
 
 namespace opengl_core
 {
