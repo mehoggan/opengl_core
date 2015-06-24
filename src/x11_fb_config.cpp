@@ -97,4 +97,8 @@ namespace opengl_core
   {
     return (void*)(&(m_impl->m_best_config));
   }
+
+  void fb_config::destroy()
+  {
+  }
 }

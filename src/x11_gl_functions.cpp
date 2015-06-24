@@ -380,9 +380,9 @@ namespace opengl_core
 
 #define LOAD_GL_FUNCTION(type, name, sym_loader) \
   name = (type)sym_loader->load(#name); \
-  assert(name != nullptr); \
-  std::cout << "Successfully Loaded " << (#name) << " @" << std::hex \
-    << (&name) << std::dec << std::endl;
+  if (name == nullptr) { \
+    assert(name != nullptr); \
+  }
 
 namespace opengl_core
 {

@@ -20,6 +20,7 @@ namespace opengl_core
     ~fb_config();
 
     void choose_best(render_window *detail = nullptr);
+    void destroy();
 
     void *impl();
   };

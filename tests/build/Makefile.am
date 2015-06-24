@@ -7,10 +7,7 @@ AM_CXXFLAGS = -std=gnu++11
 test_opengl_core_SOURCES = \
 	../main.cpp \
 	../test_x11_display.cpp \
-	../test_x11_fb_config.cpp \
-	../test_x11_render_context.cpp \
-	../test_x11_render_system.cpp \
-	../test_x11_render_window.cpp
+	../test_x11_render_system.cpp
 
 test_opengl_core_LDFLAGS = -no-install \
 	-L$(abs_top_builddir)/../../build/.libs -L/usr/lib64/nvidia \

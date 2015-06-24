@@ -21,7 +21,10 @@ if [[ ${DEBUG} == 'true' ]]; then
       make clean all && \
       if [[ ${VALGRIND} == 'true' ]]; then
         valgrind --leak-check=full \
-          --suppressions=./ubuntu-14.04-nvidia-331.supp ./test_opengl_core
+          --gen-suppressions=all \
+          --track-origins=yes \
+          --suppressions=${SCRIPTPATH}/suppressions/fedora-21-nvidia-346.47.supp \
+          ./test_opengl_core
       else
         ./test_opengl_core
       fi
@@ -35,7 +38,9 @@ if [[ ${DEBUG} == 'true' ]]; then
   for i in seq 1 5; do echo ""; done;
 fi
 
-sleep 5
+if [[ ${RELEASE} == 'true' ]] && [[ ${DEBUG} == 'true' ]]; then
+  sleep 5
+fi
 
 if [[ ${RELEASE} == 'true' ]]; then
   for i in seq 1 5; do echo ""; done;
@@ -54,7 +59,10 @@ if [[ ${RELEASE} == 'true' ]]; then
       make clean all && \
       if [[ ${VALGRIND} == 'true' ]]; then
         valgrind --leak-check=full \
-          --suppressions=./ubuntu-14.04-nvidia-331.supp ./test_opengl_core
+          --gen-suppressions=all \
+          --track-origins=yes \
+          --suppressions=${SCRIPTPATH}/suppressions/fedora-21-nvidia-346.47.supp \
+          ./test_opengl_core
       else
         ./test_opengl_core
       fi

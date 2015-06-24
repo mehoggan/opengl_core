@@ -1,9 +1,9 @@
 #include <core/render_system.h>
 
-#include <core/gl_functions.h>
-
 #include <core/fb_config.h>
+#include <core/gl_functions.h>
 #include <core/x11_display.h>
+#include <core/x11_event_mask.h>
 
 #include <chrono>
 #include <iostream>
@@ -19,6 +19,7 @@ namespace opengl_core
     render_context m_context;
     render_window m_window;
     fb_config m_fbc;
+    XEvent m_x_event;
   };
 
   render_system::render_system() :
@@ -65,6 +66,34 @@ namespace opengl_core
     m_impl->m_context.make_current(m_impl->m_window);
 
     gl_functions::configure(m_impl->m_context);
+    m_impl->m_context.make_not_current();
+
+    Window &window = *static_cast<Window*>((m_impl->m_window.impl()));
+    bool terminate = false;
+    bool exposed = false;
+    while (!terminate) {
+      while (::XCheckWindowEvent(display, window, events::mask,
+        &m_impl->m_x_event)) {
+        if (m_impl->m_x_event.type == Expose) {
+          exposed = true;
+        }
+
+        if (m_impl->m_x_event.type == KeyPress) {
+          std::cout << "Key Pressed" << std::endl;
+          terminate = true;
+        }
+      }
+
+      if (terminate || !exposed) {
+        continue;
+      }
+
+      m_impl->m_context.make_current(m_impl->m_window);
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+      glClearColor(1.0, 0.0, 0.0, 1.0);
+      glXSwapBuffers(display, window);
+      m_impl->m_context.make_not_current();
+    }
   }
 
   void render_system::destroy()
@@ -72,6 +101,8 @@ namespace opengl_core
     m_impl->m_context.make_not_current();
     m_impl->m_context.destroy();
     m_impl->m_window.destroy();
+    m_impl->m_fbc.destroy();
     x11_display::release();
+    std::cout << x11_display::use_count() << std::endl;
   }
 }

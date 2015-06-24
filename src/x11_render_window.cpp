@@ -1,6 +1,7 @@
 #include <core/render_window.h>
 
 #include <core/x11_display.h>
+#include <core/x11_event_mask.h>
 
 #include <cassert>
 #include <iomanip>
@@ -55,6 +56,7 @@ namespace opengl_core
       CWBorderPixel|CWColormap|CWEventMask,
       &swa);
 
+    XSelectInput(display, m_impl->m_window, events::mask);
 
     XFree(vi);
     if (!m_impl->m_window) {

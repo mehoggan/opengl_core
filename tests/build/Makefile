@@ -102,10 +102,8 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am__dirstamp = $(am__leading_dot)dirstamp
 am_test_opengl_core_OBJECTS = ../main.$(OBJEXT) \
-	../test_x11_display.$(OBJEXT) ../test_x11_fb_config.$(OBJEXT) \
-	../test_x11_render_context.$(OBJEXT) \
-	../test_x11_render_system.$(OBJEXT) \
-	../test_x11_render_window.$(OBJEXT)
+	../test_x11_display.$(OBJEXT) \
+	../test_x11_render_system.$(OBJEXT)
 test_opengl_core_OBJECTS = $(am_test_opengl_core_OBJECTS)
 test_opengl_core_LDADD = $(LDADD)
 AM_V_lt = $(am__v_lt_$(V))
@@ -196,23 +194,23 @@ distuninstallcheck_listfiles = find . -type f -print
 am__distuninstallcheck_listfiles = $(distuninstallcheck_listfiles) \
   | sed 's|^\./|$(prefix)/|' | grep -v '$(infodir)/dir$$'
 distcleancheck_listfiles = find . -type f -print
-ACLOCAL = ${SHELL} /home/mhoggan/Devel/opengl_core/tests/build/missing aclocal-1.14
+ACLOCAL = ${SHELL} /home/mhoggan/Devel/opengl/opengl_core/tests/build/missing aclocal-1.14
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 1
 AR = ar
-AUTOCONF = ${SHELL} /home/mhoggan/Devel/opengl_core/tests/build/missing autoconf
-AUTOHEADER = ${SHELL} /home/mhoggan/Devel/opengl_core/tests/build/missing autoheader
-AUTOMAKE = ${SHELL} /home/mhoggan/Devel/opengl_core/tests/build/missing automake-1.14
+AUTOCONF = ${SHELL} /home/mhoggan/Devel/opengl/opengl_core/tests/build/missing autoconf
+AUTOHEADER = ${SHELL} /home/mhoggan/Devel/opengl/opengl_core/tests/build/missing autoheader
+AUTOMAKE = ${SHELL} /home/mhoggan/Devel/opengl/opengl_core/tests/build/missing automake-1.14
 AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2
 CPP = gcc -E
-CPPFLAGS = -DNDEBUG
+CPPFLAGS = -DDEBUG
 CXX = g++
 CXXCPP = g++ -E
 CXXDEPMODE = depmode=gcc3
-CXXFLAGS = -O3 -std=gnu++11
+CXXFLAGS = -g -O0 -std=gnu++11
 CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
 DEPDIR = .deps
@@ -240,7 +238,7 @@ LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LIPO = 
 LN_S = ln -s
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /home/mhoggan/Devel/opengl_core/tests/build/missing makeinfo
+MAKEINFO = ${SHELL} /home/mhoggan/Devel/opengl/opengl_core/tests/build/missing makeinfo
 MANIFEST_TOOL = :
 MKDIR_P = /usr/bin/mkdir -p
 NM = /usr/bin/nm -B
@@ -263,10 +261,10 @@ SET_MAKE =
 SHELL = /bin/sh
 STRIP = strip
 VERSION = 0.1
-abs_builddir = /home/mhoggan/Devel/opengl_core/tests/build
-abs_srcdir = /home/mhoggan/Devel/opengl_core/tests/build
-abs_top_builddir = /home/mhoggan/Devel/opengl_core/tests/build
-abs_top_srcdir = /home/mhoggan/Devel/opengl_core/tests/build
+abs_builddir = /home/mhoggan/Devel/opengl/opengl_core/tests/build
+abs_srcdir = /home/mhoggan/Devel/opengl/opengl_core/tests/build
+abs_top_builddir = /home/mhoggan/Devel/opengl/opengl_core/tests/build
+abs_top_srcdir = /home/mhoggan/Devel/opengl/opengl_core/tests/build
 ac_ct_AR = ar
 ac_ct_CC = gcc
 ac_ct_CXX = g++
@@ -296,7 +294,7 @@ host_vendor = unknown
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/mhoggan/Devel/opengl_core/tests/build/install-sh
+install_sh = ${SHELL} /home/mhoggan/Devel/opengl/opengl_core/tests/build/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -322,10 +320,7 @@ AM_CXXFLAGS = -std=gnu++11
 test_opengl_core_SOURCES = \
 	../main.cpp \
 	../test_x11_display.cpp \
-	../test_x11_fb_config.cpp \
-	../test_x11_render_context.cpp \
-	../test_x11_render_system.cpp \
-	../test_x11_render_window.cpp
+	../test_x11_render_system.cpp
 
 test_opengl_core_LDFLAGS = -no-install \
 	-L$(abs_top_builddir)/../../build/.libs -L/usr/lib64/nvidia \
@@ -443,13 +438,7 @@ clean-binPROGRAMS:
 ../main.$(OBJEXT): ../$(am__dirstamp) ../$(DEPDIR)/$(am__dirstamp)
 ../test_x11_display.$(OBJEXT): ../$(am__dirstamp) \
 	../$(DEPDIR)/$(am__dirstamp)
-../test_x11_fb_config.$(OBJEXT): ../$(am__dirstamp) \
-	../$(DEPDIR)/$(am__dirstamp)
-../test_x11_render_context.$(OBJEXT): ../$(am__dirstamp) \
-	../$(DEPDIR)/$(am__dirstamp)
 ../test_x11_render_system.$(OBJEXT): ../$(am__dirstamp) \
-	../$(DEPDIR)/$(am__dirstamp)
-../test_x11_render_window.$(OBJEXT): ../$(am__dirstamp) \
 	../$(DEPDIR)/$(am__dirstamp)
 
 test_opengl_core$(EXEEXT): $(test_opengl_core_OBJECTS) $(test_opengl_core_DEPENDENCIES) $(EXTRA_test_opengl_core_DEPENDENCIES) 
@@ -465,10 +454,7 @@ distclean-compile:
 
 include ../$(DEPDIR)/main.Po
 include ../$(DEPDIR)/test_x11_display.Po
-include ../$(DEPDIR)/test_x11_fb_config.Po
-include ../$(DEPDIR)/test_x11_render_context.Po
 include ../$(DEPDIR)/test_x11_render_system.Po
-include ../$(DEPDIR)/test_x11_render_window.Po
 
 .cpp.o:
 	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\

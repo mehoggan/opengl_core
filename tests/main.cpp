@@ -1,8 +1,5 @@
 #include <test_base.h>
-#include <test_fb_config.h>
-#include <test_render_context.h>
 #include <test_render_system.h>
-#include <test_render_window.h>
 
 #define _CRTDBG_MAP_ALLOC
 #include <core/memory_leaks.h>
@@ -14,11 +11,8 @@
 int main(int argc, char *argv[])
 {
   MEMORY_LEAK_DETECTION_START();
-  std::array<std::shared_ptr<test_base>, 4> tests = {
+  std::array<std::shared_ptr<test_base>, 1> tests = {
     std::shared_ptr<test_base>(new test_render_system()),
-    std::shared_ptr<test_base>(new test_fb_config()),
-    std::shared_ptr<test_base>(new test_render_window()),
-    std::shared_ptr<test_base>(new test_render_context())
   };
 
   std::cout << "Going to run " << tests.size() << " tests." << std::endl;

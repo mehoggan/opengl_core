@@ -151,7 +151,6 @@ namespace opengl_core
   {
     Display *&display = x11_display::acquire();
     Window &win = *(static_cast<Window*>(window.impl()));
-    std::cout << "Making context current" << std::endl;
     assert(glXMakeCurrent(display, win, m_impl->m_context) &&
       "Failed to make context current");
     x11_display::release();
