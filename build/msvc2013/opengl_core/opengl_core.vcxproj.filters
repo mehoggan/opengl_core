@@ -54,6 +54,9 @@
     <ClInclude Include="..\..\..\declspec.h">
       <Filter>includes</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\includes\core\concurrent_queue.h">
+      <Filter>includes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\win32_hinstance.cpp">

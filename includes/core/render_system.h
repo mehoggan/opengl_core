@@ -5,8 +5,6 @@
 
 #include <core/non_copyable.h>
 
-// NOTE: gl_thread_local on functions to my understanding is used to only denote
-// that the function accesses a gl_thread_local static variable.
 namespace opengl_core
 {
   class OPENGL_CORE_API render_system : public non_copyable
@@ -15,11 +13,15 @@ namespace opengl_core
     struct render_system_impl;
     render_system_impl *m_impl;
 
+  private:
+    void render_loop();
+
   public:
     render_system();
     ~render_system();
 
     bool init();
+    void terminate();
     void destroy();
   };
 }

@@ -326,11 +326,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\main.cpp" />
-    <ClCompile Include="..\..\..\test_win32_fb_config.cpp" />
-    <ClCompile Include="..\..\..\test_win32_hinstance.cpp" />
-    <ClCompile Include="..\..\..\test_win32_render_context.cpp" />
     <ClCompile Include="..\..\..\test_win32_render_system.cpp" />
-    <ClCompile Include="..\..\..\test_win32_render_window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\test_base.h" />

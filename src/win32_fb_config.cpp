@@ -2,6 +2,7 @@
 
 #include <core/extension_checker.h>
 #include <core/symbol_loader.h>
+#include <core/render_system.h>
 #include <core/render_window.h>
 #include <core/win32_error_handler.h>
 
@@ -53,7 +54,7 @@ namespace opengl_core
     delete m_impl;
   }
 
-  void fb_config::choose_best(render_window *detail)
+  void fb_config::choose_best(render_system &system, render_window *detail)
   {
     if (!detail) {
       // This is a forced error so make sure not to show a false positive.
@@ -64,7 +65,7 @@ namespace opengl_core
     // This will destroy the default window created in the ctor. This is called
     // by the render context because it must be created first before
     // the best PIXEL FORMAT can be chosen.
-    detail->init(*this);
+    detail->init(system, *this);
     detail->map();
 
     HWND hwnd = *reinterpret_cast<HWND*>(detail->impl());

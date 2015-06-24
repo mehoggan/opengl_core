@@ -1,6 +1,7 @@
 #include <core/render_context.h>
 
 #include <core/extension_checker.h>
+#include <core/render_system.h>
 #include <core/symbol_loader.h>
 #include <core/win32_error_handler.h>
 
@@ -40,7 +41,8 @@ namespace opengl_core
     delete m_impl;
   }
 
-  void render_context::init(render_window &window, fb_config &fbc)
+  void render_context::init(render_system &system, render_window &window,
+    fb_config &fbc)
   {
     auto hwnd = *static_cast<HWND*>(window.impl());
     auto hdc = ::GetDC(hwnd);
@@ -88,7 +90,7 @@ namespace opengl_core
     // the best PIXELFORMATDESTRIPTOR. fbc_config::choose_best() will destroy
     // the initial window and recreate it with the best fbc possible and assign
     // the fbc to the HDC associated with the newly created window.
-    fbc.choose_best(&window);
+    fbc.choose_best(system, &window);
     hwnd = *static_cast<HWND*>(window.impl());
     if (!hwnd) {
       print_last_error_and_assert();

@@ -9,6 +9,8 @@
 
 namespace opengl_core
 {
+  class render_system;
+
   class render_window : public non_copyable
   {
   private:
@@ -19,7 +21,7 @@ namespace opengl_core
     render_window();
     ~render_window();
 
-    void init(fb_config &fbc);
+    void init(render_system &system, fb_config &fbc);
     void map();
     void destroy();
 

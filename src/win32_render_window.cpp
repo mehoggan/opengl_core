@@ -1,5 +1,6 @@
 #include <core/render_window.h>
 
+#include <core/render_system.h>
 #include <core/win32_error_handler.h>
 #include <core/win32_hinstance.h>
 #include <core/win32_wndproc.h>
@@ -50,7 +51,7 @@ namespace opengl_core
     m_impl->m_window = ::CreateWindowEx(0, m_impl->m_window_class.lpszClassName,
       L"", WS_OVERLAPPEDWINDOW,
       CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-      NULL, NULL, win32_hinstance::acquire(), this);
+      NULL, NULL, win32_hinstance::acquire(), nullptr);
     if (!m_impl->m_window) {
       print_last_error_and_assert();
     }
@@ -61,7 +62,7 @@ namespace opengl_core
     delete m_impl;
   }
 
-  void render_window::init(fb_config &fbc)
+  void render_window::init(render_system &system, fb_config &fbc)
   {
     ShowWindow(m_impl->m_window, SW_HIDE);
     destroy();
@@ -87,7 +88,7 @@ namespace opengl_core
     m_impl->m_window = ::CreateWindowEx(0, m_impl->m_window_class.lpszClassName,
       L"", WS_OVERLAPPEDWINDOW,
       CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-      NULL, NULL, win32_hinstance::acquire(), this);
+      NULL, NULL, win32_hinstance::acquire(), &system);
     if (!m_impl->m_window) {
       print_last_error_and_assert();
     }

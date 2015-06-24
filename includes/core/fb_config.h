@@ -7,6 +7,7 @@
 
 namespace opengl_core
 {
+  class render_system;
   class render_window;
 
   class fb_config : public non_copyable
@@ -19,7 +20,7 @@ namespace opengl_core
     fb_config();
     ~fb_config();
 
-    void choose_best(render_window *detail = nullptr);
+    void choose_best(render_system &system, render_window *detail = nullptr);
     void destroy();
 
     void *impl();
