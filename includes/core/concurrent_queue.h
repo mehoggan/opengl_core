@@ -80,8 +80,7 @@ namespace opengl_core
 
       queue_not_empty(std::queue<T> &queue)
         : m_queue(queue)
-      {
-      }
+      {}
 
       bool operator()() const
       {
