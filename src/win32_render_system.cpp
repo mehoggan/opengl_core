@@ -80,7 +80,6 @@ namespace opengl_core
 
     MSG msg;
     memset(&msg, 0, sizeof(msg));
-    unsigned int quit_message_count = 0;
     auto hwnd = *static_cast<HWND*>(m_impl->m_window.impl());
     bool render = true;
     do {

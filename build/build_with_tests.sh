@@ -24,6 +24,7 @@ if [[ ${DEBUG} == 'true' ]]; then
           --gen-suppressions=all \
           --track-origins=yes \
           --suppressions=${SCRIPTPATH}/suppressions/fedora-21-nvidia-346.47.supp \
+          --suppressions=${SCRIPTPATH}/suppressions/c++11-stdlib-GLIBC_2.2.5.supp \
           ./test_opengl_core
       else
         ./test_opengl_core
@@ -62,6 +63,7 @@ if [[ ${RELEASE} == 'true' ]]; then
           --gen-suppressions=all \
           --track-origins=yes \
           --suppressions=${SCRIPTPATH}/suppressions/fedora-21-nvidia-346.47.supp \
+          --suppressions=${SCRIPTPATH}/suppressions/c++11-stdlib-GLIBC_2.2.5.supp \
           ./test_opengl_core
       else
         ./test_opengl_core
