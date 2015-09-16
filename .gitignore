@@ -62,3 +62,4 @@ bin/
 unit_test_*
 filters*
 a.out
+*/.deps/*
