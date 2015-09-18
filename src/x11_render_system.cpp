@@ -1,9 +1,9 @@
-#include <core/render_system.h>
+#include "core/render_system.h"
 
-#include <core/fb_config.h>
-#include <core/gl_functions.h>
-#include <core/x11_display.h>
-#include <core/x11_event_mask.h>
+#include "core/fb_config.h"
+#include "core/gl_functions.h"
+#include "core/x11_display.h"
+#include "core/x11_event_mask.h"
 
 #include <chrono>
 #include <iostream>

@@ -1,7 +1,7 @@
 #ifndef OPENGL_CORE_X11_DISPLAY_H_INCLUDED
 #define OPENGL_CORE_X11_DISPLAY_H_INCLUDED
 
-#include <declspec.h>
+#include "declspec.h"
 
 #include <X11/Xlib.h>
 

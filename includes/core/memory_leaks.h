@@ -1,7 +1,7 @@
 #ifndef MEMORY_LEAKS_H_INCLUDED
 #define MEMORY_LEAKS_H_INCLUDED
 
-#include <core/platform.h>
+#include "core/platform.h"
 
 #ifdef __OPENGL_CORE_WINDOWS__
   #define _CRTDBG_MAP_ALLOC

@@ -1,6 +1,6 @@
-#include <core/gl_functions.h>
+#include "core/gl_functions.h"
 
-#include <core/win32_error_handler.h>
+#include "core/win32_error_handler.h"
 
 #include <algorithm>
 #include <cassert>

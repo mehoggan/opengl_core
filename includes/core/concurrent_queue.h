@@ -18,7 +18,7 @@
 #ifndef OPENGL_CORE_CONCURRENT_QUEUE_H_INCLUDED
 #define OPENGL_CORE_CONCURRENT_QUEUE_H_INCLUDED
 
-#include <core/non_copyable.h>
+#include "core/non_copyable.h"
 
 #include <condition_variable>
 #include <queue>

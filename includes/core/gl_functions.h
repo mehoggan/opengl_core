@@ -1,7 +1,7 @@
 #ifndef GL_FUNCTIONS_H_INCLUDED
 #define GL_FUNCTIONS_H_INCLUDED
 
-#include <declspec.h>
+#include "declspec.h"
 
 /*! Each OpenGL version will be grouped in and of its own by an extern "C" scope
  */

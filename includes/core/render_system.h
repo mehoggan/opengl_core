@@ -1,9 +1,9 @@
 #ifndef RENDER_SYSTEM_H_INCLUDED
 #define RENDER_SYSTEM_H_INCLUDED
 
-#include <declspec.h>
+#include "declspec.h"
 
-#include <core/non_copyable.h>
+#include "core/non_copyable.h"
 
 namespace opengl_core
 {

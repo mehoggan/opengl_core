@@ -1,11 +1,11 @@
-#include <core/render_system.h>
+#include "core/render_system.h"
 
-#include <core/concurrent_queue.h>
-#include <core/fb_config.h>
-#include <core/gl_functions.h>
-#include <core/render_context.h>
-#include <core/render_window.h>
-#include <core/win32_error_handler.h>
+#include "core/concurrent_queue.h"
+#include "core/fb_config.h"
+#include "core/gl_functions.h"
+#include "core/render_context.h"
+#include "core/render_window.h"
+#include "core/win32_error_handler.h"
 
 #include <chrono>
 #include <condition_variable>

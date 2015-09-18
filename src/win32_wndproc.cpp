@@ -1,7 +1,7 @@
-#include <core/win32_wndproc.h>
+#include "core/win32_wndproc.h"
 
-#include <core/fb_config.h>
-#include <core/render_system.h>
+#include "core/fb_config.h"
+#include "core/render_system.h"
 
 #include <unordered_map>
 

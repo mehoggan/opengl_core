@@ -1,7 +1,7 @@
 #ifndef NON_COPYABLE_HPP_INCLUDED
 #define NON_COPYABLE_HPP_INCLUDED
 
-#include <declspec.h>
+#include "declspec.h"
 
 namespace opengl_core
 {
