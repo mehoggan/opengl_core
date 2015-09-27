@@ -47,13 +47,16 @@ else()
   message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 endif()
 
-add_library(opengl_core SHARED ${src})
 add_library(opengl_core_static STATIC ${src})
+add_library(opengl_core_shared SHARED ${src})
 
-target_link_libraries(opengl_core ${OPENGL_gl_LIBRARY})
 target_link_libraries(opengl_core_static ${OPENGL_gl_LIBRARY})
+target_link_libraries(opengl_core_shared ${OPENGL_gl_LIBRARY})
 
 add_definitions(-DUNICODE -D_UNICODE)
-  
+
+set_target_properties(opengl_core_static PROPERTIES COMPILE_DEFINITIONS _USRSTATIC)
+target_compile_definitions(opengl_core_shared PRIVATE _USRSHARED OPENGL_CORE_EXPORTS)
+
 enable_testing()
 add_test(NAME tests COMMAND core_tests)

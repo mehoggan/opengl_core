@@ -22,8 +22,8 @@
   #define GLAPI extern
 
 #elif (defined WIN32) || (defined _WIN32) || (defined __WIN32__)
-  #ifdef _USRDLL
-    #ifdef OPENGL_CORE_EXPORTS
+  #if defined(_USRSHARED)
+    #if defined(OPENGL_CORE_EXPORTS)
       #define OPENGL_CORE_API __declspec(dllexport)
       #define EXTERN_OPENGL_CORE_API extern __declspec(dllexport)
     #else
