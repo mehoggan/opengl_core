@@ -1,5 +1,5 @@
-#ifndef MEMORY_LEAKS_H_INCLUDED
-#define MEMORY_LEAKS_H_INCLUDED
+#ifndef CORE_MEMORY_LEAKS_H_INCLUDED
+#define CORE_MEMORY_LEAKS_H_INCLUDED
 
 #include "core/platform.h"
 
