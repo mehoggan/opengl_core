@@ -22,8 +22,9 @@ namespace opengl_core
     for (start = ext_list;;) {
       where = strstr(start, extension);
 
-      if (!where)
+      if (!where) {
         break;
+      }
 
       terminator = where + strlen(extension);
 
