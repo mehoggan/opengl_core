@@ -48,7 +48,7 @@
 
   #define GLAPI __declspec(dllimport)
 
-#elif (defined __gnu_linux__) || (defined __linux__)
+#elif (defined __gnu_linux__) || (defined __linux__) || __APPLE__
   #define OPENGL_CORE_API
   #define EXTERN_OPENGL_CORE_API extern __attribute__ ((visibility("default")))
 

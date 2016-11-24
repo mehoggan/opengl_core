@@ -1,7 +1,7 @@
 #ifndef SYMBOL_LOADER_H_INCLUDED
 #define SYMBOL_LOADER_H_INCLUDED
 
-#include "core/non_copyable.h"
+#include "opengl_core/core/non_copyable.h"
 
 #include <iostream>
 

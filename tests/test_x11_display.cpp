@@ -1,4 +1,4 @@
-#include "test_x11_display.h"
+#include "opengl_core/core/x11_display.h"
 
 #include <chrono>
 #include <iostream>

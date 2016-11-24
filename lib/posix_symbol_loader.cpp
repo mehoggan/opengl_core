@@ -1,6 +1,6 @@
-#include "core/symbol_loader.h"
+#include "opengl_core/core/symbol_loader.h"
 
-#include <Windows.h>
+#include <dlfcn.h>
 
 namespace opengl_core
 {
@@ -8,7 +8,7 @@ namespace opengl_core
     m_lib_name(lib_name),
     m_good(false)
   {
-    m_handle = (void*)LoadLibraryA(lib_name);
+    m_handle = dlopen(lib_name, RTLD_GLOBAL | RTLD_LAZY);
 
     if (!m_handle) {
       print_error();
@@ -19,7 +19,7 @@ namespace opengl_core
 
   symbol_loader::~symbol_loader()
   {
-    BOOL status = FreeLibrary((HMODULE)m_handle);
+    int status = dlclose(m_handle);
     if (status) {
       print_error();
     }
@@ -29,7 +29,7 @@ namespace opengl_core
   {
     void *func = nullptr;
     if (m_good) {
-      func = GetProcAddress((HMODULE)m_handle, symb_name);
+      func = dlsym(m_handle, symb_name);
       if (func == nullptr) {
         std::cerr << "Failed to load " << symb_name << " from "
           << m_lib_name << std::endl;
@@ -42,8 +42,7 @@ namespace opengl_core
 
   void symbol_loader::print_error()
   {
-    DWORD err = GetLastError();
-  
-    std::cerr << err << std::endl;
+    const char *errstr = dlerror();
+    std::cerr << errstr << std::endl;
   }
 }

@@ -111,3 +111,8 @@ CMakeFiles/
 CTestTestfile.cmake
 build/tests/
 *.ycm_*
+config.h
+Makefile
+test-driver
+*.log
+
