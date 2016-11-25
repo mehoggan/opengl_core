@@ -3,7 +3,7 @@
 
 #include "declspec.h"
 
-#include "core/non_copyable.h"
+#include "opengl_core/core/non_copyable.h"
 
 namespace opengl_core
 {

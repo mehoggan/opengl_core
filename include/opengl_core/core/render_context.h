@@ -1,10 +1,10 @@
 #ifndef RENDER_CONTEXT_H_INCLUDED
 #define RENDER_CONTEXT_H_INCLUDED
 
-#include "core/non_copyable.h"
+#include "opengl_core/core/non_copyable.h"
 
-#include "core/fb_config.h"
-#include "core/render_window.h"
+#include "opengl_core/core/fb_config.h"
+#include "opengl_core/core/render_window.h"
 
 #include <memory>
 

@@ -1,7 +1,7 @@
-#include "core/render_window.h"
+#include "opengl_core/core/render_window.h"
 
-#include "core/x11_display.h"
-#include "core/x11_event_mask.h"
+#include "opengl_core/core/x11_display.h"
+#include "opengl_core/core/x11_event_mask.h"
 
 #include <cassert>
 #include <iomanip>
@@ -45,7 +45,7 @@ namespace opengl_core
     swa.border_pixel = 0;
     swa.event_mask = StructureNotifyMask;
 
-    Window w = m_impl->m_window = XCreateWindow(
+    m_impl->m_window = XCreateWindow(
       display,
       RootWindow(display, vi->screen),
       0, 0, 100, 100,

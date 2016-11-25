@@ -1,8 +1,8 @@
-#include "core/render_context.h"
+#include "opengl_core/core/render_context.h"
 
-#include "core/extension_checker.h"
-#include "core/render_system.h"
-#include "core/x11_display.h"
+#include "opengl_core/core/extension_checker.h"
+#include "opengl_core/core/render_system.h"
+#include "opengl_core/core/x11_display.h"
 
 #include <cassert>
 #include <cstdlib>
@@ -25,6 +25,8 @@ namespace
   int context_error_handler(Display *, XErrorEvent *)
   {
     context_error = true;
+
+    return 0;
   }
 }
 
@@ -93,6 +95,7 @@ namespace opengl_core
       XLockDisplay(display);
       int (*oldHandler)(Display*, XErrorEvent*) = XSetErrorHandler(
         &context_error_handler);
+      (void)(oldHandler);
       XUnlockDisplay(display);
 
       GLint versions[][2] = {

@@ -12,14 +12,14 @@
   #endif
 
   #include <stdint.h>
-  #ifndef GLAPIENTRY
-  #  define GLAPIENTRY __stdcall
+  #ifndef OGLAPIENTRY
+  #  define OGLAPIENTRY __stdcall
   #endif
   #ifndef OPENGL_CORE_APIENTRY
   #  define OPENGL_CORE_APIENTRY __stdcall
   #endif
 
-  #define GLAPI extern
+  #define OGLAPI extern
 
 #elif (defined WIN32) || (defined _WIN32) || (defined __WIN32__)
   #if defined(_USRSHARED)
@@ -39,29 +39,30 @@
   #endif
 
   #include <stdint.h>
-  #ifndef GLAPIENTRY
-  #  define GLAPIENTRY __stdcall
+  #ifndef OGLAPIENTRY
+  #  define OGLAPIENTRY __stdcall
   #endif
   #ifndef OPENGL_CORE_APIENTRY
   #  define OPENGL_CORE_APIENTRY __stdcall
   #endif
 
-  #define GLAPI __declspec(dllimport)
+  #define OGLAPI __declspec(dllimport)
 
 #elif (defined __gnu_linux__) || (defined __linux__) || __APPLE__
   #define OPENGL_CORE_API
-  #define EXTERN_OPENGL_CORE_API extern __attribute__ ((visibility("default")))
+  #define EXTERN_OPENGL_CORE_API extern __attribute__ \
+    ((visibility("default")))
 
   #include <stddef.h>
   #include <stdint.h>
   #define APIENTRY
-  #ifndef GLAPIENTRY
-  #  define GLAPIENTRY
+  #ifndef OGLAPIENTRY
+  #  define OGLAPIENTRY
   #endif
   #ifndef OPENGL_CORE_APIENTRY
   #  define OPENGL_CORE_APIENTRY
   #endif
 
-  #define GLAPI
+  #define OGLAPI
 
 #endif

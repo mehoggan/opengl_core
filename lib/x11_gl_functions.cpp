@@ -1,6 +1,6 @@
-#include "core/gl_functions.h"
+#include "opengl_core/core/gl_functions.h"
 
-#include "core/x11_display.h"
+#include "opengl_core/core/x11_display.h"
 
 #include <algorithm>
 #include <cassert>
@@ -140,7 +140,8 @@ PFNGLCREATESHADERPROC opengl_core_CreateShader = NULL;
 PFNGLDELETEPROGRAMPROC opengl_core_DeleteProgram = NULL;
 PFNGLDELETESHADERPROC opengl_core_DeleteShader = NULL;
 PFNGLDETACHSHADERPROC opengl_core_DetachShader = NULL;
-PFNGLDISABLEVERTEXATTRIBARRAYPROC opengl_core_DisableVertexAttribArray = NULL;
+PFNGLDISABLEVERTEXATTRIBARRAYPROC
+  opengl_core_DisableVertexAttribArray = NULL;
 PFNGLDRAWBUFFERSPROC opengl_core_DrawBuffers = NULL;
 PFNGLENABLEVERTEXATTRIBARRAYPROC opengl_core_EnableVertexAttribArray = NULL;
 PFNGLGETACTIVEATTRIBPROC opengl_core_GetActiveAttrib = NULL;
@@ -250,15 +251,16 @@ PFNGLGETFRAGDATALOCATIONPROC opengl_core_GetFragDataLocation = NULL;
 PFNGLGETSTRINGIPROC opengl_core_GetStringi = NULL;
 PFNGLGETTEXPARAMETERIIVPROC opengl_core_GetTexParameterIiv = NULL;
 PFNGLGETTEXPARAMETERIUIVPROC opengl_core_GetTexParameterIuiv = NULL;
-PFNGLGETTRANSFORMFEEDBACKVARYINGPROC opengl_core_GetTransformFeedbackVarying =
-  NULL;
+PFNGLGETTRANSFORMFEEDBACKVARYINGPROC
+  opengl_core_GetTransformFeedbackVarying = NULL;
 PFNGLGETUNIFORMUIVPROC opengl_core_GetUniformuiv = NULL;
 PFNGLGETVERTEXATTRIBIIVPROC opengl_core_GetVertexAttribIiv = NULL;
 PFNGLGETVERTEXATTRIBIUIVPROC opengl_core_GetVertexAttribIuiv = NULL;
 PFNGLISENABLEDIPROC opengl_core_IsEnabledi = NULL;
 PFNGLTEXPARAMETERIIVPROC opengl_core_TexParameterIiv = NULL;
 PFNGLTEXPARAMETERIUIVPROC opengl_core_TexParameterIuiv = NULL;
-PFNGLTRANSFORMFEEDBACKVARYINGSPROC opengl_core_TransformFeedbackVaryings = NULL;
+PFNGLTRANSFORMFEEDBACKVARYINGSPROC
+  opengl_core_TransformFeedbackVaryings = NULL;
 PFNGLUNIFORM1UIPROC opengl_core_Uniform1ui = NULL;
 PFNGLUNIFORM1UIVPROC opengl_core_Uniform1uiv = NULL;
 PFNGLUNIFORM2UIPROC opengl_core_Uniform2ui = NULL;
@@ -352,7 +354,8 @@ namespace opengl_core
 
       std::cout << "Extensions availiable for (using glGetStringi()): "
         << context.query_major_version() << "."
-        << context.query_minor_version() << " versioned context " << std::endl;
+        << context.query_minor_version() << " versioned context "
+        << std::endl;
       GLint n = 0;
       glGetIntegerv(GL_NUM_EXTENSIONS, &n);
       for (GLint i = 0; i < n; ++i) {
@@ -362,7 +365,8 @@ namespace opengl_core
     } else {
       std::cout << "Extensions availiable for (using glGetString(): "
         << context.query_major_version() << "."
-        << context.query_minor_version() << " versioned context " << std::endl;
+        << context.query_minor_version() << " versioned context "
+        << std::endl;
 
       const GLubyte *extensions = glGetString(GL_EXTENSIONS);
       std::string std_extensions((const char*)extensions);

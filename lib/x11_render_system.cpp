@@ -1,16 +1,15 @@
-#include "core/render_system.h"
+#include "opengl_core/core/render_system.h"
 
-#include "core/fb_config.h"
-#include "core/gl_functions.h"
-#include "core/x11_display.h"
-#include "core/x11_event_mask.h"
+#include "opengl_core/core/fb_config.h"
+#include "opengl_core/core/render_context.h"
+#include "opengl_core/core/x11_display.h"
+#include "opengl_core/core/x11_event_mask.h"
 
 #include <chrono>
 #include <iostream>
 #include <thread>
 
-#include <X11/Xlib.h>
-#include <GL/glx.h>
+#include "opengl_core/core/gl_functions.h"
 
 namespace opengl_core
 {
@@ -101,6 +100,8 @@ namespace opengl_core
       glXSwapBuffers(display, window);
       m_impl->m_context.make_not_current();
     }
+
+    return true;
   }
 
   void render_system::destroy()

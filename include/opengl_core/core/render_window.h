@@ -1,9 +1,9 @@
 #ifndef RENDER_WINDOW_H_INCLUDED
 #define RENDER_WINDOW_H_INCLUDED
 
-#include "core/non_copyable.h"
+#include "opengl_core/core/non_copyable.h"
 
-#include "core/fb_config.h"
+#include "opengl_core/core/fb_config.h"
 
 #include <memory>
 
