@@ -51,5 +51,6 @@ AX_VALGRIND_CHECK
 
 AC_CONFIG_FILES([Makefile \
 	lib/Makefile \
+	bin/Makefile \
 	tests/Makefile ])
 AC_OUTPUT

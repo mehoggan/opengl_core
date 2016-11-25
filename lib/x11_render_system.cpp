@@ -18,7 +18,6 @@ namespace opengl_core
     render_context m_context;
     render_window m_window;
     fb_config m_fbc;
-
     Atom m_delete_window;
   };
 
@@ -61,11 +60,12 @@ namespace opengl_core
 
     m_impl->m_window.init((*this), m_impl->m_fbc);
     Window &window = *static_cast<Window*>((m_impl->m_window.impl()));
-    m_impl->m_delete_window = XInternAtom(display, "WM_DELETE_WINDOW", False);
-    if (!XSetWMProtocols(display, window, &m_impl->m_delete_window, 1)) {
-      std::cout << "Set Window Protocols Failed" << std::endl;
-    }
     m_impl->m_window.map();
+    m_impl->m_delete_window = XInternAtom(display, "WM_DELETE_WINDOW",
+      False);
+    if (!XSetWMProtocols(display, window, &m_impl->m_delete_window , 1)) {
+      std::cerr << "Set Window Protocols Failed" << std::endl;
+    }
 
     m_impl->m_context.init((*this), m_impl->m_window, m_impl->m_fbc);
     m_impl->m_context.make_current(m_impl->m_window);
@@ -77,13 +77,12 @@ namespace opengl_core
     bool exposed = false;
     XEvent x_event;
     while (!terminate) {
-      while (::XCheckWindowEvent(display, window, events::mask, &x_event)) {
-        std::cout << "Message Type " << x_event.type << std::endl;
+      while (::XPending(display)) {
+        XNextEvent(display, &x_event);
         if (x_event.type == Expose) {
           exposed = true;
         }
         if (x_event.type == ClientMessage) {
-          std::cout << "Client Message" << std::endl;
           if ((Atom)x_event.xclient.data.l[0] == m_impl->m_delete_window) {
             terminate = true;
           }
