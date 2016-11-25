@@ -1,8 +1,8 @@
 #ifndef CHECK_SUITE_H
 #define CHECK_SUITE_H
 
-#include <check.h>
-#include <stdlib.h>
+struct Suite;
+struct SRunner;
 
 typedef void (*test_func)(int);
 

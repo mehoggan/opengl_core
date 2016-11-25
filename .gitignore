@@ -80,4 +80,9 @@ config.h
 Makefile
 test-driver
 *.log
-
+*.trs
+*.Po
+*.Plo
+tests/check_x11_display
+tests/check_x11_render_system
+*.dirstamp

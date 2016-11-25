@@ -1,5 +1,7 @@
 #include "suite.h"
 
+#include <check.h>
+
 SRunner *
 suite_runner_create(Suite *s)
 {
