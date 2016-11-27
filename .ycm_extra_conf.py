@@ -18,6 +18,8 @@ flags = [
          '-D_XOPEN_SOURCE 500'
 ]
 
+SOURCE_EXTENSIONS = ['.cpp', '.inl', '.mm']
+
 if compilation_database_folder:
     database = ycm_core.CompilationDatabase(compilation_database_folder)
 else:

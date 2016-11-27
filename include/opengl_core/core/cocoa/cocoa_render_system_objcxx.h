@@ -15,34 +15,17 @@
  * limitations under the License.
  *
  */
-#ifndef SYMBOL_LOADER_H_INCLUDED
-#define SYMBOL_LOADER_H_INCLUDED
+#import "opengl_core/core/render_system.h"
 
-#include "opengl_core/core/non_copyable.h"
+#import <Foundation/Foundation.h>
 
-#include <iostream>
-
-
-namespace opengl_core
+@interface render_system_objcxx : NSObject
 {
-  class symbol_loader : public non_copyable
-  {
-  private:
-    void *m_handle;
-    const char *m_lib_name;
-    bool m_good;
-
-  public:
-    explicit symbol_loader(const char *lib_name);
-    ~symbol_loader();
-
-    bool get_good() const { return m_good; }
-
-    void *load(const char *symb_name);
-
-  private:
-    void print_error();
-  };
 }
 
-#endif
+-(void) render_loop;
+-(bool) init_system;
+-(void) terminate;
+-(void) destroy;
+
+@end

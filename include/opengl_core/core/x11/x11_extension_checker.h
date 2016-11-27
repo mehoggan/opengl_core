@@ -15,34 +15,15 @@
  * limitations under the License.
  *
  */
-#ifndef SYMBOL_LOADER_H_INCLUDED
-#define SYMBOL_LOADER_H_INCLUDED
-
-#include "opengl_core/core/non_copyable.h"
-
-#include <iostream>
-
+#ifndef EXTENSION_CHECKER_H_INCLUDED
+#define EXTENSION_CHECKER_H_INCLUDED
 
 namespace opengl_core
 {
-  class symbol_loader : public non_copyable
+  extern "C"
   {
-  private:
-    void *m_handle;
-    const char *m_lib_name;
-    bool m_good;
-
-  public:
-    explicit symbol_loader(const char *lib_name);
-    ~symbol_loader();
-
-    bool get_good() const { return m_good; }
-
-    void *load(const char *symb_name);
-
-  private:
-    void print_error();
-  };
+    bool is_extension_supported(const char *ext_list, const char *extension);
+  }
 }
 
 #endif

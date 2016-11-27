@@ -25,12 +25,14 @@ if LINUX
 #	-I$(top_builddir)/tests/include -std=c++11 -Wall -Werror -pedantic
 #check_x11_render_system_LDADD = $(top_builddir)/lib/libopengl_core.la \
 #	-lcheck -lsubunit -lm -lrt
+#check_x11_render_system_LDFLAGS = -lc++
 
 check_x11_display_SOURCES = suite.cpp check_x11_display.cpp
 check_x11_display_CXXFLAGS = -I$(top_builddir)/include/ \
 	-I$(top_builddir)/tests/include -std=c++11 -Wall -Werror -pedantic
 check_x11_display_LDADD = $(top_builddir)/lib/libopengl_core.la \
 	-lcheck -lsubunit -lm -lrt
+check_x11_display_LDFLAGS = -lc++
 else
 endif
 

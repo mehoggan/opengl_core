@@ -30,7 +30,7 @@ namespace opengl_core
     delete m_impl;
   }
 
-  bool render_system::init()
+  bool render_system::init_system()
   {
     XInitThreads();
 
@@ -73,6 +73,13 @@ namespace opengl_core
     gl_functions::configure(m_impl->m_context);
     m_impl->m_context.make_not_current();
 
+    render_loop();
+
+    return true;
+  }
+
+  void render_system::render_loop()
+  {
     bool terminate = false;
     bool exposed = false;
     XEvent x_event;
@@ -99,8 +106,6 @@ namespace opengl_core
       glXSwapBuffers(display, window);
       m_impl->m_context.make_not_current();
     }
-
-    return true;
   }
 
   void render_system::destroy()

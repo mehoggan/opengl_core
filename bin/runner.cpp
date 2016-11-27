@@ -3,7 +3,7 @@
 int main(int argc, char *argv[])
 {
   opengl_core::render_system render_system;
-  render_system.init();
+  render_system.init_system();
   render_system.destroy();
   return 0;
 }

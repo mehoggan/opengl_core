@@ -41,6 +41,7 @@ AM_CONDITIONAL([OSX], [test "$build_mac" = "yes"])
 
 # Checks for programs.
 AC_PROG_CXX
+AC_PROG_OBJCXX
 
 AC_CHECK_HEADERS([\
 	math.h
