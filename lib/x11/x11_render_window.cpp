@@ -1,7 +1,7 @@
 #include "opengl_core/core/render_window.h"
 
-#include "opengl_core/core/x11_display.h"
-#include "opengl_core/core/x11_event_mask.h"
+#include "opengl_core/core/x11/x11_display.h"
+#include "opengl_core/core/x11/x11_event_mask.h"
 
 #include <cassert>
 #include <iomanip>

@@ -1,8 +1,8 @@
 #include "opengl_core/core/render_context.h"
 
-#include "opengl_core/core/extension_checker.h"
 #include "opengl_core/core/render_system.h"
-#include "opengl_core/core/x11_display.h"
+#include "opengl_core/core/x11/x11_display.h"
+#include "opengl_core/core/x11/x11_extension_checker.h"
 
 #include <cassert>
 #include <cstdlib>

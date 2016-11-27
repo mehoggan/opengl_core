@@ -29,10 +29,9 @@ pkginclude_HEADERS += \
 	$(top_builddir)/include/opengl_core/core/x11/x11_display.h \
 	$(top_builddir)/include/opengl_core/core/x11/x11_extension_checker.h \
 	$(top_builddir)/include/opengl_core/core/x11/x11_event_mask.h \
-	$(top_builddir)/include/opengl_core/core/x11/x11_gl_functions.h \
-AM_CXXFLAGS = $(INTI_CFLAGS) -Werror -Wall -pedantic \
-	-I/usr/local/include/ -I$(top_builddir)/include/ -std=c++11 -Wall -Werror \
-	-pedantic
+	$(top_builddir)/include/opengl_core/core/x11/x11_gl_functions.h
+AM_CPPFLAGS = -I/usr/local/include/ \
+	-I$(top_builddir)/include/ -Werror -Wall -pedantic -std=c++11
 libopengl_core_la_LDFLAGS = $(INIT_LIBS) -lGL -pthread
 endif
 

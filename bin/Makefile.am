@@ -13,7 +13,9 @@ runner_SOURCES = runner.cpp
 runner_CXXFLAGS = -I$(top_builddir)/include/ \
 	-I$(top_builddir)/tools/include -std=c++11
 runner_LDADD = $(top_builddir)/lib/libopengl_core.la
+if OSX
 runner_LDFLAGS = -lc++
+endif
 
 CLEANFILES = *.o
 CLEANDIRS = deps/ \

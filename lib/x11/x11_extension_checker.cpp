@@ -1,4 +1,4 @@
-#include "opengl_core/core/extension_checker.h"
+#include "opengl_core/core/x11/x11_extension_checker.h"
 
 #include <cstring>
 

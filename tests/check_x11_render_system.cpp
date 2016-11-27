@@ -1,18 +1,18 @@
 #include "opengl_core/core/render_system.h"
-#include "opengl_core/core/gl_functions.h"
+#include "opengl_core/core/x11/x11_gl_functions.h"
 
 #include "suite.h"
-
-#include <check.h>
 
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
 
+#include <check.h>
+
 START_TEST(test_x11_render_system)
 {
   opengl_core::render_system render_system;
-  render_system.init();
+  ck_assert(render_system.init_system());
   render_system.destroy();
 }
 END_TEST

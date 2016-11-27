@@ -1,6 +1,6 @@
-#include "opengl_core/core/gl_functions.h"
+#include "opengl_core/core/x11/x11_gl_functions.h"
 
-#include "opengl_core/core/x11_display.h"
+#include "opengl_core/core/x11/x11_display.h"
 
 #include <algorithm>
 #include <cassert>

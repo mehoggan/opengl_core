@@ -1,4 +1,4 @@
-#include "opengl_core/core/x11_display.h"
+#include "opengl_core/core/x11/x11_display.h"
 
 #include <cassert>
 #include <iostream>

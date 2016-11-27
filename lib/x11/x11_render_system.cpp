@@ -2,14 +2,13 @@
 
 #include "opengl_core/core/fb_config.h"
 #include "opengl_core/core/render_context.h"
-#include "opengl_core/core/x11_display.h"
-#include "opengl_core/core/x11_event_mask.h"
+#include "opengl_core/core/x11/x11_display.h"
+#include "opengl_core/core/x11/x11_event_mask.h"
+#include "opengl_core/core/x11/x11_gl_functions.h"
 
 #include <chrono>
 #include <iostream>
 #include <thread>
-
-#include "opengl_core/core/gl_functions.h"
 
 namespace opengl_core
 {
@@ -75,6 +74,7 @@ namespace opengl_core
 
     render_loop();
 
+    x11_display::release();
     return true;
   }
 
@@ -83,6 +83,9 @@ namespace opengl_core
     bool terminate = false;
     bool exposed = false;
     XEvent x_event;
+    Display *&display = opengl_core::x11_display::acquire();
+    m_impl->m_window.init((*this), m_impl->m_fbc);
+    Window &window = *static_cast<Window*>((m_impl->m_window.impl()));
     while (!terminate) {
       while (::XPending(display)) {
         XNextEvent(display, &x_event);
@@ -106,6 +109,7 @@ namespace opengl_core
       glXSwapBuffers(display, window);
       m_impl->m_context.make_not_current();
     }
+    x11_display::release();
   }
 
   void render_system::destroy()
