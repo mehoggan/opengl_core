@@ -37,7 +37,8 @@ namespace opengl_core
     render_context();
     ~render_context();
 
-    void init(render_system &system, render_window &window, fb_config &fbc);
+    void init_render_context(render_system &system,
+      render_window &window, fb_config &fbc);
     void make_current(render_window &window);
     void make_not_current();
     void destroy();

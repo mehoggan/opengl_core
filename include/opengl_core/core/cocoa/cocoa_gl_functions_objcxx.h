@@ -15,4 +15,23 @@
  * limitations under the License.
  *
  */
+#import "opengl_core/core/gl_functions.h"
+
+#import <Foundation/Foundation.h>
+
+@interface gl_functions_objcxx : NSObject
+{
+}
+
++(void) load_1_2:(void *) sym_loader;
++(void) load_1_3:(void *) sym_loader;
++(void) load_1_4:(void *) sym_loader;
++(void) load_1_5:(void *) sym_loader;
++(void) load_2_0:(void *) sym_loader;
++(void) load_2_1:(void *) sym_loader;
++(void) load_3_0:(void *) sym_loader;
+
++(void) configure:(void *)context;
+
+@end
 

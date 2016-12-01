@@ -15,4 +15,21 @@
  * limitations under the License.
  *
  */
+#import "opengl_core/core/render_context.h"
 
+#import <Foundation/Foundation.h>
+
+@interface render_context_objcxx : NSObject
+{
+}
+
+-(void) init_render_context:(void *)system :(void *)window
+    :(void *)fbc;
+-(void) make_current:(void *)window;
+-(void) make_not_current;
+-(void) destroy;
+
+-(int) query_major_version;
+-(int) query_minor_version;
+
+@end

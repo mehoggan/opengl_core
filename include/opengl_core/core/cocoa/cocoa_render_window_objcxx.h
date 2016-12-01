@@ -15,4 +15,16 @@
  * limitations under the License.
  *
  */
+#import "opengl_core/core/render_window.h"
 
+#import <Foundation/Foundation.h>
+
+@interface render_window_objcxx : NSObject
+{
+}
+
+-(void) init_window:(void *)system :(void *)fbc;
+-(void) map;
+-(void) destroy;
+
+@end

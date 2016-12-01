@@ -4,7 +4,6 @@
 
 namespace opengl_core
 {
-
   struct fb_config::fb_config_impl
   {
     void *id_self;
@@ -25,7 +24,7 @@ namespace opengl_core
   void fb_config::choose_best(render_system &system,
     render_window *detail)
   {
-    [(id)m_impl->id_self choose_best: (void*)&system :(void*)detail];
+    [(id)m_impl->id_self choose_best:(void *)&system :(void *)detail];
   }
 
   void fb_config::destroy()

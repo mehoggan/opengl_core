@@ -57,7 +57,7 @@ namespace opengl_core
 
     m_impl->m_fbc.choose_best((*this));
 
-    m_impl->m_window.init((*this), m_impl->m_fbc);
+    m_impl->m_window.init_window((*this), m_impl->m_fbc);
     Window &window = *static_cast<Window*>((m_impl->m_window.impl()));
     m_impl->m_window.map();
     m_impl->m_delete_window = XInternAtom(display, "WM_DELETE_WINDOW",
@@ -66,7 +66,7 @@ namespace opengl_core
       std::cerr << "Set Window Protocols Failed" << std::endl;
     }
 
-    m_impl->m_context.init((*this), m_impl->m_window, m_impl->m_fbc);
+    m_impl->m_context.init_context((*this), m_impl->m_window, m_impl->m_fbc);
     m_impl->m_context.make_current(m_impl->m_window);
 
     gl_functions::configure(m_impl->m_context);
@@ -119,6 +119,5 @@ namespace opengl_core
     m_impl->m_window.destroy();
     m_impl->m_fbc.destroy();
     x11_display::release();
-    std::cout << x11_display::use_count() << std::endl;
   }
 }
