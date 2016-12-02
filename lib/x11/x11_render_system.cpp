@@ -112,6 +112,10 @@ namespace opengl_core
     x11_display::release();
   }
 
+  void render_system::terminate_system()
+  {
+  }
+
   void render_system::destroy()
   {
     m_impl->m_context.make_not_current();

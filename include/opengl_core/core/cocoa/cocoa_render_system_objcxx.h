@@ -16,16 +16,25 @@
  *
  */
 #import "opengl_core/core/render_system.h"
+#import "opengl_core/core/cocoa/cocoa_render_window_objcxx.h"
 
+#import <AppKit/AppKit.h>
+#import <Cocoa/Cocoa.h>
 #import <Foundation/Foundation.h>
 
 @interface render_system_objcxx : NSObject
 {
+  NSAutoreleasePool *pool;
+  NSUInteger window_style;
+  NSRect window_rect;
+  NSWindow *window;
+  NSWindowController *window_controller;
+  render_window_objcxx *render_window;
 }
 
 -(void) render_loop;
 -(bool) init_system;
--(void) terminate;
+-(void) terminate_system;
 -(void) destroy;
 
 @end

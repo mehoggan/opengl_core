@@ -38,7 +38,7 @@ namespace opengl_core
     ~render_system();
 
     bool init_system();
-    void terminate();
+    void terminate_system();
     void destroy();
   };
 }

@@ -53,7 +53,7 @@ pkginclude_HEADERS +=
 AM_CXXFLAGS = $(INTI_CXXFLAGS) -Werror -Wall -pedantic \
 	-I$(top_builddir)/include/ -I$(top_builddir)/objc \
 	-std=c++11 -Wall -Werror -pedantic
-AM_OBJCXXFLAGS = -x objective-c++ -I$(top_builddir)/include -std=c++11
-	-I$(top_builddir)/include/objc -framework Foundation,OpenGL
-libopengl_core_la_LDFLAGS = $(INIT_LIBS) -framework Foundation,OpenGL
+AM_OBJCXXFLAGS = -x objective-c++ -I$(top_builddir)/include -std=c++11 \
+	-I$(top_builddir)/include/objc -framework Cocoa
+libopengl_core_la_LDFLAGS = $(INIT_LIBS) -framework Foundation,OpenGL,UIKit
 endif

@@ -57,9 +57,9 @@ namespace opengl_core
     return ret;
   }
 
-  void render_system::terminate()
+  void render_system::terminate_system()
   {
-    [(id)m_impl->id_self terminate];
+    [(id)m_impl->id_self terminate_system];
   }
 
   void render_system::destroy()
@@ -80,10 +80,32 @@ namespace opengl_core
 -(bool) init_system
 {
   NSLog(@"Hello World %s\n", __FUNCTION__);
+
+  pool = [[NSAutoreleasePool alloc] init];
+  [NSApplication sharedApplication];
+
+  window_style = NSTitledWindowMask | NSClosableWindowMask |
+    NSResizableWindowMask;
+
+  window_rect = NSMakeRect(100, 100, 400, 400);
+  window = [[NSWindow alloc] initWithContentRect:window_rect
+    styleMask:window_style
+    backing:NSBackingStoreBuffered
+    defer:NO];
+  [window autorelease];
+
+  window_controller = [[NSWindowController alloc] initWithWindow:window];
+  [window_controller autorelease];
+
+  [window orderFrontRegardless];
+  [NSApp run];
+
+  [pool drain];
+
   return true;
 }
 
--(void) terminate
+-(void) terminate_system
 {
   NSLog(@"Hello World %s\n", __FUNCTION__);
 }
