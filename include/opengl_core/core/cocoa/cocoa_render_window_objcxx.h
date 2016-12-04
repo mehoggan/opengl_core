@@ -17,14 +17,20 @@
  */
 #import "opengl_core/core/render_window.h"
 
+#import <AppKit/AppKit.h>
+#import <Cocoa/Cocoa.h>
 #import <Foundation/Foundation.h>
 
 @interface render_window_objcxx : NSObject
 {
+  NSAutoreleasePool *pool;
+  NSUInteger window_style;
+  NSWindow *window;
 }
 
 -(void) init_window:(void *)system :(void *)fbc;
 -(void) map;
 -(void) destroy;
+-(void *) impl;
 
 @end

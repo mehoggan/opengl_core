@@ -39,7 +39,17 @@ namespace opengl_core
 
 -(void) init_window:(void *)system :(void *)fbc
 {
-  NSLog(@"Hello World %s\n", __FUNCTION__);
+  window_style = NSTitledWindowMask | NSClosableWindowMask |
+    NSResizableWindowMask;
+
+  pool = [[NSAutoreleasePool alloc] init];
+
+  window = [[NSWindow alloc]
+    initWithContentRect:NSMakeRect(100, 100, 400, 400)
+    styleMask:window_style
+    backing:NSBackingStoreBuffered
+    defer:YES];
+  [window autorelease];
 }
 
 -(void) map
@@ -49,7 +59,12 @@ namespace opengl_core
 
 -(void) destroy
 {
-  NSLog(@"Hello World %s\n", __FUNCTION__);
+  [pool drain];
+}
+
+-(void *) impl
+{
+  return (void *)self->window;
 }
 
 @end

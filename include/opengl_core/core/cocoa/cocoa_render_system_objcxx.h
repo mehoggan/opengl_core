@@ -25,9 +25,6 @@
 @interface render_system_objcxx : NSObject
 {
   NSAutoreleasePool *pool;
-  NSUInteger window_style;
-  NSRect window_rect;
-  NSWindow *window;
   NSWindowController *window_controller;
   render_window_objcxx *render_window;
 }
