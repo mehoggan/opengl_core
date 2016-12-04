@@ -4,11 +4,14 @@
 #include "opengl_core/core/render_context.h"
 #include "opengl_core/core/x11/x11_display.h"
 #include "opengl_core/core/x11/x11_event_mask.h"
-#include "opengl_core/core/x11/x11_gl_functions.h"
 
 #include <chrono>
 #include <iostream>
 #include <thread>
+
+#include "opengl_core/core/gl_functions.h"
+
+#include <GL/glx.h>
 
 namespace opengl_core
 {
@@ -17,6 +20,7 @@ namespace opengl_core
     render_context m_context;
     render_window m_window;
     fb_config m_fbc;
+
     Atom m_delete_window;
   };
 
@@ -27,6 +31,41 @@ namespace opengl_core
   render_system::~render_system()
   {
     delete m_impl;
+  }
+
+  void render_system::render_loop()
+  {
+    Display *&display = opengl_core::x11_display::acquire();
+    Window &window = *static_cast<Window*>((m_impl->m_window.impl()));
+
+    bool terminate = false;
+    bool exposed = false;
+    XEvent x_event;
+    while (!terminate) {
+      int n = XEventsQueued(display, QueuedAfterReading);
+      while (n--) {
+        XNextEvent(display, &x_event);
+        if (x_event.type == Expose) {
+          exposed = true;
+        } else if (x_event.type == ClientMessage) {
+          if ((Atom)x_event.xclient.data.l[0] == m_impl->m_delete_window) {
+            terminate = true;
+          }
+        }
+      }
+
+      if (terminate || !exposed) {
+        continue;
+      }
+
+      m_impl->m_context.make_current(m_impl->m_window);
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+      glClearColor(1.0, 0.0, 0.0, 1.0);
+      glXSwapBuffers(display, window);
+      m_impl->m_context.make_not_current();
+    }
+
+    x11_display::release();
   }
 
   bool render_system::init_system()
@@ -59,12 +98,11 @@ namespace opengl_core
 
     m_impl->m_window.init_window((*this), m_impl->m_fbc);
     Window &window = *static_cast<Window*>((m_impl->m_window.impl()));
-    m_impl->m_window.map();
-    m_impl->m_delete_window = XInternAtom(display, "WM_DELETE_WINDOW",
-      False);
-    if (!XSetWMProtocols(display, window, &m_impl->m_delete_window , 1)) {
-      std::cerr << "Set Window Protocols Failed" << std::endl;
+    m_impl->m_delete_window = XInternAtom(display, "WM_DELETE_WINDOW", False);
+    if (!XSetWMProtocols(display, window, &m_impl->m_delete_window, 1)) {
+      std::cout << "Set Window Protocols Failed" << std::endl;
     }
+    m_impl->m_window.map();
 
     m_impl->m_context.init_render_context((*this), m_impl->m_window,
       m_impl->m_fbc);
@@ -76,44 +114,8 @@ namespace opengl_core
     render_loop();
 
     x11_display::release();
+
     return true;
-  }
-
-  void render_system::render_loop()
-  {
-    bool terminate = false;
-    bool exposed = false;
-    XEvent x_event;
-    Display *&display = opengl_core::x11_display::acquire();
-    m_impl->m_window.init_window((*this), m_impl->m_fbc);
-    Window &window = *static_cast<Window*>((m_impl->m_window.impl()));
-    while (!terminate) {
-      while (::XPending(display)) {
-        XNextEvent(display, &x_event);
-        if (x_event.type == Expose) {
-          std::cout << "Exposed set" << std::endl;
-          exposed = true;
-        }
-        if (x_event.type == ClientMessage) {
-          if ((Atom)x_event.xclient.data.l[0] == m_impl->m_delete_window) {
-            terminate = true;
-          }
-        }
-      }
-
-      if (terminate || !exposed) {
-        std::cout << "continuing" << std::endl;
-        continue;
-      }
-
-      std::cout << "drawing" << std::endl;
-      m_impl->m_context.make_current(m_impl->m_window);
-      //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-      glClearColor(1.0, 1.0, 1.0, 1.0);
-      glXSwapBuffers(display, window);
-      m_impl->m_context.make_not_current();
-    }
-    x11_display::release();
   }
 
   void render_system::terminate_system()
@@ -127,5 +129,6 @@ namespace opengl_core
     m_impl->m_window.destroy();
     m_impl->m_fbc.destroy();
     x11_display::release();
+    std::cout << x11_display::use_count() << std::endl;
   }
 }
