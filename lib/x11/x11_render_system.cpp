@@ -66,7 +66,8 @@ namespace opengl_core
       std::cerr << "Set Window Protocols Failed" << std::endl;
     }
 
-    m_impl->m_context.init_context((*this), m_impl->m_window, m_impl->m_fbc);
+    m_impl->m_context.init_render_context((*this), m_impl->m_window,
+      m_impl->m_fbc);
     m_impl->m_context.make_current(m_impl->m_window);
 
     gl_functions::configure(m_impl->m_context);
@@ -84,12 +85,13 @@ namespace opengl_core
     bool exposed = false;
     XEvent x_event;
     Display *&display = opengl_core::x11_display::acquire();
-    m_impl->m_window.init((*this), m_impl->m_fbc);
+    m_impl->m_window.init_window((*this), m_impl->m_fbc);
     Window &window = *static_cast<Window*>((m_impl->m_window.impl()));
     while (!terminate) {
       while (::XPending(display)) {
         XNextEvent(display, &x_event);
         if (x_event.type == Expose) {
+          std::cout << "Exposed set" << std::endl;
           exposed = true;
         }
         if (x_event.type == ClientMessage) {
@@ -100,12 +102,14 @@ namespace opengl_core
       }
 
       if (terminate || !exposed) {
+        std::cout << "continuing" << std::endl;
         continue;
       }
 
+      std::cout << "drawing" << std::endl;
       m_impl->m_context.make_current(m_impl->m_window);
-      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-      glClearColor(1.0, 0.0, 0.0, 1.0);
+      //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+      glClearColor(1.0, 1.0, 1.0, 1.0);
       glXSwapBuffers(display, window);
       m_impl->m_context.make_not_current();
     }

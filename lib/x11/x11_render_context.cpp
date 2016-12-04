@@ -54,8 +54,8 @@ namespace opengl_core
     delete m_impl;
   }
 
-  void render_context::init(render_system &, render_window &window,
-    fb_config &fbc)
+  void render_context::init_render_context(render_system &,
+    render_window &window, fb_config &fbc)
   {
     Display *&display = x11_display::acquire();
     GLXFBConfig &config = *(static_cast<GLXFBConfig*>(fbc.impl()));
