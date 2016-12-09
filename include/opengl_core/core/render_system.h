@@ -22,24 +22,30 @@
 
 #include "opengl_core/core/non_copyable.h"
 
+#include <cstdint>
+#include <functional>
+
 namespace opengl_core
 {
   class OPENGL_CORE_API render_system : public non_copyable
   {
-  private:
+  public:
     struct render_system_impl;
+
+  private:
     render_system_impl *m_impl;
 
-  private:
-    void render_loop();
+  public:
+    typedef std::function<void (std::size_t millis)> render_function;
 
   public:
-    render_system();
+    render_system(render_function &render, bool threaded = false);
     ~render_system();
 
     bool init_system();
     void terminate_system();
     void destroy();
+    void* impl();
   };
 }
 

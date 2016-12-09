@@ -29,7 +29,9 @@ namespace opengl_core
     static const long mask = (FocusChangeMask | EnterWindowMask |
       LeaveWindowMask | ExposureMask | ButtonPressMask | ButtonReleaseMask |
       PointerMotionMask | KeyPressMask | KeyReleaseMask |
-      PropertyChangeMask | StructureNotifyMask | KeymapStateMask);
+      PropertyChangeMask | StructureNotifyMask | KeymapStateMask |
+      Button1MotionMask | Button2MotionMask | Button3MotionMask |
+      Button4MotionMask | Button5MotionMask | ButtonMotionMask);
   };
 }
 

@@ -9,9 +9,16 @@
 
 #include <check.h>
 
+void render_function(std::size_t millis)
+{
+  ck_assert(true);
+}
+
 START_TEST(test_x11_render_system)
 {
-  opengl_core::render_system render_system;
+  opengl_core::render_system::render_function renderer = std::bind(
+    &render_function, std::placeholders::_1);
+  opengl_core::render_system render_system(renderer);
   ck_assert(render_system.init_system());
   render_system.destroy();
 }
