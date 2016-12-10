@@ -48,7 +48,7 @@ namespace opengl_core
     m_impl->m_window = XCreateWindow(
       display,
       RootWindow(display, vi->screen),
-      0, 0, 100, 100,
+      0, 0, 800, 600,
       0,
       vi->depth,
       InputOutput,

@@ -36,16 +36,27 @@ namespace opengl_core
     render_system_impl *m_impl;
 
   public:
-    typedef std::function<void (std::size_t millis)> render_function;
+    typedef std::function<void (render_system &system)>
+      init_function;
+    typedef std::function<void (render_system &system)>
+      pre_render_function;
+    typedef std::function<void (render_system &system, std::size_t millis)>
+      render_function;
+    typedef std::function<void (render_system &system)>
+      post_render_function;
+    typedef std::function<void (render_system &system)>
+      shutdown_function;
 
   public:
-    render_system(render_function &render, bool threaded = false);
+    render_system(init_function &init, pre_render_function &pre_render,
+      render_function &render, post_render_function &post_render,
+      shutdown_function &shutdown, bool threaded = false);
     ~render_system();
 
     bool init_system();
     void terminate_system();
     void destroy();
-    void* impl();
+    void *impl();
   };
 }
 

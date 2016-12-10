@@ -8,6 +8,7 @@
 #include <cassert>
 #include <atomic>
 #include <chrono>
+#include <unistd.h>
 #include <iostream>
 #include <thread>
 
@@ -22,7 +23,11 @@ namespace opengl_core
     render_context m_context;
     render_window m_window;
     fb_config m_fbc;
+    init_function m_init;
+    pre_render_function m_pre_render;
     render_function m_renderer;
+    post_render_function m_post_render;
+    shutdown_function m_shutdown;
     bool m_threaded;
     std::atomic_bool m_spin_lock;
     std::atomic_bool m_render;
@@ -42,6 +47,8 @@ namespace opengl_core
     impl->m_context.init_render_context(render, impl->m_window, impl->m_fbc);
     impl->m_context.make_current(impl->m_window);
 
+    impl->m_init(render);
+
     impl->m_spin_lock.store(false, std::memory_order_release);
 
     bool render_flag = false;
@@ -50,67 +57,19 @@ namespace opengl_core
       render_flag = false;
 
       impl->m_context.make_current(impl->m_window);
+      impl->m_pre_render(render);
+      glClearColor(0.0, 0.0, 0.0, 1.0);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-      glClearColor(1.0, 0.0, 0.0, 1.0);
-      impl->m_renderer(0);
+      impl->m_renderer(render, 0);
+      std::cout << "Swapping buffers " << std::this_thread::get_id() <<
+        std::endl;
       glXSwapBuffers(display, window);
-      impl->m_renderer(0);
-      std::cout << "Drawing" << std::endl << std::flush;
+      impl->m_post_render(render);
       impl->m_context.make_not_current();
     }
+
+    impl->m_shutdown(render);
     opengl_core::x11_display::release();
-  }
-
-  render_system::render_system(render_function &render, bool threaded) :
-    m_impl(new render_system_impl)
-  {
-    m_impl->m_renderer = render;
-    m_impl->m_threaded = threaded;
-    m_impl->m_spin_lock.store(true, std::memory_order_relaxed);
-    m_impl->m_render.store(true, std::memory_order_relaxed);
-  }
-
-  render_system::~render_system()
-  {
-    delete m_impl;
-  }
-
-  static void event_render_loop(render_system &system)
-  {
-    Display *&display = opengl_core::x11_display::acquire();
-    render_system::render_system_impl *impl =
-        reinterpret_cast<render_system::render_system_impl *>(system.impl());
-    Window &window = *static_cast<Window*>(impl->m_window.impl());
-
-    bool terminate = false;
-    bool exposed = false;
-    XEvent x_event;
-    while (!terminate) {
-      int n = XEventsQueued(display, QueuedAfterReading);
-      while (n--) {
-        XNextEvent(display, &x_event);
-        if (x_event.type == Expose) {
-          exposed = true;
-        } else if (x_event.type == ClientMessage) {
-          if ((Atom)x_event.xclient.data.l[0] == impl->m_delete_window) {
-            terminate = true;
-          }
-        }
-      }
-
-      if (terminate || !exposed) {
-        continue;
-      }
-
-      impl->m_context.make_current(impl->m_window);
-      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-      glClearColor(1.0, 0.0, 0.0, 1.0);
-      impl->m_renderer(0);
-      glXSwapBuffers(display, window);
-      impl->m_context.make_not_current();
-    }
-
-    x11_display::release();
   }
 
   static void event_loop(render_system &system)
@@ -118,7 +77,6 @@ namespace opengl_core
     Display *&display = opengl_core::x11_display::acquire();
     render_system::render_system_impl *impl =
         reinterpret_cast<render_system::render_system_impl *>(system.impl());
-
     bool terminate = false;
     bool exposed = false;
     XEvent x_event;
@@ -144,6 +102,85 @@ namespace opengl_core
     x11_display::release();
   }
 
+  static void event_render_loop(render_system &system)
+  {
+    Display *&display = opengl_core::x11_display::acquire();
+    render_system::render_system_impl *impl =
+        reinterpret_cast<render_system::render_system_impl *>(system.impl());
+    Window &window = *static_cast<Window*>(impl->m_window.impl());
+    impl->m_context.make_current(impl->m_window);
+    impl->m_init(system);
+    impl->m_context.make_not_current();
+
+    bool terminate = false;
+    bool exposed = false;
+    XEvent x_event;
+    while (!terminate) {
+      int n = XEventsQueued(display, QueuedAfterReading);
+      while (n--) {
+        XNextEvent(display, &x_event);
+        if (x_event.type == Expose) {
+          exposed = true;
+        } else if (x_event.type == ClientMessage) {
+          if ((Atom)x_event.xclient.data.l[0] == impl->m_delete_window) {
+            terminate = true;
+          }
+        }
+      }
+
+      if (terminate || !exposed) {
+        continue;
+      }
+
+      impl->m_context.make_current(impl->m_window);
+      impl->m_pre_render(system);
+      glClearColor(1.0, 1.0, 1.0, 1.0);
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+      glViewport(0, 0, 800, 600);
+      glBegin(GL_QUADS);
+        glColor3f(1., 0., 0.); glVertex3f(-.75, -.75, 0.);
+        glColor3f(0., 1., 0.); glVertex3f( .75, -.75, 0.);
+        glColor3f(0., 0., 1.); glVertex3f( .75,  .75, 0.);
+        glColor3f(1., 1., 0.); glVertex3f(-.75,  .75, 0.);
+      glEnd();
+      //impl->m_renderer(system, 0);
+      std::cout << "swap" << std::endl << std::flush;
+      glXSwapBuffers(display, window);
+
+      impl->m_post_render(system);
+      impl->m_context.make_not_current();
+    }
+
+    impl->m_context.make_current(impl->m_window);
+    impl->m_shutdown(system);
+    impl->m_context.make_not_current();
+
+    x11_display::release();
+  }
+
+  render_system::render_system(init_function &init,
+      pre_render_function &pre_render, render_function &render,
+      post_render_function &post_render, shutdown_function &shutdown,
+      bool threaded) :
+    m_impl(new render_system_impl)
+  {
+    m_impl->m_renderer = render;
+
+    m_impl->m_init = init;
+    m_impl->m_pre_render = pre_render;
+    m_impl->m_renderer = render;
+    m_impl->m_post_render = post_render;
+    m_impl->m_shutdown = shutdown;
+    m_impl->m_threaded = threaded;
+    m_impl->m_spin_lock.store(true, std::memory_order_relaxed);
+    m_impl->m_render.store(true, std::memory_order_relaxed);
+  }
+
+  render_system::~render_system()
+  {
+    delete m_impl;
+  }
 
   bool render_system::init_system()
   {
