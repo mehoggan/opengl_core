@@ -85,3 +85,4 @@ test-driver
 tests/check_x11_display
 tests/check_x11_render_system
 *.dirstamp
+*.Plo
