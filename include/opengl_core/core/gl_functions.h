@@ -18,7 +18,6 @@
 #ifndef GL_FUNCTIONS_HPP_INCLUDED
 #define GL_FUNCTIONS_HPP_INCLUDED
 
-#include "opengl_core/core/render_context.h"
 #include "opengl_core/core/symbol_loader.h"
 
 namespace opengl_core
@@ -41,7 +40,8 @@ namespace opengl_core
     static void load_3_0(symbol_loader *sym_loader);
 
   public:
-    static void configure(const render_context &context);
+    static void configure(const std::uint8_t major,
+      const std::uint8_t minor);
   };
 }
 #endif

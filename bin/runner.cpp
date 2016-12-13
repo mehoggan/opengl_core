@@ -1,27 +1,26 @@
-#include "opengl_core/core/render_system.h"
 #include "opengl_core/core/x11/x11_gl_functions.h"
 
 #include <cstdint>
 #include <iostream>
 #include <thread>
 
-void init_function(opengl_core::render_system &system)
+void init_function()
 {
 }
 
-void pre_render_function(opengl_core::render_system &system)
+void pre_render_function()
 {
 }
 
-void render_function(opengl_core::render_system &system, std::size_t millis)
+void render_function()
 {
 }
 
-void post_render_function(opengl_core::render_system &system)
+void post_render_function()
 {
 }
 
-void shutdown_function(opengl_core::render_system &system)
+void shutdown_function()
 {
 }
 
