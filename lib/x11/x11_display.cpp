@@ -1,35 +1,93 @@
 #include "opengl_core/core/x11/x11_display.h"
 
 #include <cassert>
+#include <cerrno>
+#include <cstring>
+#include <functional>
 #include <iostream>
 
 namespace opengl_core
 {
-  thread_local x11_display::X11_Display *x11_display::s_display = NULL;
-  thread_local uint32_t x11_display::s_use_count = 0u;
+  static pthread_key_t pthread_display_key;
+  static pthread_key_t pthread_use_key;
 
-  x11_display::X11_Display *&x11_display::acquire()
+  extern "C"
   {
-    if (s_use_count == 0) {
-      s_display = ::XOpenDisplay(NULL); // Open local display only
-      assert(s_display && "Failed to open XDisplay");
+    static void use_key_dtor(void *use_key)
+    {
+      if (use_key) {
+        auto use = *((std::uint32_t *)use_key);
+        assert(use == 0 && "User did not release all displays before "
+          "thread exited.");
+        delete (std::uint32_t *)use_key;
+      }
     }
-    ++s_use_count;
 
-    return s_display;
-  }
+    bool x11_display_init()
+    {
+      int status;
+      bool ret = true;
 
-  void x11_display::sync(bool flush_events)
-  {
-    ::XSync(s_display, flush_events ? True : False);
-  }
+      if (ret) {
+        errno = 0;
+        status = pthread_key_create(&pthread_display_key, NULL);
+        if (status || errno != 0) {
+          std::cerr << std::strerror(errno) << std::endl << std::flush;
+          ret = false;
+        }
+      }
 
-  void x11_display::release()
-  {
-    if (s_use_count == 1u) {
-      ::XCloseDisplay(s_display);
-      s_display = 0;
+      if (ret) {
+        errno = 0;
+        status = pthread_key_create(&pthread_use_key, use_key_dtor);
+        if (status || errno != 0) {
+          std::cerr << std::strerror(errno) << std::endl << std::flush;
+          ret = false;
+        }
+      }
+
+      return ret;
     }
-    --s_use_count;
+
+    Display *x11_display_thread_specific_acquire()
+    {
+      auto *display = (Display *)pthread_getspecific(pthread_display_key);
+      if (!display) {
+        display = ::XOpenDisplay(NULL);
+        pthread_setspecific(pthread_display_key, display);
+
+        auto *d = (std::uint32_t *)pthread_getspecific(pthread_use_key);
+        if (!d) {
+          pthread_setspecific(pthread_use_key, new std::uint32_t(0));
+        }
+      }
+
+      auto &use = *((std::uint32_t *)pthread_getspecific(pthread_use_key));
+      ++(use);
+
+      return display;
+    }
+
+    void x11_display_thread_specific_release()
+    {
+      auto &use = *((std::uint32_t *)pthread_getspecific(pthread_use_key));
+      --(use);
+      if (use == 0) {
+        auto *display = (Display *)pthread_getspecific(pthread_display_key);
+        ::XCloseDisplay(display);
+        display = nullptr;
+        pthread_setspecific(pthread_display_key, display);
+      }
+    }
+
+    std::uint32_t x11_display_thread_specifc_use_count()
+    {
+      auto usep = (std::uint32_t *)pthread_getspecific(pthread_use_key);
+      if (usep) {
+        return *usep;
+      } else {
+        return 0;
+      }
+    }
   }
 }

@@ -312,7 +312,8 @@ PFNGLGETGRAPHICSRESETSTATUSPROC opengl_core_GetGraphicsResetStatus = NULL;
 
 namespace opengl_core
 {
-  void gl_functions::configure(const render_context &context)
+  void gl_functions::configure(const std::uint8_t major,
+      const std::uint8_t minor)
   {
     symbol_loader sym_loader("libGL.so");
     assert(sym_loader.get_good() && "Failed to load libGL.so");
@@ -340,22 +341,17 @@ namespace opengl_core
         &opengl_core::gl_functions::load_1_2, &sym_loader))
     };
     for (auto version : versions) {
-      if (version.first[0] <= context.query_major_version() &&
-        version.first[1] <= context.query_minor_version()) {
+      if (version.first[0] <= major && version.first[1] <= minor) {
         version.second(&sym_loader);
       }
     }
 
     std::vector<std::string> extensions_vector;
 
-    if (context.query_major_version() >= 3) {
+    if (major >= 3) {
       glGetStringi = (PFNGLGETSTRINGIPROC)sym_loader.load("glGetStringi");
       assert(glGetStringi && "Could not acquire glGetStringi");
 
-      std::cout << "Extensions availiable for (using glGetStringi()): "
-        << context.query_major_version() << "."
-        << context.query_minor_version() << " versioned context "
-        << std::endl;
       GLint n = 0;
       glGetIntegerv(GL_NUM_EXTENSIONS, &n);
       for (GLint i = 0; i < n; ++i) {
@@ -363,11 +359,6 @@ namespace opengl_core
         extensions_vector.push_back(extension);
       }
     } else {
-      std::cout << "Extensions availiable for (using glGetString(): "
-        << context.query_major_version() << "."
-        << context.query_minor_version() << " versioned context "
-        << std::endl;
-
       const GLubyte *extensions = glGetString(GL_EXTENSIONS);
       std::string std_extensions((const char*)extensions);
       std::replace(std_extensions.begin(), std_extensions.end(), ' ', '\n');

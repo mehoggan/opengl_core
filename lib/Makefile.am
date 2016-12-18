@@ -2,6 +2,7 @@ lib_LTLIBRARIES = libopengl_core.la
 pkginclude_HEADERS = \
 	$(top_builddir)/declspec.h \
 	$(top_builddir)/include/opengl_core/core/concurrent_queue.h \
+	$(top_builddir)/include/opengl_core/core/init.h \
 	$(top_builddir)/include/opengl_core/core/non_copyable.h \
 	$(top_builddir)/include/opengl_core/core/platform.h \
 	$(top_builddir)/include/opengl_core/core/symbol_loader.h
@@ -17,9 +18,11 @@ libopengl_core_la_SOURCES += \
 	x11/x11_display.cpp \
 	x11/x11_extension_checker.cpp \
 	x11/x11_gl_functions.cpp \
+	x11/x11_init.cpp
 pkginclude_HEADERS += \
 	$(top_builddir)/include/opengl_core/core/x11/x11_display.h \
-	$(top_builddir)/include/opengl_core/core/x11/x11_extension_checker.h \
+	$(top_builddir)/include/opengl_core/core/x11/x11_extension_checker.h
+	$(top_builddir)/include/opengl_core/core/x11/x11_gl_functions.h
 AM_CPPFLAGS = -I/usr/local/include/ \
 	-I$(top_builddir)/include/ -Werror -Wall -pedantic -std=c++11
 libopengl_core_la_LDFLAGS = $(INIT_LIBS) -lGL -pthread

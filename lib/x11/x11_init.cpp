@@ -15,22 +15,29 @@
  * limitations under the License.
  *
  */
-#ifndef OPENGL_CORE_X11_DISPLAY_H_INCLUDED
-#define OPENGL_CORE_X11_DISPLAY_H_INCLUDED
+#include "opengl_core/core/init.h"
 
-#include "declspec.h"
-#include <cstdint>
+#include "opengl_core/core/x11/x11_display.h"
+
 #include <X11/Xlib.h>
 
 namespace opengl_core
 {
-  extern "C"
+  bool init()
   {
-    bool x11_display_init();
-    Display *x11_display_thread_specific_acquire();
-    void x11_display_thread_specific_release();
+    bool ret = true;
+    Status status = 0;
 
-    std::uint32_t x11_display_thread_specifc_use_count();
+    status = XInitThreads();
+    if (status == 0) {
+      ret = false;
+    }
+
+    if (ret) {
+      ret = x11_display_init();
+    }
+
+    return ret;
   }
 }
-#endif
+
