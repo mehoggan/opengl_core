@@ -58,8 +58,8 @@ void thread_func(int x, int y, int w, int h)
 {
   Display *display = opengl_core::x11_display_thread_specific_acquire();
   if (!display) {
-    std::cerr << "Failed to acquire thread on " << std::this_thread::get_id()
-      << std::endl << std::flush;
+    std::cerr << "Failed to acquire display on thread "
+      << std::this_thread::get_id() << std::endl << std::flush;
   }
 
   glXCreateContextAttribsARBProc glXCreateContextAttribsARB = NULL;
@@ -110,13 +110,12 @@ void thread_func(int x, int y, int w, int h)
   std::cout << "Mapping window" << std::endl;
   XMapWindow(display, win);
 
-  // Create an oldstyle context first, to get the correct function pointer
-  // for glXCreateContextAttribsARB
   GLXContext ctx_old = glXCreateContext(display, vi, 0, GL_TRUE);
   glXCreateContextAttribsARB =  (glXCreateContextAttribsARBProc)
     glXGetProcAddress((const GLubyte*)"glXCreateContextAttribsARB");
   glXMakeCurrent(display, 0, 0);
   glXDestroyContext(display, ctx_old);
+  XFree(vi);
 
   if (glXCreateContextAttribsARB == NULL) {
     std::cerr << "glXCreateContextAttribsARB entry point not found." <<
@@ -138,6 +137,7 @@ void thread_func(int x, int y, int w, int h)
     std::cerr << "Failed to create GL3 context." << std::endl << std::flush;
     exit(-1);
   }
+  XFree(fbc);
 
   std::cout << "Making context current" << std::endl;
   glXMakeCurrent(display, win, ctx);
