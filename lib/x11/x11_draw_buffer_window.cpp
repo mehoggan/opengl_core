@@ -18,13 +18,73 @@
 
 #include "opengl_core/core/x11/x11_display.h"
 
+#include <iostream>
+#include <stdexcept>
+
 namespace opengl_core
 {
   extern "C"
   {
-    OPENGL_CORE_API draw_buffer_window draw_buffer_window_create(
-      draw_buffer_config &dbc)
+    draw_buffer_window draw_buffer_window_create(draw_buffer_config &dbc,
+      int origin_x, int origin_y, int width, int height)
     {
+      Display *display = x11_display_thread_specific_acquire();
+
+      XVisualInfo *vi = glXGetVisualFromFBConfig(display, dbc);
+      if (!vi) {
+        std::cerr << "Failed to create internal resources for "
+          << "draw_buffer_window" << std::endl << std::flush;
+        XFree(vi);
+        x11_display_thread_specific_release();
+        throw std::runtime_error("Internal Failure!!!");
+      }
+
+      XSetWindowAttributes swa;
+      swa.colormap = XCreateColormap(display,
+        RootWindow(display, vi->screen), vi->visual, AllocNone);
+      swa.border_pixel = 0;
+      swa.event_mask = StructureNotifyMask;
+
+      Window win = XCreateWindow(display, RootWindow(display, vi->screen),
+        origin_x, origin_y, width, height, 0,
+        vi->depth, InputOutput, vi->visual,
+        CWBorderPixel | CWColormap | CWEventMask, &swa);
+      if (!win) {
+        std::cerr << "Failed to create internal resources for "
+          << "draw_buffer_window" << std::endl << std::flush;
+        XFree(vi);
+        x11_display_thread_specific_release();
+        throw std::runtime_error("Internal Failure!!!");
+      }
+
+      XFree(vi);
+      x11_display_thread_specific_release();
+      return win;
+    }
+
+    void draw_buffer_window_show(draw_buffer_window win)
+    {
+      Display *display = x11_display_thread_specific_acquire();
+      auto old_handler = XSetErrorHandler([](
+        Display *display, XErrorEvent *error) -> int {
+          if (error && error->error_code == BadWindow) {
+            std::cerr << "Failed to create show draw_buffer_window"
+              << "draw_buffer_window" << std::endl << std::flush;
+            x11_display_thread_specific_release();
+            throw std::runtime_error("Internal Failure!!!");
+          }
+          return -1;
+      });
+      XMapWindow(display, win);
+      XSetErrorHandler(old_handler);
+      x11_display_thread_specific_release();
+    }
+
+    void draw_buffer_window_free(draw_buffer_window win)
+    {
+      Display *display = x11_display_thread_specific_acquire();
+      XDestroyWindow(display, win);
+      x11_display_thread_specific_release();
     }
   }
 }

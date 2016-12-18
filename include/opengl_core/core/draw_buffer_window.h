@@ -27,7 +27,12 @@ namespace opengl_core
   extern "C"
   {
     OPENGL_CORE_API draw_buffer_window draw_buffer_window_create(
-      draw_buffer_config &dbc);
+      draw_buffer_config &dbc, int origin_x, int origin_y, int width,
+      int height);
+
+    OPENGL_CORE_API void draw_buffer_window_show(draw_buffer_window win);
+
+    OPENGL_CORE_API void draw_buffer_window_free(draw_buffer_window win);
   }
 }
 

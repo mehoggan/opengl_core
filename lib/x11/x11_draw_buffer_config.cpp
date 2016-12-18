@@ -41,7 +41,7 @@ namespace opengl_core
   {
     draw_buffer_config *choose_best_draw_buffer_config()
     {
-      Display *display = opengl_core::x11_display_thread_specific_acquire();
+      Display *display = x11_display_thread_specific_acquire();
       int fbcount;
       GLXFBConfig *fbc = ::glXChooseFBConfig(display, DefaultScreen(display),
         visual_attribs, &fbcount);
@@ -53,7 +53,7 @@ namespace opengl_core
         if (ret == nullptr || errno != 0) {
           std::cerr << "Failed to create internal resources for "
             << "draw_buffer_config" << std::endl << std::flush;
-          opengl_core::x11_display_thread_specific_release();
+          x11_display_thread_specific_release();
           ::XFree(fbc);
           throw std::runtime_error("Internal Failure!!!");
         }
@@ -62,13 +62,13 @@ namespace opengl_core
         if (ret == nullptr) {
           std::cerr << "Failed to create internal resources for "
             << "draw_buffer_config" << std::endl << std::flush;
-          opengl_core::x11_display_thread_specific_release();
+          x11_display_thread_specific_release();
           ::XFree(fbc);
           throw std::runtime_error("Internal Failure!!!");
         }
       }
       ::XFree(fbc);
-      opengl_core::x11_display_thread_specific_release();
+      x11_display_thread_specific_release();
 
       return ret;
     }

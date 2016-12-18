@@ -18,9 +18,93 @@
 
 #include "opengl_core/core/x11/x11_display.h"
 
+#include <iostream>
+
+#define GLX_CONTEXT_MAJOR_VERSION_ARB 0x2091
+#define GLX_CONTEXT_MINOR_VERSION_ARB 0x2092
+
 namespace opengl_core
 {
   extern "C"
   {
+    OPENGL_CORE_API draw_buffer_context draw_buffer_context_create(
+      draw_buffer_config &dbc, int major_version, int minor_version)
+    {
+      Display *display = x11_display_thread_specific_acquire();
+
+      typedef GLXContext (*glXCreateContextAttribsARBProc)(
+        Display*, GLXFBConfig, GLXContext, Bool, const int*);
+
+      glXCreateContextAttribsARBProc glXCreateContextAttribsARB = NULL;
+      XVisualInfo *vi = glXGetVisualFromFBConfig(display, dbc);
+      GLXContext ctx_old = glXCreateContext(display, vi, 0, GL_TRUE);
+      glXCreateContextAttribsARB =  (glXCreateContextAttribsARBProc)
+        glXGetProcAddress((const GLubyte*)"glXCreateContextAttribsARB");
+      glXMakeCurrent(display, 0, 0);
+      glXDestroyContext(display, ctx_old);
+      XFree(vi);
+
+      if (!glXCreateContextAttribsARB) {
+        x11_display_thread_specific_release();
+      }
+
+      static int context_attribs[] =
+      {
+        GLX_CONTEXT_MAJOR_VERSION_ARB, major_version,
+        GLX_CONTEXT_MINOR_VERSION_ARB, minor_version,
+        None
+      };
+
+      std::cout << "Creating context" << std::endl;
+      GLXContext ctx = glXCreateContextAttribsARB(display, dbc, nullptr,
+        true, context_attribs);
+      if (!ctx) {
+        x11_display_thread_specific_release();
+      }
+
+      x11_display_thread_specific_release();
+      return ctx;
+    }
+
+    draw_buffer_context draw_buffer_context_get_current()
+    {
+      return glXGetCurrentContext();
+    }
+
+    void draw_buffer_context_make_current(draw_buffer_context &ctx,
+      draw_buffer_window &win)
+    {
+      Display *display = x11_display_thread_specific_acquire();
+      glXMakeCurrent(display, win, ctx);
+      x11_display_thread_specific_release();
+    }
+
+    void draw_buffer_context_make_not_current(
+      draw_buffer_context &)
+    {
+      Display *display = x11_display_thread_specific_acquire();
+      glXMakeCurrent(display, 0, 0);
+      x11_display_thread_specific_release();
+    }
+
+    draw_buffer_context draw_buffer_context_make_shared(
+      draw_buffer_context &ctx)
+    {
+      return nullptr;
+    }
+
+    void draw_buffer_context_free(draw_buffer_context ctx)
+    {
+      Display *display = x11_display_thread_specific_acquire();
+      glXDestroyContext(display, ctx);
+      x11_display_thread_specific_release();
+    }
+
+    void swap_buffers(draw_buffer_window win)
+    {
+      Display *display = x11_display_thread_specific_acquire();
+      glXSwapBuffers(display, win);
+      x11_display_thread_specific_release();
+    }
   }
 }

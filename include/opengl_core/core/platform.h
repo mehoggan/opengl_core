@@ -27,8 +27,12 @@
   #define __OPENGL_CORE_GNULINUX__ 1
   #define msvc_typename
   #include <GL/glx.h>
+namespace opengl_core
+{
   typedef GLXFBConfig draw_buffer_config;
   typedef Window draw_buffer_window;
+  typedef GLXContext draw_buffer_context;
+}
 #elif defined(macintosh) || defined(Macintosh) || defined(__APPLE__)
   #define __OPENGL_CORE_MACOSX__ 1
   #define msvc_typename

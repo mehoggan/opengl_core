@@ -3,6 +3,7 @@ pkginclude_HEADERS = \
 	$(top_builddir)/declspec.h \
 	$(top_builddir)/include/opengl_core/core/concurrent_queue.h \
 	$(top_builddir)/include/opengl_core/core/draw_buffer_config.h \
+	$(top_builddir)/include/opengl_core/core/draw_buffer_window.h \
 	$(top_builddir)/include/opengl_core/core/init.h \
 	$(top_builddir)/include/opengl_core/core/non_copyable.h \
 	$(top_builddir)/include/opengl_core/core/platform.h \
@@ -18,11 +19,16 @@ if LINUX
 libopengl_core_la_SOURCES += \
 	x11/x11_display.cpp \
 	x11/x11_draw_buffer_config.cpp \
+	x11/x11_draw_buffer_context.cpp \
+	x11/x11_draw_buffer_window.cpp \
 	x11/x11_extension_checker.cpp \
 	x11/x11_gl_functions.cpp \
 	x11/x11_init.cpp
 pkginclude_HEADERS += \
 	$(top_builddir)/include/opengl_core/core/x11/x11_display.h \
+	$(top_builddir)/include/opengl_core/core/draw_buffer_config.h \
+	$(top_builddir)/include/opengl_core/core/draw_buffer_context.h \
+	$(top_builddir)/include/opengl_core/core/draw_buffer_window.h \
 	$(top_builddir)/include/opengl_core/core/x11/x11_extension_checker.h
 	$(top_builddir)/include/opengl_core/core/x11/x11_gl_functions.h
 AM_CPPFLAGS = -I/usr/local/include/ \

@@ -1,5 +1,7 @@
 #include "opengl_core/core/x11/x11_display.h"
 #include "opengl_core/core/draw_buffer_config.h"
+#include "opengl_core/core/draw_buffer_context.h"
+#include "opengl_core/core/draw_buffer_window.h"
 #include "opengl_core/core/init.h"
 #include "opengl_core/core/platform.h"
 
@@ -16,11 +18,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-
-#define GLX_CONTEXT_MAJOR_VERSION_ARB     0x2091
-#define GLX_CONTEXT_MINOR_VERSION_ARB     0x2092
-typedef GLXContext (*glXCreateContextAttribsARBProc)(Display*, GLXFBConfig,
-  GLXContext, Bool, const int*);
 
 void thread_func(int x, int y, int w = 800, int h = 600);
 
@@ -64,86 +61,42 @@ void thread_func(int x, int y, int w, int h)
       << std::this_thread::get_id() << std::endl << std::flush;
   }
 
-  draw_buffer_config *fbc = opengl_core::choose_best_draw_buffer_config();
+  opengl_core::draw_buffer_config *fbc =
+    opengl_core::choose_best_draw_buffer_config();
   if (!fbc) {
     std::cerr << "Failed to retrieve a framebuffer config" << std::endl;
     exit(-1);
   }
 
-  std::cout << "Getting XVisualInfo" << std::endl;
-  XVisualInfo *vi = glXGetVisualFromFBConfig(display, *fbc);
+  opengl_core::draw_buffer_window win =
+    opengl_core::draw_buffer_window_create(*fbc, x, y, w, h);
+  opengl_core::draw_buffer_window_show(win);
 
-  XSetWindowAttributes swa;
-  std::cout << "Creating colormap" << std::endl;
-  swa.colormap = XCreateColormap(display, RootWindow(display, vi->screen),
-    vi->visual, AllocNone);
-  swa.border_pixel = 0;
-  swa.event_mask = StructureNotifyMask;
+  opengl_core::draw_buffer_context ctx =
+    opengl_core::draw_buffer_context_create(*fbc, 3, 0);
 
-  std::cout << "Creating window" << std::endl;
-  Window win = XCreateWindow(display, RootWindow(display, vi->screen), x, y,
-    w, h, 0, vi->depth, InputOutput, vi->visual,
-    CWBorderPixel | CWColormap | CWEventMask, &swa);
-  if (!win) {
-    std::cerr << "Failed to create window." << std::endl << std::flush;
-    exit(-1);
-  }
-
-  std::cout << "Mapping window" << std::endl;
-  XMapWindow(display, win);
-
-  glXCreateContextAttribsARBProc glXCreateContextAttribsARB = NULL;
-
-  GLXContext ctx_old = glXCreateContext(display, vi, 0, GL_TRUE);
-  glXCreateContextAttribsARB =  (glXCreateContextAttribsARBProc)
-    glXGetProcAddress((const GLubyte*)"glXCreateContextAttribsARB");
-  glXMakeCurrent(display, 0, 0);
-  glXDestroyContext(display, ctx_old);
-  XFree(vi);
-
-  if (glXCreateContextAttribsARB == NULL) {
-    std::cerr << "glXCreateContextAttribsARB entry point not found." <<
-      std::endl << std::flush;
-    exit(-1);
-  }
-
-  static int context_attribs[] =
-  {
-    GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
-    GLX_CONTEXT_MINOR_VERSION_ARB, 0,
-    None
-  };
-
-  std::cout << "Creating context" << std::endl;
-  GLXContext ctx = glXCreateContextAttribsARB(display, *fbc, NULL, true,
-    context_attribs);
-  if (!ctx) {
-    std::cerr << "Failed to create GL3 context." << std::endl << std::flush;
-    exit(-1);
-  }
   opengl_core::draw_buffer_config_free(fbc);
 
-  std::cout << "Making context current" << std::endl;
-  glXMakeCurrent(display, win, ctx);
-
+  opengl_core::draw_buffer_context_make_current(ctx, win);
     glViewport(0, 0, 800, 600);
     glClearColor (0, 0.5, 1, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     draw_quad();
-    glXSwapBuffers (display, win);
+    opengl_core::swap_buffers(win);
 
     sleep(5);
 
     glClearColor (1, 0.5, 0, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     draw_quad();
-    glXSwapBuffers (display, win);
+    opengl_core::swap_buffers(win);
 
     sleep(5);
 
-  ctx = glXGetCurrentContext();
-  glXMakeCurrent(display, 0, 0);
-  glXDestroyContext(display, ctx);
+  ctx = opengl_core::draw_buffer_context_get_current();
+  opengl_core::draw_buffer_context_make_not_current(ctx);
+  opengl_core::draw_buffer_context_free(ctx);
 
+  opengl_core::draw_buffer_window_free(win);
   opengl_core::x11_display_thread_specific_release();
 }
