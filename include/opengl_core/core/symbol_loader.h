@@ -13,7 +13,6 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 #ifndef SYMBOL_LOADER_H_INCLUDED
 #define SYMBOL_LOADER_H_INCLUDED
@@ -22,10 +21,9 @@
 
 #include <iostream>
 
-
 namespace opengl_core
 {
-  class symbol_loader : public non_copyable
+  class OPENGL_CORE_API symbol_loader : public non_copyable
   {
   private:
     void *m_handle;

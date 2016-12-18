@@ -1,5 +1,7 @@
 #include "opengl_core/core/x11/x11_display.h"
+#include "opengl_core/core/draw_buffer_config.h"
 #include "opengl_core/core/init.h"
+#include "opengl_core/core/platform.h"
 
 #include <GL/gl.h>
 #include <GL/glx.h>
@@ -62,34 +64,14 @@ void thread_func(int x, int y, int w, int h)
       << std::this_thread::get_id() << std::endl << std::flush;
   }
 
-  glXCreateContextAttribsARBProc glXCreateContextAttribsARB = NULL;
-
-  const char *extensions = glXQueryExtensionsString(display,
-    DefaultScreen(display));
-  std::cout << extensions << std::endl;
-
-  static int visual_attribs[] =
-  {
-    GLX_RENDER_TYPE, GLX_RGBA_BIT,
-    GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
-    GLX_DOUBLEBUFFER, true,
-    GLX_RED_SIZE, 1,
-    GLX_GREEN_SIZE, 1,
-    GLX_BLUE_SIZE, 1,
-    None
-  };
-
-  std::cout << "Getting framebuffer config" << std::endl;
-  int fbcount;
-  GLXFBConfig *fbc = glXChooseFBConfig(display, DefaultScreen(display),
-    visual_attribs, &fbcount);
+  draw_buffer_config *fbc = opengl_core::choose_best_draw_buffer_config();
   if (!fbc) {
     std::cerr << "Failed to retrieve a framebuffer config" << std::endl;
     exit(-1);
   }
 
   std::cout << "Getting XVisualInfo" << std::endl;
-  XVisualInfo *vi = glXGetVisualFromFBConfig(display, fbc[0]);
+  XVisualInfo *vi = glXGetVisualFromFBConfig(display, *fbc);
 
   XSetWindowAttributes swa;
   std::cout << "Creating colormap" << std::endl;
@@ -109,6 +91,8 @@ void thread_func(int x, int y, int w, int h)
 
   std::cout << "Mapping window" << std::endl;
   XMapWindow(display, win);
+
+  glXCreateContextAttribsARBProc glXCreateContextAttribsARB = NULL;
 
   GLXContext ctx_old = glXCreateContext(display, vi, 0, GL_TRUE);
   glXCreateContextAttribsARB =  (glXCreateContextAttribsARBProc)
@@ -131,13 +115,13 @@ void thread_func(int x, int y, int w, int h)
   };
 
   std::cout << "Creating context" << std::endl;
-  GLXContext ctx = glXCreateContextAttribsARB(display, fbc[0], NULL, true,
+  GLXContext ctx = glXCreateContextAttribsARB(display, *fbc, NULL, true,
     context_attribs);
   if (!ctx) {
     std::cerr << "Failed to create GL3 context." << std::endl << std::flush;
     exit(-1);
   }
-  XFree(fbc);
+  opengl_core::draw_buffer_config_free(fbc);
 
   std::cout << "Making context current" << std::endl;
   glXMakeCurrent(display, win, ctx);

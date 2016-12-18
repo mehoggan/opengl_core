@@ -14,15 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef EXTENSION_CHECKER_H_INCLUDED
-#define EXTENSION_CHECKER_H_INCLUDED
+#include "opengl_core/core/draw_buffer_context.h"
+
+#include "opengl_core/core/x11/x11_display.h"
 
 namespace opengl_core
 {
   extern "C"
   {
-    bool is_extension_supported(const char *ext_list, const char *extension);
   }
 }
-
-#endif

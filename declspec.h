@@ -1,3 +1,6 @@
+#ifndef DECLSPEC_H_INCLUDED
+#define DECLSPEC_H_INCLUDED
+
 #if defined(__CYGWIN__) || defined(__MINGW32__)
   #ifdef _USRDLL
     #ifdef OPENGL_CORE_EXPORTS
@@ -64,5 +67,7 @@
   #endif
 
   #define OGLAPI
+
+#endif
 
 #endif

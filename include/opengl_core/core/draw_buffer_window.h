@@ -14,15 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef EXTENSION_CHECKER_H_INCLUDED
-#define EXTENSION_CHECKER_H_INCLUDED
+#ifndef OPENGL_CORE_DRAW_BUFFER_WINDOW_H_INCLUDED
+#define OPENGL_CORE_DRAW_BUFFER_WINDOW_H_INCLUDED
+
+#include "declspec.h"
+
+#include "opengl_core/core/platform.h"
+#include "opengl_core/core/draw_buffer_config.h"
 
 namespace opengl_core
 {
   extern "C"
   {
-    bool is_extension_supported(const char *ext_list, const char *extension);
+    OPENGL_CORE_API draw_buffer_window draw_buffer_window_create(
+      draw_buffer_config &dbc);
   }
 }
 
 #endif
+

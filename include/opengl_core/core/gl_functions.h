@@ -13,7 +13,6 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 #ifndef GL_FUNCTIONS_HPP_INCLUDED
 #define GL_FUNCTIONS_HPP_INCLUDED
@@ -31,13 +30,13 @@ namespace opengl_core
   struct gl_functions
   {
   private:
-    static void load_1_2(symbol_loader *sym_loader);
-    static void load_1_3(symbol_loader *sym_loader);
-    static void load_1_4(symbol_loader *sym_loader);
-    static void load_1_5(symbol_loader *sym_loader);
-    static void load_2_0(symbol_loader *sym_loader);
-    static void load_2_1(symbol_loader *sym_loader);
-    static void load_3_0(symbol_loader *sym_loader);
+    OPENGL_CORE_API static void load_1_2(symbol_loader *sym_loader);
+    OPENGL_CORE_API static void load_1_3(symbol_loader *sym_loader);
+    OPENGL_CORE_API static void load_1_4(symbol_loader *sym_loader);
+    OPENGL_CORE_API static void load_1_5(symbol_loader *sym_loader);
+    OPENGL_CORE_API static void load_2_0(symbol_loader *sym_loader);
+    OPENGL_CORE_API static void load_2_1(symbol_loader *sym_loader);
+    OPENGL_CORE_API static void load_3_0(symbol_loader *sym_loader);
 
   public:
     static void configure(const std::uint8_t major,

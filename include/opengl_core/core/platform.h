@@ -13,7 +13,6 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 #ifndef OPENGL_CORE_PLATFORM_H_INCLUDED
 #define OPENGL_CORE_PLATFORM_H_INCLUDED
@@ -27,6 +26,9 @@
 #elif defined(__gnu_linux__) || defined(__linux__)
   #define __OPENGL_CORE_GNULINUX__ 1
   #define msvc_typename
+  #include <GL/glx.h>
+  typedef GLXFBConfig draw_buffer_config;
+  typedef Window draw_buffer_window;
 #elif defined(macintosh) || defined(Macintosh) || defined(__APPLE__)
   #define __OPENGL_CORE_MACOSX__ 1
   #define msvc_typename
