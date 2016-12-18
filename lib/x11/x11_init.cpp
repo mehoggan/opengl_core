@@ -39,5 +39,12 @@ namespace opengl_core
 
     return ret;
   }
+
+  bool shutdown()
+  {
+    bool ret = true;
+
+    return ret;
+  }
 }
 

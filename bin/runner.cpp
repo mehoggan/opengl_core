@@ -4,8 +4,11 @@
 #include <GL/gl.h>
 #include <GL/glx.h>
 
+#include <cstdlib>
+#include <functional>
 #include <iostream>
 #include <thread>
+#include <vector>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,6 +19,8 @@
 #define GLX_CONTEXT_MINOR_VERSION_ARB     0x2092
 typedef GLXContext (*glXCreateContextAttribsARBProc)(Display*, GLXFBConfig,
   GLXContext, Bool, const int*);
+
+void thread_func(int x, int y, int w = 800, int h = 600);
 
 void draw_quad()
 {
@@ -32,8 +37,25 @@ int main (int argc, char ** argv)
   bool init_status = opengl_core::init();
   if (!init_status) {
     std::cerr << "Failed to init all systems." << std::endl << std::flush;
+    exit(-1);
   }
 
+  std::vector<std::thread> threads;
+  threads.resize(10);
+  for (int i = 0; i < 9; ++i) {
+    threads[i] = std::thread(std::bind(&thread_func, std::rand() % 100,
+      std::rand() % 100, 800, 600));
+  }
+
+  for (auto &thread : threads) {
+    if (thread.joinable()) {
+      thread.join();
+    }
+  }
+}
+
+void thread_func(int x, int y, int w, int h)
+{
   Display *display = opengl_core::x11_display_thread_specific_acquire();
   if (!display) {
     std::cerr << "Failed to acquire thread on " << std::this_thread::get_id()
@@ -62,8 +84,8 @@ int main (int argc, char ** argv)
   GLXFBConfig *fbc = glXChooseFBConfig(display, DefaultScreen(display),
     visual_attribs, &fbcount);
   if (!fbc) {
-    std::cout << "Failed to retrieve a framebuffer config" << std::endl;
-    return 1;
+    std::cerr << "Failed to retrieve a framebuffer config" << std::endl;
+    exit(-1);
   }
 
   std::cout << "Getting XVisualInfo" << std::endl;
@@ -77,13 +99,12 @@ int main (int argc, char ** argv)
   swa.event_mask = StructureNotifyMask;
 
   std::cout << "Creating window" << std::endl;
-  Window win = XCreateWindow(display, RootWindow(display, vi->screen), 0, 0,
-    800, 600, 0, vi->depth, InputOutput, vi->visual,
+  Window win = XCreateWindow(display, RootWindow(display, vi->screen), x, y,
+    w, h, 0, vi->depth, InputOutput, vi->visual,
     CWBorderPixel | CWColormap | CWEventMask, &swa);
-  if (!win)
-  {
-    std::cout << "Failed to create window." << std::endl;
-    return 1;
+  if (!win) {
+    std::cerr << "Failed to create window." << std::endl << std::flush;
+    exit(-1);
   }
 
   std::cout << "Mapping window" << std::endl;
@@ -97,11 +118,10 @@ int main (int argc, char ** argv)
   glXMakeCurrent(display, 0, 0);
   glXDestroyContext(display, ctx_old);
 
-  if (glXCreateContextAttribsARB == NULL)
-  {
-    std::cout << "glXCreateContextAttribsARB entry point not found." <<
-      std::endl;
-    return false;
+  if (glXCreateContextAttribsARB == NULL) {
+    std::cerr << "glXCreateContextAttribsARB entry point not found." <<
+      std::endl << std::flush;
+    exit(-1);
   }
 
   static int context_attribs[] =
@@ -115,8 +135,8 @@ int main (int argc, char ** argv)
   GLXContext ctx = glXCreateContextAttribsARB(display, fbc[0], NULL, true,
     context_attribs);
   if (!ctx) {
-    std::cout << "Failed to create GL3 context." << std::endl;
-    return 1;
+    std::cerr << "Failed to create GL3 context." << std::endl << std::flush;
+    exit(-1);
   }
 
   std::cout << "Making context current" << std::endl;
@@ -141,5 +161,5 @@ int main (int argc, char ** argv)
   glXMakeCurrent(display, 0, 0);
   glXDestroyContext(display, ctx);
 
-  return 0;
+  opengl_core::x11_display_thread_specific_release();
 }

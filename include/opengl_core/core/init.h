@@ -21,6 +21,8 @@
 namespace opengl_core
 {
   bool init();
+
+  bool shutdown();
 }
 
 #endif
