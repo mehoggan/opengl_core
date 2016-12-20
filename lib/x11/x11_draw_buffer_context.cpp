@@ -93,14 +93,14 @@ namespace opengl_core
       return nullptr;
     }
 
-    void draw_buffer_context_free(draw_buffer_context ctx)
+    void draw_buffer_context_free(draw_buffer_context &ctx)
     {
       Display *display = x11_display_thread_specific_acquire();
       glXDestroyContext(display, ctx);
       x11_display_thread_specific_release();
     }
 
-    void swap_buffers(draw_buffer_window win)
+    void swap_buffers(draw_buffer_window &win)
     {
       Display *display = x11_display_thread_specific_acquire();
       glXSwapBuffers(display, win);

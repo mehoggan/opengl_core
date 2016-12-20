@@ -25,9 +25,9 @@ namespace opengl_core
 {
   extern "C"
   {
-    OPENGL_CORE_API draw_buffer_config *choose_best_draw_buffer_config();
+    OPENGL_CORE_API draw_buffer_config choose_best_draw_buffer_config();
 
-    OPENGL_CORE_API void draw_buffer_config_free(draw_buffer_config *&dbc);
+    OPENGL_CORE_API void draw_buffer_config_free(draw_buffer_config &dbc);
   }
 }
 

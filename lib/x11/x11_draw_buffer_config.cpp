@@ -39,46 +39,33 @@ namespace opengl_core
 
   extern "C"
   {
-    draw_buffer_config *choose_best_draw_buffer_config()
+    draw_buffer_config choose_best_draw_buffer_config()
     {
       Display *display = x11_display_thread_specific_acquire();
       int fbcount;
       GLXFBConfig *fbc = ::glXChooseFBConfig(display, DefaultScreen(display),
         visual_attribs, &fbcount);
 
-      draw_buffer_config *ret = nullptr;
+      draw_buffer_config ret;
+      memset(&ret, 0, sizeof(GLXFBConfig));
       if (fbc) {
         errno = 0;
-        ret = (GLXFBConfig *)std::calloc(1, sizeof(GLXFBConfig));
-        if (ret == nullptr || errno != 0) {
-          std::cerr << "Failed to create internal resources for "
-            << "draw_buffer_config" << std::endl << std::flush;
-          x11_display_thread_specific_release();
-          ::XFree(fbc);
-          throw std::runtime_error("Internal Failure!!!");
-        }
-
-        ret = (GLXFBConfig *)memcpy(ret, &fbc[0], sizeof(GLXFBConfig));
-        if (ret == nullptr) {
-          std::cerr << "Failed to create internal resources for "
-            << "draw_buffer_config" << std::endl << std::flush;
-          x11_display_thread_specific_release();
-          ::XFree(fbc);
-          throw std::runtime_error("Internal Failure!!!");
-        }
+        memcpy(&ret, &fbc[0], sizeof(GLXFBConfig));
+        ::XFree(fbc);
+      } else {
+        std::cerr << "Failed to create internal resources for "
+          << "draw_buffer_config" << std::endl << std::flush;
+        x11_display_thread_specific_release();
+        ::XFree(fbc);
+        throw std::runtime_error("Internal Failure!!!");
       }
-      ::XFree(fbc);
       x11_display_thread_specific_release();
 
       return ret;
     }
 
-    void draw_buffer_config_free(draw_buffer_config *&dbc)
+    void draw_buffer_config_free(draw_buffer_config &)
     {
-      if (dbc) {
-        free(dbc);
-        dbc = nullptr;
-      }
     }
   }
 }

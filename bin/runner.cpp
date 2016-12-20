@@ -55,7 +55,7 @@ int main (int argc, char ** argv)
 
 void thread_func(int x, int y, int w, int h)
 {
-  opengl_core::draw_buffer_config *fbc =
+  opengl_core::draw_buffer_config fbc =
     opengl_core::choose_best_draw_buffer_config();
   if (!fbc) {
     std::cerr << "Failed to retrieve a framebuffer config" << std::endl;
@@ -63,11 +63,11 @@ void thread_func(int x, int y, int w, int h)
   }
 
   opengl_core::draw_buffer_window win =
-    opengl_core::draw_buffer_window_create(*fbc, x, y, w, h);
+    opengl_core::draw_buffer_window_create(fbc, x, y, w, h);
   opengl_core::draw_buffer_window_show(win);
 
   opengl_core::draw_buffer_context ctx =
-    opengl_core::draw_buffer_context_create(*fbc, 3, 0);
+    opengl_core::draw_buffer_context_create(fbc, 3, 0);
 
   opengl_core::draw_buffer_config_free(fbc);
 

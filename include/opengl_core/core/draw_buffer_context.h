@@ -41,9 +41,9 @@ namespace opengl_core
     OPENGL_CORE_API draw_buffer_context draw_buffer_context_make_shared(
       draw_buffer_context &ctx);
 
-    OPENGL_CORE_API void draw_buffer_context_free(draw_buffer_context ctx);
+    OPENGL_CORE_API void draw_buffer_context_free(draw_buffer_context &ctx);
 
-    OPENGL_CORE_API void swap_buffers(draw_buffer_window win);
+    OPENGL_CORE_API void swap_buffers(draw_buffer_window &win);
   }
 }
 

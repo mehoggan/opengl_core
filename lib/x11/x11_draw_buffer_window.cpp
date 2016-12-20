@@ -62,7 +62,7 @@ namespace opengl_core
       return win;
     }
 
-    void draw_buffer_window_show(draw_buffer_window win)
+    void draw_buffer_window_show(draw_buffer_window &win)
     {
       Display *display = x11_display_thread_specific_acquire();
       auto old_handler = XSetErrorHandler([](
@@ -80,7 +80,7 @@ namespace opengl_core
       x11_display_thread_specific_release();
     }
 
-    void draw_buffer_window_free(draw_buffer_window win)
+    void draw_buffer_window_free(draw_buffer_window &win)
     {
       Display *display = x11_display_thread_specific_acquire();
       XDestroyWindow(display, win);
