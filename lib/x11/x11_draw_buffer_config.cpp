@@ -18,6 +18,7 @@
 
 #include "opengl_core/core/x11/x11_display.h"
 
+#include <cassert>
 #include <cerrno>
 #include <cstdlib>
 #include <cstring>
@@ -45,22 +46,44 @@ namespace opengl_core
       int fbcount;
       GLXFBConfig *fbc = ::glXChooseFBConfig(display, DefaultScreen(display),
         visual_attribs, &fbcount);
-
-      draw_buffer_config ret;
-      memset(&ret, 0, sizeof(GLXFBConfig));
-      if (fbc) {
-        errno = 0;
-        memcpy(&ret, &fbc[0], sizeof(GLXFBConfig));
-        ::XFree(fbc);
-      } else {
+      if (!fbc) {
         std::cerr << "Failed to create internal resources for "
           << "draw_buffer_config" << std::endl << std::flush;
         x11_display_thread_specific_release();
         ::XFree(fbc);
         throw std::runtime_error("Internal Failure!!!");
       }
-      x11_display_thread_specific_release();
 
+      int best_fbc = -1;
+      int worst_fbc = -1;
+      int best_num_samp = -1;
+      int worst_num_samp = 999;
+
+      for (int i=0; i<fbcount; ++i) {
+        XVisualInfo *vi = glXGetVisualFromFBConfig(display, fbc[i]);
+        if (vi) {
+          int samp_buf;
+          int samples;
+          glXGetFBConfigAttrib(display, fbc[i], GLX_SAMPLE_BUFFERS,
+            &samp_buf);
+          glXGetFBConfigAttrib(display, fbc[i], GLX_SAMPLES, &samples);
+
+          if (best_fbc < 0 || (samp_buf && samples > best_num_samp)) {
+            best_fbc = i;
+            best_num_samp = samples;
+          }
+          if (worst_fbc < 0 || (!samp_buf || samples < worst_num_samp)) {
+            worst_fbc = i, worst_num_samp = samples;
+          }
+        }
+        XFree(vi);
+      }
+
+      assert(best_fbc != -1 && "Internal error failed to find valid draw "
+        " buffer configuration.");
+      GLXFBConfig ret = fbc[best_fbc];
+      ::XFree(fbc);
+      x11_display_thread_specific_release();
       return ret;
     }
 

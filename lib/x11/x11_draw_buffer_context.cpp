@@ -17,6 +17,7 @@
 #include "opengl_core/core/draw_buffer_context.h"
 
 #include "opengl_core/core/x11/x11_display.h"
+#include "opengl_core/core/x11/x11_extension_checker.h"
 
 #include <iostream>
 
@@ -40,6 +41,13 @@ namespace opengl_core
       GLXContext ctx_old = glXCreateContext(display, vi, 0, GL_TRUE);
       glXCreateContextAttribsARB =  (glXCreateContextAttribsARBProc)
         glXGetProcAddress((const GLubyte*)"glXCreateContextAttribsARB");
+
+      const char *glx_exts = ::glXQueryExtensionsString(display,
+        DefaultScreen(display));
+      if (!is_extension_supported(glx_exts, "GLX_ARB_create_context") ||
+        !glXCreateContextAttribsARB){
+      }
+
       glXMakeCurrent(display, 0, 0);
       glXDestroyContext(display, ctx_old);
       XFree(vi);

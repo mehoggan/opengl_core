@@ -32,6 +32,7 @@ namespace opengl_core
   private:
     non_copyable(const non_copyable &) = delete;
     non_copyable &operator=(const non_copyable &) = delete;
+    non_copyable &operator=(const non_copyable &&) = delete;
     non_copyable(non_copyable &&) = delete;
   };
 }
