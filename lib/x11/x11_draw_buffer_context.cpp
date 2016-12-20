@@ -46,6 +46,10 @@ namespace opengl_core
         DefaultScreen(display));
       if (!is_extension_supported(glx_exts, "GLX_ARB_create_context") ||
         !glXCreateContextAttribsARB){
+        std::cerr << "Unable to create 3.2 or higher OpenGL context."
+          << std::endl << std::flush;
+        x11_display_thread_specific_release();
+        throw std::runtime_error("Internal Failure!!!");
       }
 
       glXMakeCurrent(display, 0, 0);
