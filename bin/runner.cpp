@@ -55,12 +55,6 @@ int main (int argc, char ** argv)
 
 void thread_func(int x, int y, int w, int h)
 {
-  Display *display = opengl_core::x11_display_thread_specific_acquire();
-  if (!display) {
-    std::cerr << "Failed to acquire display on thread "
-      << std::this_thread::get_id() << std::endl << std::flush;
-  }
-
   opengl_core::draw_buffer_config *fbc =
     opengl_core::choose_best_draw_buffer_config();
   if (!fbc) {
@@ -98,5 +92,4 @@ void thread_func(int x, int y, int w, int h)
   opengl_core::draw_buffer_context_free(ctx);
 
   opengl_core::draw_buffer_window_free(win);
-  opengl_core::x11_display_thread_specific_release();
 }

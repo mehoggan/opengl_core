@@ -39,6 +39,14 @@ namespace opengl_core
       }
     }
 
+    static void display_key_dtor(void *display)
+    {
+      if (display) {
+        auto *local_display = (Display *)display;
+        ::XCloseDisplay(local_display);
+      }
+    }
+
     bool x11_display_init()
     {
       int status;
@@ -46,7 +54,7 @@ namespace opengl_core
 
       if (ret) {
         errno = 0;
-        status = pthread_key_create(&pthread_display_key, NULL);
+        status = pthread_key_create(&pthread_display_key, display_key_dtor);
         if (status || errno != 0) {
           std::cerr << std::strerror(errno) << std::endl << std::flush;
           ret = false;
@@ -88,12 +96,6 @@ namespace opengl_core
     {
       auto &use = *((std::uint32_t *)pthread_getspecific(pthread_use_key));
       --(use);
-      if (use == 0) {
-        auto *display = (Display *)pthread_getspecific(pthread_display_key);
-        ::XCloseDisplay(display);
-        display = nullptr;
-        pthread_setspecific(pthread_display_key, display);
-      }
     }
 
     std::uint32_t x11_display_thread_specifc_use_count()
