@@ -77,7 +77,7 @@ namespace opengl_core
     {
       auto *display = (Display *)pthread_getspecific(pthread_display_key);
       if (!display) {
-        display = ::XOpenDisplay(NULL);
+        display = ::XOpenDisplay(":0");
         pthread_setspecific(pthread_display_key, display);
 
         auto *d = (std::uint32_t *)pthread_getspecific(pthread_use_key);

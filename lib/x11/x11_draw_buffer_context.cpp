@@ -20,6 +20,7 @@
 #include "opengl_core/core/x11/x11_extension_checker.h"
 
 #include <iostream>
+#include <stdexcept>
 
 #define GLX_CONTEXT_MAJOR_VERSION_ARB 0x2091
 #define GLX_CONTEXT_MINOR_VERSION_ARB 0x2092

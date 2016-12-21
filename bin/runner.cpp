@@ -1,9 +1,8 @@
-#include "opengl_core/core/x11/x11_display.h"
 #include "opengl_core/core/draw_buffer_config.h"
 #include "opengl_core/core/draw_buffer_context.h"
 #include "opengl_core/core/draw_buffer_window.h"
 #include "opengl_core/core/init.h"
-#include "opengl_core/core/platform.h"
+#include "opengl_core/core/standard_renderer.h"
 
 #include <cstdlib>
 #include <functional>
@@ -11,28 +10,9 @@
 #include <thread>
 #include <vector>
 
-#include <GL/gl.h>
-#include <GL/glx.h>
+void thread_func(int x, int y, int w, int h, int gl_major, int gl_minor);
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-
-void thread_func(int x, int y, int w = 800, int h = 600, int gl_major = 3,
-  int gl_minor = 2);
-
-void draw_quad()
-{
-  glBegin(GL_QUADS);
-    glColor3f(1., 0., 0.); glVertex3f(-.75, -.75, 0.);
-    glColor3f(0., 1., 0.); glVertex3f(.75, -.75, 0.);
-    glColor3f(0., 0., 1.); glVertex3f(.75,  .75, 0.);
-    glColor3f(1., 1., 0.); glVertex3f(-.75,  .75, 0.);
-  glEnd();
-}
-
-int main (int argc, char ** argv)
+int main(int argc, char * argv[])
 {
   bool init_status = opengl_core::init();
   if (!init_status) {
@@ -41,10 +21,10 @@ int main (int argc, char ** argv)
   }
 
   std::vector<std::thread> threads;
-  threads.resize(10);
-  for (int i = 0; i < 9; ++i) {
+  threads.resize(2);
+  for (int i = 0; i < threads.size(); ++i) {
     threads[i] = std::thread(std::bind(&thread_func, std::rand() % 100,
-      std::rand() % 100, 800, 600, 3, 0));
+      std::rand() % 100, 800, 600, 2, 1));
   }
 
   for (auto &thread : threads) {
@@ -65,21 +45,7 @@ void thread_func(int x, int y, int w, int h, int gl_major, int gl_minor)
     opengl_core::draw_buffer_context_create(fbc, gl_major, gl_minor);
   opengl_core::draw_buffer_config_free(fbc);
 
-  opengl_core::draw_buffer_context_make_current(ctx, win);
-    glViewport(0, 0, 800, 600);
-    glClearColor (0, 0.5, 1, 1);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    draw_quad();
-    opengl_core::swap_buffers(win);
-    sleep(5);
-
-    glClearColor (1, 0.5, 0, 1);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    draw_quad();
-    opengl_core::swap_buffers(win);
-    sleep(5);
-  ctx = opengl_core::draw_buffer_context_get_current();
-  opengl_core::draw_buffer_context_make_not_current(ctx);
+  opengl_core::standard_event_loop_run(win, ctx);
 
   opengl_core::draw_buffer_context_free(ctx);
   opengl_core::draw_buffer_window_free(win);

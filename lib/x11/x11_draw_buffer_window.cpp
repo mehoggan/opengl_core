@@ -57,6 +57,15 @@ namespace opengl_core
         throw std::runtime_error("Internal Failure!!!");
       }
 
+      static const long mask = (FocusChangeMask | EnterWindowMask |
+        LeaveWindowMask | ExposureMask | ButtonPressMask |
+        ButtonReleaseMask | PointerMotionMask | KeyPressMask |
+        KeyReleaseMask | PropertyChangeMask | StructureNotifyMask |
+        KeymapStateMask | Button1MotionMask | Button2MotionMask |
+        Button3MotionMask | Button4MotionMask | Button5MotionMask |
+        ButtonMotionMask);
+      XSelectInput(display, win, mask);
+
       XFree(vi);
       x11_display_thread_specific_release();
       return win;
