@@ -23,6 +23,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
+#include <iterator>
 #include <functional>
 #include <string>
 #include <sstream>
@@ -364,7 +365,7 @@ namespace opengl_core
 
     std::vector<std::string> extensions_vector;
 
-    if (major >= 3) {
+    if (major >= 3 && minor >= 2) {
       glGetStringi = (PFNGLGETSTRINGIPROC)sym_loader.load("glGetStringi");
       assert(glGetStringi && "Could not acquire glGetStringi");
 
@@ -372,18 +373,32 @@ namespace opengl_core
       glGetIntegerv(GL_NUM_EXTENSIONS, &n);
       for (GLint i = 0; i < n; ++i) {
         const char* extension = (const char*)glGetStringi(GL_EXTENSIONS, i);
-        extensions_vector.push_back(extension);
+        if (extension) {
+          extensions_vector.push_back(extension);
+        } else {
+          std::cout << "Failed to load extension." << std::endl;
+        }
       }
+      std::cout << "Context version greather than 3.2 provides ";
+      std::copy(extensions_vector.begin(), extensions_vector.end(),
+        std::ostream_iterator<std::string>(std::cout, " "));
+      std::cout << std::endl;
     } else {
       const GLubyte *extensions = glGetString(GL_EXTENSIONS);
-      std::string std_extensions((const char*)extensions);
-      std::replace(std_extensions.begin(), std_extensions.end(), ' ', '\n');
-      std::stringstream ss(std_extensions);
-
-      while (ss.good()) {
-        std::string extension;
-        std::getline(ss, extension);
-        extensions_vector.push_back(extension);
+      if (extensions) {
+        std::string std_extensions((const char*)extensions);
+        std::cout << "Context version less than 3.2 provides "
+          << std_extensions << std::endl << std::flush;
+        std::replace(std_extensions.begin(), std_extensions.end(), ' ',
+          '\n');
+        std::stringstream ss(std_extensions);
+        while (ss.good()) {
+          std::string extension;
+          std::getline(ss, extension);
+          extensions_vector.push_back(extension);
+        }
+      } else {
+        std::cout << "Failed to load extensions string." << std::endl;
       }
     }
   }
@@ -641,44 +656,25 @@ namespace opengl_core
     LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4UBVPROC, glVertexAttrib4ubv, sym_loader);
     LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4UIVPROC, glVertexAttrib4uiv, sym_loader);
     LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4USVPROC, glVertexAttrib4usv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLSTENCILOPSEPARATEPROC, glStencilOpSeparate,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETATTRIBLOCATIONPROC, glGetAttribLocation,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETPROGRAMINFOLOGPROC, glGetProgramInfoLog,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETVERTEXATTRIBDVPROC, glGetVertexAttribdv,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETVERTEXATTRIBFVPROC, glGetVertexAttribfv,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETVERTEXATTRIBIVPROC, glGetVertexAttribiv,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4NUBVPROC, glVertexAttrib4Nubv,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4NUIVPROC, glVertexAttrib4Nuiv,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4NUSVPROC, glVertexAttrib4Nusv,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLBINDATTRIBLOCATIONPROC, glBindAttribLocation,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETATTACHEDSHADERSPROC, glGetAttachedShaders,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETUNIFORMLOCATIONPROC, glGetUniformLocation,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLSTENCILFUNCSEPARATEPROC, glStencilFuncSeparate,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLSTENCILMASKSEPARATEPROC, glStencilMaskSeparate,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBPOINTERPROC, glVertexAttribPointer,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLBLENDEQUATIONSEPARATEPROC, glBlendEquationSeparate,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLENABLEVERTEXATTRIBARRAYPROC,
-      glEnableVertexAttribArray, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETVERTEXATTRIBPOINTERVPROC,
-      glGetVertexAttribPointerv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLDISABLEVERTEXATTRIBARRAYPROC,
-      glDisableVertexAttribArray, sym_loader);
+    LOAD_GL_FUNCTION(PFNGLSTENCILOPSEPARATEPROC, glStencilOpSeparate, sym_loader);
+    LOAD_GL_FUNCTION(PFNGLGETATTRIBLOCATIONPROC, glGetAttribLocation, sym_loader);
+    LOAD_GL_FUNCTION(PFNGLGETPROGRAMINFOLOGPROC, glGetProgramInfoLog, sym_loader);
+    LOAD_GL_FUNCTION(PFNGLGETVERTEXATTRIBDVPROC, glGetVertexAttribdv, sym_loader);
+    LOAD_GL_FUNCTION(PFNGLGETVERTEXATTRIBFVPROC, glGetVertexAttribfv, sym_loader);
+    LOAD_GL_FUNCTION(PFNGLGETVERTEXATTRIBIVPROC, glGetVertexAttribiv, sym_loader);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4NUBVPROC, glVertexAttrib4Nubv, sym_loader);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4NUIVPROC, glVertexAttrib4Nuiv, sym_loader);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4NUSVPROC, glVertexAttrib4Nusv, sym_loader);
+    LOAD_GL_FUNCTION(PFNGLBINDATTRIBLOCATIONPROC, glBindAttribLocation, sym_loader);
+    LOAD_GL_FUNCTION(PFNGLGETATTACHEDSHADERSPROC, glGetAttachedShaders, sym_loader);
+    LOAD_GL_FUNCTION(PFNGLGETUNIFORMLOCATIONPROC, glGetUniformLocation, sym_loader);
+    LOAD_GL_FUNCTION(PFNGLSTENCILFUNCSEPARATEPROC, glStencilFuncSeparate, sym_loader);
+    LOAD_GL_FUNCTION(PFNGLSTENCILMASKSEPARATEPROC, glStencilMaskSeparate, sym_loader);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBPOINTERPROC, glVertexAttribPointer, sym_loader);
+    LOAD_GL_FUNCTION(PFNGLBLENDEQUATIONSEPARATEPROC, glBlendEquationSeparate, sym_loader);
+    LOAD_GL_FUNCTION(PFNGLENABLEVERTEXATTRIBARRAYPROC, glEnableVertexAttribArray, sym_loader);
+    LOAD_GL_FUNCTION(PFNGLGETVERTEXATTRIBPOINTERVPROC, glGetVertexAttribPointerv, sym_loader);
+    LOAD_GL_FUNCTION(PFNGLDISABLEVERTEXATTRIBARRAYPROC, glDisableVertexAttribArray, sym_loader);
   }
 
   void gl_functions::load_2_1(symbol_loader *sym_loader)

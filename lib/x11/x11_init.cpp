@@ -16,34 +16,42 @@
  */
 #include "opengl_core/core/init.h"
 
+#include "opengl_core/core/standard_renderer.h"
 #include "opengl_core/core/x11/x11_display.h"
 
 #include <X11/Xlib.h>
 
 namespace opengl_core
 {
-  bool init()
+  extern "C"
   {
-    bool ret = true;
-    Status status = 0;
+    bool init()
+    {
+      bool ret = true;
+      Status status = 0;
 
-    status = XInitThreads();
-    if (status == 0) {
-      ret = false;
+      status = XInitThreads();
+      if (status == 0) {
+        ret = false;
+      }
+
+      if (ret) {
+        ret = x11_display_init();
+      }
+
+      if (ret) {
+        ret = standard_event_loop_init();
+      }
+
+      return ret;
     }
 
-    if (ret) {
-      ret = x11_display_init();
+    bool shutdown()
+    {
+      bool ret = true;
+
+      return ret;
     }
-
-    return ret;
-  }
-
-  bool shutdown()
-  {
-    bool ret = true;
-
-    return ret;
   }
 }
 

@@ -17,11 +17,16 @@
 #ifndef OPENGL_CORE_INIT_H_INCLUDED
 #define OPENGL_CORE_INIT_H_INCLUDED
 
+#include "declspec.h"
+
 namespace opengl_core
 {
-  bool init();
+  extern "C"
+  {
+    OPENGL_CORE_API bool init();
 
-  bool shutdown();
+    OPENGL_CORE_API bool shutdown();
+  }
 }
 
 #endif

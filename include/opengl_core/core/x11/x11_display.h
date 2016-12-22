@@ -18,18 +18,22 @@
 #define OPENGL_CORE_X11_DISPLAY_H_INCLUDED
 
 #include "declspec.h"
+
 #include <cstdint>
+
 #include <X11/Xlib.h>
 
 namespace opengl_core
 {
   extern "C"
   {
-    bool x11_display_init();
-    Display *x11_display_thread_specific_acquire();
-    void x11_display_thread_specific_release();
+    OPENGL_CORE_API bool x11_display_init();
 
-    std::uint32_t x11_display_thread_specifc_use_count();
+    OPENGL_CORE_API Display *x11_display_thread_specific_acquire();
+
+    OPENGL_CORE_API void x11_display_thread_specific_release();
+
+    OPENGL_CORE_API std::uint32_t x11_display_thread_specifc_use_count();
   }
 }
 #endif
