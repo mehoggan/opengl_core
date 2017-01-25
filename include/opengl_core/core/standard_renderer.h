@@ -29,23 +29,28 @@ namespace opengl_core
   {
     OPENGL_CORE_API bool standard_event_loop_init();
 
-    typedef std::function<void ()> init_callback;
+    typedef std::function<void (draw_buffer_window &,
+      draw_buffer_context &)> init_callback;
     OPENGL_CORE_API void set_thread_local_init_callback(
       const init_callback &cb);
 
-    typedef std::function<void ()> pre_render_callback;
+    typedef std::function<void (draw_buffer_window &,
+      draw_buffer_context &)> pre_render_callback;
     OPENGL_CORE_API void set_thread_local_pre_render_callback(
       const pre_render_callback &cb);
 
-    typedef std::function<void ()> render_callback;
+    typedef std::function<void (draw_buffer_window &,
+      draw_buffer_context &)> render_callback;
     OPENGL_CORE_API void set_thread_local_render_callback(
       const render_callback &cb);
 
-    typedef std::function<void ()> post_render_callback;
+    typedef std::function<void (draw_buffer_window &,
+      draw_buffer_context &)> post_render_callback;
     OPENGL_CORE_API void set_thread_local_post_render_callback(
       const post_render_callback &cb);
 
-    typedef std::function<void ()> close_callback;
+    typedef std::function<void (draw_buffer_window &,
+      draw_buffer_context &)> close_callback;
     OPENGL_CORE_API void set_thread_local_close_callback(
       const close_callback &cb);
 

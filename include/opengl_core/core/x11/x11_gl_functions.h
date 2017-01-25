@@ -2173,9 +2173,12 @@ extern "C"
   typedef void (OGLAPIENTRY *PFNGLFRAMEBUFFERTEXTUREPROC)(GLenum target,
     GLenum attachment, GLuint texture, GLint level);
   typedef void (OGLAPIENTRY *PFNGLGETBUFFERPARAMETERI64VPROC)(GLenum target,
-    GLenum value, GLint64 * data);
+    GLenum value, GLint64 *data);
   typedef void (OGLAPIENTRY *PFNGLGETINTEGER64I_VPROC)(GLenum pname,
-    GLuint index, GLint64 * data);
+    GLuint index, GLint64 *data);
+  typedef void (OGLAPIENTRY *PFNGLGENVERTEXARRAYSPROC)(GLsizei n,
+    GLuint *arrays);
+  typedef void (OGLAPIENTRY *PFNGLBINDVERTEXARRAYPROC)(GLuint array);
 }
 
 // OpenGL 3.3
@@ -2950,10 +2953,14 @@ EXTERN_OPENGL_CORE_API PFNGLFRAMEBUFFERTEXTUREPROC
 EXTERN_OPENGL_CORE_API PFNGLGETBUFFERPARAMETERI64VPROC
   opengl_core_GetBufferParameteri64v;
 EXTERN_OPENGL_CORE_API PFNGLGETINTEGER64I_VPROC opengl_core_GetInteger64i_v;
+EXTERN_OPENGL_CORE_API PFNGLGENVERTEXARRAYSPROC opengl_core_GenVertexArrays;
+EXTERN_OPENGL_CORE_API PFNGLBINDVERTEXARRAYPROC opengl_core_BindVertexArray;
 
 #define glFramebufferTexture opengl_core_FramebufferTexture
 #define glGetBufferParameteri64v opengl_core_GetBufferParameteri64v
 #define glGetInteger64i_v opengl_core_GetInteger64i_v
+#define glGenVertexArrays opengl_core_GenVertexArrays
+#define glBindVertexArray opengl_core_BindVertexArray
 
 EXTERN_OPENGL_CORE_API PFNGLVERTEXATTRIBDIVISORPROC
   opengl_core_VertexAttribDivisor;

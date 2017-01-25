@@ -23,12 +23,20 @@
 #include "opengl_core/core/draw_buffer_config.h"
 #include "opengl_core/core/draw_buffer_window.h"
 
+#include <cstdlib>
+#include <tuple>
+
 namespace opengl_core
 {
   extern "C"
   {
+    typedef struct gl_version {
+      std::uint16_t major;
+      std::uint16_t minor;
+    } gl_version;
+
     OPENGL_CORE_API draw_buffer_context draw_buffer_context_create(
-      draw_buffer_config &dbc, int major_version, int minor_version);
+      draw_buffer_config &dbc, const gl_version &ctx_ver);
 
     OPENGL_CORE_API draw_buffer_context draw_buffer_context_get_current();
 
@@ -44,7 +52,11 @@ namespace opengl_core
     OPENGL_CORE_API void draw_buffer_context_free(draw_buffer_context &ctx);
 
     OPENGL_CORE_API void swap_buffers(draw_buffer_window &win);
+
+    OPENGL_CORE_API gl_version draw_buffer_context_version(
+      draw_buffer_context &ctx, draw_buffer_window &win);
   }
+
 }
 
 #endif

@@ -17,7 +17,12 @@
 #ifndef GL_FUNCTIONS_HPP_INCLUDED
 #define GL_FUNCTIONS_HPP_INCLUDED
 
-#include "opengl_core/core/symbol_loader.h"
+#include "declspec.h"
+
+#include "opengl_core/core/draw_buffer_context.h"
+#include "opengl_core/core/gl_utils.h"
+
+#include <cstdint>
 
 namespace opengl_core
 {
@@ -30,17 +35,25 @@ namespace opengl_core
   struct gl_functions
   {
   private:
-    OPENGL_CORE_API static void load_1_2(symbol_loader *sym_loader);
-    OPENGL_CORE_API static void load_1_3(symbol_loader *sym_loader);
-    OPENGL_CORE_API static void load_1_4(symbol_loader *sym_loader);
-    OPENGL_CORE_API static void load_1_5(symbol_loader *sym_loader);
-    OPENGL_CORE_API static void load_2_0(symbol_loader *sym_loader);
-    OPENGL_CORE_API static void load_2_1(symbol_loader *sym_loader);
-    OPENGL_CORE_API static void load_3_0(symbol_loader *sym_loader);
+    OPENGL_CORE_API static void load_1_2();
+    OPENGL_CORE_API static void load_1_3();
+    OPENGL_CORE_API static void load_1_4();
+    OPENGL_CORE_API static void load_1_5();
+    OPENGL_CORE_API static void load_2_0();
+    OPENGL_CORE_API static void load_2_1();
+    OPENGL_CORE_API static void load_3_0();
+    OPENGL_CORE_API static void load_3_1();
+    OPENGL_CORE_API static void load_3_2();
+    OPENGL_CORE_API static void load_3_3();
+    OPENGL_CORE_API static void load_4_0();
+    OPENGL_CORE_API static void load_4_1();
+    OPENGL_CORE_API static void load_4_2();
+    OPENGL_CORE_API static void load_4_3();
+    OPENGL_CORE_API static void load_4_4();
+    OPENGL_CORE_API static void load_4_5();
 
   public:
-    static void configure(const std::uint8_t major,
-      const std::uint8_t minor);
+    static void configure(const gl_version &ctx_ver);
   };
 }
 #endif

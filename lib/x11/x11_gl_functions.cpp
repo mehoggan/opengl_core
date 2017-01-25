@@ -25,6 +25,7 @@
 #include <iostream>
 #include <iterator>
 #include <functional>
+#include <stdexcept>
 #include <string>
 #include <sstream>
 
@@ -316,6 +317,8 @@ PFNGLTEXBUFFERPROC opengl_core_TexBuffer = NULL;
 PFNGLFRAMEBUFFERTEXTUREPROC opengl_core_FramebufferTexture = NULL;
 PFNGLGETBUFFERPARAMETERI64VPROC opengl_core_GetBufferParameteri64v = NULL;
 PFNGLGETINTEGER64I_VPROC opengl_core_GetInteger64i_v = NULL;
+PFNGLGENVERTEXARRAYSPROC opengl_core_GenVertexArrays = NULL;
+PFNGLBINDVERTEXARRAYPROC opengl_core_BindVertexArray = NULL;
 
 PFNGLVERTEXATTRIBDIVISORPROC opengl_core_VertexAttribDivisor = NULL;
 
@@ -329,65 +332,103 @@ PFNGLGETGRAPHICSRESETSTATUSPROC opengl_core_GetGraphicsResetStatus = NULL;
 
 namespace opengl_core
 {
-  void gl_functions::configure(const std::uint8_t major,
-      const std::uint8_t minor)
+  void gl_functions::configure(const gl_version &ctx_ver)
   {
-    symbol_loader sym_loader("libGL.so");
-    assert(sym_loader.get_good() && "Failed to load libGL.so");
-
     // NOTE: glext.h from https://www.opengl.org/registry/api/GL/glext.h
     // intitialy groups functions by versions. Then it groups by extensions.
     // Some extensions are duplicated. Duplicates have the appropiate suffix.
     // e.g. ARB, NV, ..., etc.
-    typedef std::function<void(symbol_loader *)> load_func;
-    std::pair<std::vector<int>, load_func> versions[] =
+    typedef std::function<void()> load_func;
+    typedef std::pair<std::pair<int, int>, load_func> ver_to_func;
+    std::vector<std::pair<std::pair<int, int>, load_func>> versions =
     {
-      std::make_pair<std::vector<int>, load_func>({3, 0}, std::bind(
-        &opengl_core::gl_functions::load_3_0, &sym_loader)),
-      std::make_pair<std::vector<int>, load_func>({2, 1}, std::bind(
-        &opengl_core::gl_functions::load_2_1, &sym_loader)),
-      std::make_pair<std::vector<int>, load_func>({2, 0}, std::bind(
-        &opengl_core::gl_functions::load_2_0, &sym_loader)),
-      std::make_pair<std::vector<int>, load_func>({1, 5}, std::bind(
-        &opengl_core::gl_functions::load_1_5, &sym_loader)),
-      std::make_pair<std::vector<int>, load_func>({1, 4}, std::bind(
-        &opengl_core::gl_functions::load_1_4, &sym_loader)),
-      std::make_pair<std::vector<int>, load_func>({1, 3}, std::bind(
-        &opengl_core::gl_functions::load_1_3, &sym_loader)),
-      std::make_pair<std::vector<int>, load_func>({1, 2}, std::bind(
-        &opengl_core::gl_functions::load_1_2, &sym_loader))
+      std::make_pair<std::pair<int, int>, load_func>({4, 5}, std::bind(
+        &opengl_core::gl_functions::load_4_5)),
+      std::make_pair<std::pair<int, int>, load_func>({4, 4}, std::bind(
+        &opengl_core::gl_functions::load_4_4)),
+      std::make_pair<std::pair<int, int>, load_func>({4, 3}, std::bind(
+        &opengl_core::gl_functions::load_4_3)),
+      std::make_pair<std::pair<int, int>, load_func>({4, 2}, std::bind(
+        &opengl_core::gl_functions::load_4_2)),
+      std::make_pair<std::pair<int, int>, load_func>({4, 1}, std::bind(
+        &opengl_core::gl_functions::load_4_1)),
+      std::make_pair<std::pair<int, int>, load_func>({4, 0}, std::bind(
+        &opengl_core::gl_functions::load_4_0)),
+      std::make_pair<std::pair<int, int>, load_func>({3, 3}, std::bind(
+        &opengl_core::gl_functions::load_3_3)),
+      std::make_pair<std::pair<int, int>, load_func>({3, 2}, std::bind(
+        &opengl_core::gl_functions::load_3_2)),
+      std::make_pair<std::pair<int, int>, load_func>({3, 1}, std::bind(
+        &opengl_core::gl_functions::load_3_1)),
+      std::make_pair<std::pair<int, int>, load_func>({3, 0}, std::bind(
+        &opengl_core::gl_functions::load_3_0)),
+      std::make_pair<std::pair<int, int>, load_func>({2, 1}, std::bind(
+        &opengl_core::gl_functions::load_2_1)),
+      std::make_pair<std::pair<int, int>, load_func>({2, 0}, std::bind(
+        &opengl_core::gl_functions::load_2_0)),
+      std::make_pair<std::pair<int, int>, load_func>({1, 5}, std::bind(
+        &opengl_core::gl_functions::load_1_5)),
+      std::make_pair<std::pair<int, int>, load_func>({1, 4}, std::bind(
+        &opengl_core::gl_functions::load_1_4)),
+      std::make_pair<std::pair<int, int>, load_func>({1, 3}, std::bind(
+        &opengl_core::gl_functions::load_1_3)),
+      std::make_pair<std::pair<int, int>, load_func>({1, 2}, std::bind(
+        &opengl_core::gl_functions::load_1_2))
     };
-    for (auto version : versions) {
-      if (version.first[0] <= major && version.first[1] <= minor) {
-        version.second(&sym_loader);
-      }
+
+
+    // Find the closest funtion to the specified version by the client.
+    auto it = std::find_if(versions.begin(), versions.end(),
+      [&](ver_to_func &p) {
+        return (p.first.first <= ctx_ver.major &&
+          p.first.second <= ctx_ver.minor);
+      });
+    if (it == versions.end()) {
+      std::cerr << "Failed to provide a valid OpenGL version."
+       << std::endl << std::flush;
+      throw std::runtime_error("Failed to provide a valid OpenGL version.");
+    }
+    while (it != versions.end()) {
+      it->second();
+      ++it;
     }
 
+    // For display purposes only. This does not imply that all functions
+    // mapped to the extensions were loaded.
     std::vector<std::string> extensions_vector;
 
-    if (major >= 3 && minor >= 2) {
-      glGetStringi = (PFNGLGETSTRINGIPROC)sym_loader.load("glGetStringi");
+    if (ctx_ver.major >= 3 && ctx_ver.minor >= 0) {
+      glGetStringi = (PFNGLGETSTRINGIPROC)glXGetProcAddress(
+        (GLubyte *)"glGetStringi");
       assert(glGetStringi && "Could not acquire glGetStringi");
 
       GLint n = 0;
-      glGetIntegerv(GL_NUM_EXTENSIONS, &n);
+      glGetIntegerv(GL_NUM_EXTENSIONS, &n); GL_CALL(glGetIntegerv)
       for (GLint i = 0; i < n; ++i) {
-        const char* extension = (const char*)glGetStringi(GL_EXTENSIONS, i);
+        const GLubyte *extension = glGetStringi(GL_EXTENSIONS, i);
+          GL_CALL(glGetStringi(GL_EXTENSIONS))
         if (extension) {
-          extensions_vector.push_back(extension);
+          extensions_vector.push_back((const char *)extension);
         } else {
           std::cout << "Failed to load extension." << std::endl;
         }
       }
-      std::cout << "Context version greather than 3.2 provides ";
+      std::cout << "Context version greater than or equal to "
+        << (std::uint32_t)ctx_ver.major << "."
+        << (std::uint32_t)ctx_ver.minor << " provides" << std::endl
+        << std::flush;
       std::copy(extensions_vector.begin(), extensions_vector.end(),
         std::ostream_iterator<std::string>(std::cout, " "));
       std::cout << std::endl;
     } else {
       const GLubyte *extensions = glGetString(GL_EXTENSIONS);
+        GL_CALL(glGetString(GL_EXTENSIONS))
       if (extensions) {
         std::string std_extensions((const char*)extensions);
-        std::cout << "Context version less than 3.2 provides "
+        std::cout << "Context version less than "
+          << (std::uint32_t)ctx_ver.major
+          << "." << (std::uint32_t)ctx_ver.minor << "provides ";
+        std::cout << "Context version less than 3.0 provides "
           << std_extensions << std::endl << std::flush;
         std::replace(std_extensions.begin(), std_extensions.end(), ' ',
           '\n');
@@ -404,371 +445,394 @@ namespace opengl_core
   }
 }
 
-#define LOAD_GL_FUNCTION(type, name, sym_loader) \
-  name = (type)sym_loader->load(#name); \
+#define LOAD_GL_FUNCTION(type, name) \
+  name = (type)glXGetProcAddress((GLubyte *)#name); \
   if (name == nullptr) { \
-    assert(name != nullptr); \
+    assert(name != nullptr && "Failed to load "#name); \
   }
 
 namespace opengl_core
 {
-  void gl_functions::load_1_2(symbol_loader *sym_loader)
+  void gl_functions::load_1_2()
   {
     std::cout << "Loading OpenGL 1.2 Functions " << std::endl;
-    LOAD_GL_FUNCTION(PFNGLBLENDCOLORPROC, glBlendColor, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLTEXIMAGE3DPROC, glTexImage3D, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLBLENDEQUATIONPROC, glBlendEquation, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLTEXSUBIMAGE3DPROC, glTexSubImage3D, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLDRAWRANGEELEMENTSPROC, glDrawRangeElements,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLCOPYTEXSUBIMAGE3DPROC, glCopyTexSubImage3D,
-      sym_loader);
+    LOAD_GL_FUNCTION(PFNGLBLENDCOLORPROC, glBlendColor);
+    LOAD_GL_FUNCTION(PFNGLTEXIMAGE3DPROC, glTexImage3D);
+    LOAD_GL_FUNCTION(PFNGLBLENDEQUATIONPROC, glBlendEquation);
+    LOAD_GL_FUNCTION(PFNGLTEXSUBIMAGE3DPROC, glTexSubImage3D);
+    LOAD_GL_FUNCTION(PFNGLDRAWRANGEELEMENTSPROC, glDrawRangeElements);
+    LOAD_GL_FUNCTION(PFNGLCOPYTEXSUBIMAGE3DPROC, glCopyTexSubImage3D);
   }
 
-  void gl_functions::load_1_3(symbol_loader *sym_loader)
+  void gl_functions::load_1_3()
   {
     std::cout << "Loading OpenGL 1.3 Functions " << std::endl;
-    LOAD_GL_FUNCTION(PFNGLACTIVETEXTUREPROC, glActiveTexture, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLSAMPLECOVERAGEPROC, glSampleCoverage, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD1DPROC, glMultiTexCoord1d, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD1FPROC, glMultiTexCoord1f, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD1IPROC, glMultiTexCoord1i, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD1SPROC, glMultiTexCoord1s, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD2DPROC, glMultiTexCoord2d, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD2FPROC, glMultiTexCoord2f, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD2IPROC, glMultiTexCoord2i, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD2SPROC, glMultiTexCoord2s, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD3DPROC, glMultiTexCoord3d, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD3FPROC, glMultiTexCoord3f, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD3IPROC, glMultiTexCoord3i, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD3SPROC, glMultiTexCoord3s, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD4DPROC, glMultiTexCoord4d, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD4FPROC, glMultiTexCoord4f, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD4IPROC, glMultiTexCoord4i, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD4SPROC, glMultiTexCoord4s, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD1DVPROC, glMultiTexCoord1dv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD1FVPROC, glMultiTexCoord1fv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD1IVPROC, glMultiTexCoord1iv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD1SVPROC, glMultiTexCoord1sv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD2DVPROC, glMultiTexCoord2dv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD2FVPROC, glMultiTexCoord2fv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD2IVPROC, glMultiTexCoord2iv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD2SVPROC, glMultiTexCoord2sv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD3DVPROC, glMultiTexCoord3dv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD3FVPROC, glMultiTexCoord3fv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD3IVPROC, glMultiTexCoord3iv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD3SVPROC, glMultiTexCoord3sv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD4DVPROC, glMultiTexCoord4dv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD4FVPROC, glMultiTexCoord4fv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD4IVPROC, glMultiTexCoord4iv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD4SVPROC, glMultiTexCoord4sv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLCLIENTACTIVETEXTUREPROC, glClientActiveTexture,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLLOADTRANSPOSEMATRIXFPROC, glLoadTransposeMatrixf,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLLOADTRANSPOSEMATRIXDPROC, glLoadTransposeMatrixd,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTTRANSPOSEMATRIXFPROC, glMultTransposeMatrixf,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTTRANSPOSEMATRIXDPROC, glMultTransposeMatrixd,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLCOMPRESSEDTEXIMAGE3DPROC, glCompressedTexImage3D,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLCOMPRESSEDTEXIMAGE2DPROC, glCompressedTexImage2D,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLCOMPRESSEDTEXIMAGE1DPROC, glCompressedTexImage1D,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETCOMPRESSEDTEXIMAGEPROC, glGetCompressedTexImage,
-      sym_loader);
+    LOAD_GL_FUNCTION(PFNGLACTIVETEXTUREPROC, glActiveTexture);
+    LOAD_GL_FUNCTION(PFNGLSAMPLECOVERAGEPROC, glSampleCoverage);
+    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD1DPROC, glMultiTexCoord1d);
+    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD1FPROC, glMultiTexCoord1f);
+    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD1IPROC, glMultiTexCoord1i);
+    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD1SPROC, glMultiTexCoord1s);
+    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD2DPROC, glMultiTexCoord2d);
+    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD2FPROC, glMultiTexCoord2f);
+    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD2IPROC, glMultiTexCoord2i);
+    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD2SPROC, glMultiTexCoord2s);
+    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD3DPROC, glMultiTexCoord3d);
+    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD3FPROC, glMultiTexCoord3f);
+    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD3IPROC, glMultiTexCoord3i);
+    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD3SPROC, glMultiTexCoord3s);
+    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD4DPROC, glMultiTexCoord4d);
+    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD4FPROC, glMultiTexCoord4f);
+    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD4IPROC, glMultiTexCoord4i);
+    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD4SPROC, glMultiTexCoord4s);
+    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD1DVPROC, glMultiTexCoord1dv);
+    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD1FVPROC, glMultiTexCoord1fv);
+    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD1IVPROC, glMultiTexCoord1iv);
+    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD1SVPROC, glMultiTexCoord1sv);
+    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD2DVPROC, glMultiTexCoord2dv);
+    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD2FVPROC, glMultiTexCoord2fv);
+    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD2IVPROC, glMultiTexCoord2iv);
+    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD2SVPROC, glMultiTexCoord2sv);
+    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD3DVPROC, glMultiTexCoord3dv);
+    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD3FVPROC, glMultiTexCoord3fv);
+    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD3IVPROC, glMultiTexCoord3iv);
+    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD3SVPROC, glMultiTexCoord3sv);
+    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD4DVPROC, glMultiTexCoord4dv);
+    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD4FVPROC, glMultiTexCoord4fv);
+    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD4IVPROC, glMultiTexCoord4iv);
+    LOAD_GL_FUNCTION(PFNGLMULTITEXCOORD4SVPROC, glMultiTexCoord4sv);
+    LOAD_GL_FUNCTION(PFNGLCLIENTACTIVETEXTUREPROC, glClientActiveTexture);
+    LOAD_GL_FUNCTION(PFNGLLOADTRANSPOSEMATRIXFPROC, glLoadTransposeMatrixf);
+    LOAD_GL_FUNCTION(PFNGLLOADTRANSPOSEMATRIXDPROC, glLoadTransposeMatrixd);
+    LOAD_GL_FUNCTION(PFNGLMULTTRANSPOSEMATRIXFPROC, glMultTransposeMatrixf);
+    LOAD_GL_FUNCTION(PFNGLMULTTRANSPOSEMATRIXDPROC, glMultTransposeMatrixd);
+    LOAD_GL_FUNCTION(PFNGLCOMPRESSEDTEXIMAGE3DPROC, glCompressedTexImage3D);
+    LOAD_GL_FUNCTION(PFNGLCOMPRESSEDTEXIMAGE2DPROC, glCompressedTexImage2D);
+    LOAD_GL_FUNCTION(PFNGLCOMPRESSEDTEXIMAGE1DPROC, glCompressedTexImage1D);
+    LOAD_GL_FUNCTION(PFNGLGETCOMPRESSEDTEXIMAGEPROC,
+      glGetCompressedTexImage);
     LOAD_GL_FUNCTION(PFNGLCOMPRESSEDTEXSUBIMAGE3DPROC,
-      glCompressedTexSubImage3D, sym_loader);
+      glCompressedTexSubImage3D);
     LOAD_GL_FUNCTION(PFNGLCOMPRESSEDTEXSUBIMAGE2DPROC,
-      glCompressedTexSubImage2D, sym_loader);
+      glCompressedTexSubImage2D);
     LOAD_GL_FUNCTION(PFNGLCOMPRESSEDTEXSUBIMAGE1DPROC,
-      glCompressedTexSubImage1D, sym_loader);
+      glCompressedTexSubImage1D);
   }
 
-  void gl_functions::load_1_4(symbol_loader *sym_loader)
+  void gl_functions::load_1_4()
   {
     std::cout << "Loading OpenGL 1.4 Functions " << std::endl;
-    LOAD_GL_FUNCTION(PFNGLFOGCOORDFPROC, glFogCoordf, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLFOGCOORDDPROC, glFogCoordd, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLFOGCOORDFVPROC, glFogCoordfv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLFOGCOORDDVPROC, glFogCoorddv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLWINDOWPOS2DPROC, glWindowPos2d, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLWINDOWPOS2FPROC, glWindowPos2f, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLWINDOWPOS2IPROC, glWindowPos2i, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLWINDOWPOS2SPROC, glWindowPos2s, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLWINDOWPOS3DPROC, glWindowPos3d, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLWINDOWPOS3FPROC, glWindowPos3f, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLWINDOWPOS3IPROC, glWindowPos3i, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLWINDOWPOS3SPROC, glWindowPos3s, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLWINDOWPOS2DVPROC, glWindowPos2dv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLWINDOWPOS2FVPROC, glWindowPos2fv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLWINDOWPOS2IVPROC, glWindowPos2iv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLWINDOWPOS2SVPROC, glWindowPos2sv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLWINDOWPOS3DVPROC, glWindowPos3dv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLWINDOWPOS3FVPROC, glWindowPos3fv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLWINDOWPOS3IVPROC, glWindowPos3iv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLWINDOWPOS3SVPROC, glWindowPos3sv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLFOGCOORDPOINTERPROC, glFogCoordPointer, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTIDRAWARRAYSPROC, glMultiDrawArrays, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLPOINTPARAMETERFPROC, glPointParameterf, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLPOINTPARAMETERIPROC, glPointParameteri, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLPOINTPARAMETERFVPROC, glPointParameterfv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLPOINTPARAMETERIVPROC, glPointParameteriv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLSECONDARYCOLOR3BPROC, glSecondaryColor3b, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLSECONDARYCOLOR3DPROC, glSecondaryColor3d, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLSECONDARYCOLOR3FPROC, glSecondaryColor3f, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLSECONDARYCOLOR3IPROC, glSecondaryColor3i, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLSECONDARYCOLOR3SPROC, glSecondaryColor3s, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLBLENDFUNCSEPARATEPROC, glBlendFuncSeparate,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMULTIDRAWELEMENTSPROC, glMultiDrawElements,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLSECONDARYCOLOR3BVPROC, glSecondaryColor3bv,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLSECONDARYCOLOR3DVPROC, glSecondaryColor3dv,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLSECONDARYCOLOR3FVPROC, glSecondaryColor3fv,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLSECONDARYCOLOR3IVPROC, glSecondaryColor3iv,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLSECONDARYCOLOR3SVPROC, glSecondaryColor3sv,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLSECONDARYCOLOR3UBPROC, glSecondaryColor3ub,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLSECONDARYCOLOR3UIPROC, glSecondaryColor3ui,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLSECONDARYCOLOR3USPROC, glSecondaryColor3us,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLSECONDARYCOLOR3UBVPROC, glSecondaryColor3ubv,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLSECONDARYCOLOR3UIVPROC, glSecondaryColor3uiv,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLSECONDARYCOLOR3USVPROC, glSecondaryColor3usv,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLSECONDARYCOLORPOINTERPROC, glSecondaryColorPointer,
-      sym_loader);
+    LOAD_GL_FUNCTION(PFNGLFOGCOORDFPROC, glFogCoordf);
+    LOAD_GL_FUNCTION(PFNGLFOGCOORDDPROC, glFogCoordd);
+    LOAD_GL_FUNCTION(PFNGLFOGCOORDFVPROC, glFogCoordfv);
+    LOAD_GL_FUNCTION(PFNGLFOGCOORDDVPROC, glFogCoorddv);
+    LOAD_GL_FUNCTION(PFNGLWINDOWPOS2DPROC, glWindowPos2d);
+    LOAD_GL_FUNCTION(PFNGLWINDOWPOS2FPROC, glWindowPos2f);
+    LOAD_GL_FUNCTION(PFNGLWINDOWPOS2IPROC, glWindowPos2i);
+    LOAD_GL_FUNCTION(PFNGLWINDOWPOS2SPROC, glWindowPos2s);
+    LOAD_GL_FUNCTION(PFNGLWINDOWPOS3DPROC, glWindowPos3d);
+    LOAD_GL_FUNCTION(PFNGLWINDOWPOS3FPROC, glWindowPos3f);
+    LOAD_GL_FUNCTION(PFNGLWINDOWPOS3IPROC, glWindowPos3i);
+    LOAD_GL_FUNCTION(PFNGLWINDOWPOS3SPROC, glWindowPos3s);
+    LOAD_GL_FUNCTION(PFNGLWINDOWPOS2DVPROC, glWindowPos2dv);
+    LOAD_GL_FUNCTION(PFNGLWINDOWPOS2FVPROC, glWindowPos2fv);
+    LOAD_GL_FUNCTION(PFNGLWINDOWPOS2IVPROC, glWindowPos2iv);
+    LOAD_GL_FUNCTION(PFNGLWINDOWPOS2SVPROC, glWindowPos2sv);
+    LOAD_GL_FUNCTION(PFNGLWINDOWPOS3DVPROC, glWindowPos3dv);
+    LOAD_GL_FUNCTION(PFNGLWINDOWPOS3FVPROC, glWindowPos3fv);
+    LOAD_GL_FUNCTION(PFNGLWINDOWPOS3IVPROC, glWindowPos3iv);
+    LOAD_GL_FUNCTION(PFNGLWINDOWPOS3SVPROC, glWindowPos3sv);
+    LOAD_GL_FUNCTION(PFNGLFOGCOORDPOINTERPROC, glFogCoordPointer);
+    LOAD_GL_FUNCTION(PFNGLMULTIDRAWARRAYSPROC, glMultiDrawArrays);
+    LOAD_GL_FUNCTION(PFNGLPOINTPARAMETERFPROC, glPointParameterf);
+    LOAD_GL_FUNCTION(PFNGLPOINTPARAMETERIPROC, glPointParameteri);
+    LOAD_GL_FUNCTION(PFNGLPOINTPARAMETERFVPROC, glPointParameterfv);
+    LOAD_GL_FUNCTION(PFNGLPOINTPARAMETERIVPROC, glPointParameteriv);
+    LOAD_GL_FUNCTION(PFNGLSECONDARYCOLOR3BPROC, glSecondaryColor3b);
+    LOAD_GL_FUNCTION(PFNGLSECONDARYCOLOR3DPROC, glSecondaryColor3d);
+    LOAD_GL_FUNCTION(PFNGLSECONDARYCOLOR3FPROC, glSecondaryColor3f);
+    LOAD_GL_FUNCTION(PFNGLSECONDARYCOLOR3IPROC, glSecondaryColor3i);
+    LOAD_GL_FUNCTION(PFNGLSECONDARYCOLOR3SPROC, glSecondaryColor3s);
+    LOAD_GL_FUNCTION(PFNGLBLENDFUNCSEPARATEPROC, glBlendFuncSeparate);
+    LOAD_GL_FUNCTION(PFNGLMULTIDRAWELEMENTSPROC, glMultiDrawElements);
+    LOAD_GL_FUNCTION(PFNGLSECONDARYCOLOR3BVPROC, glSecondaryColor3bv);
+    LOAD_GL_FUNCTION(PFNGLSECONDARYCOLOR3FVPROC, glSecondaryColor3fv);
+    LOAD_GL_FUNCTION(PFNGLSECONDARYCOLOR3IVPROC, glSecondaryColor3iv);
+    LOAD_GL_FUNCTION(PFNGLSECONDARYCOLOR3SVPROC, glSecondaryColor3sv);
+    LOAD_GL_FUNCTION(PFNGLSECONDARYCOLOR3UBPROC, glSecondaryColor3ub);
+    LOAD_GL_FUNCTION(PFNGLSECONDARYCOLOR3UIPROC, glSecondaryColor3ui);
+    LOAD_GL_FUNCTION(PFNGLSECONDARYCOLOR3USPROC, glSecondaryColor3us);
+    LOAD_GL_FUNCTION(PFNGLSECONDARYCOLOR3UBVPROC, glSecondaryColor3ubv);
+    LOAD_GL_FUNCTION(PFNGLSECONDARYCOLOR3UIVPROC, glSecondaryColor3uiv);
+    LOAD_GL_FUNCTION(PFNGLSECONDARYCOLOR3USVPROC, glSecondaryColor3usv);
+    LOAD_GL_FUNCTION(PFNGLSECONDARYCOLORPOINTERPROC,
+      glSecondaryColorPointer);
   }
 
-  void gl_functions::load_1_5(symbol_loader *sym_loader)
+  void gl_functions::load_1_5()
   {
     std::cout << "Loading OpenGL 1.5 Functions " << std::endl;
-    LOAD_GL_FUNCTION(PFNGLISQUERYPROC, glIsQuery, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLENDQUERYPROC, glEndQuery, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLISBUFFERPROC, glIsBuffer, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLMAPBUFFERPROC, glMapBuffer, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGENQUERIESPROC, glGenQueries, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLBEGINQUERYPROC, glBeginQuery, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETQUERYIVPROC, glGetQueryiv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLBINDBUFFERPROC, glBindBuffer, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGENBUFFERSPROC, glGenBuffers, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLBUFFERDATAPROC, glBufferData, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLUNMAPBUFFERPROC, glUnmapBuffer, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLDELETEQUERIESPROC, glDeleteQueries, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLDELETEBUFFERSPROC, glDeleteBuffers, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLBUFFERSUBDATAPROC, glBufferSubData, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETQUERYOBJECTIVPROC, glGetQueryObjectiv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETBUFFERSUBDATAPROC, glGetBufferSubData, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETQUERYOBJECTUIVPROC, glGetQueryObjectuiv,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETBUFFERPOINTERVPROC, glGetBufferPointerv,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETBUFFERPARAMETERIVPROC, glGetBufferParameteriv,
-      sym_loader);
+    LOAD_GL_FUNCTION(PFNGLISQUERYPROC, glIsQuery);
+    LOAD_GL_FUNCTION(PFNGLENDQUERYPROC, glEndQuery);
+    LOAD_GL_FUNCTION(PFNGLISBUFFERPROC, glIsBuffer);
+    LOAD_GL_FUNCTION(PFNGLMAPBUFFERPROC, glMapBuffer);
+    LOAD_GL_FUNCTION(PFNGLGENQUERIESPROC, glGenQueries);
+    LOAD_GL_FUNCTION(PFNGLBEGINQUERYPROC, glBeginQuery);
+    LOAD_GL_FUNCTION(PFNGLGETQUERYIVPROC, glGetQueryiv);
+    LOAD_GL_FUNCTION(PFNGLBINDBUFFERPROC, glBindBuffer);
+    LOAD_GL_FUNCTION(PFNGLGENBUFFERSPROC, glGenBuffers);
+    LOAD_GL_FUNCTION(PFNGLBUFFERDATAPROC, glBufferData);
+    LOAD_GL_FUNCTION(PFNGLUNMAPBUFFERPROC, glUnmapBuffer);
+    LOAD_GL_FUNCTION(PFNGLDELETEQUERIESPROC, glDeleteQueries);
+    LOAD_GL_FUNCTION(PFNGLDELETEBUFFERSPROC, glDeleteBuffers);
+    LOAD_GL_FUNCTION(PFNGLBUFFERSUBDATAPROC, glBufferSubData);
+    LOAD_GL_FUNCTION(PFNGLGETQUERYOBJECTIVPROC, glGetQueryObjectiv);
+    LOAD_GL_FUNCTION(PFNGLGETBUFFERSUBDATAPROC, glGetBufferSubData);
+    LOAD_GL_FUNCTION(PFNGLGETQUERYOBJECTUIVPROC, glGetQueryObjectuiv);
+    LOAD_GL_FUNCTION(PFNGLGETBUFFERPOINTERVPROC, glGetBufferPointerv);
+    LOAD_GL_FUNCTION(PFNGLGETBUFFERPARAMETERIVPROC, glGetBufferParameteriv);
   }
 
-  void gl_functions::load_2_0(symbol_loader *sym_loader)
+  void gl_functions::load_2_0()
   {
     std::cout << "Loading OpenGL 2.0 Functions " << std::endl;
-    LOAD_GL_FUNCTION(PFNGLISSHADERPROC, glIsShader, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLISPROGRAMPROC, glIsProgram, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLUNIFORM1FPROC, glUniform1f, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLUNIFORM2FPROC, glUniform2f, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLUNIFORM3FPROC, glUniform3f, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLUNIFORM4FPROC, glUniform4f, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLUNIFORM1IPROC, glUniform1i, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLUNIFORM2IPROC, glUniform2i, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLUNIFORM3IPROC, glUniform3i, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLUNIFORM4IPROC, glUniform4i, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLUSEPROGRAMPROC, glUseProgram, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLUNIFORM1FVPROC, glUniform1fv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLUNIFORM2FVPROC, glUniform2fv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLUNIFORM3FVPROC, glUniform3fv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLUNIFORM4FVPROC, glUniform4fv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLUNIFORM1IVPROC, glUniform1iv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLUNIFORM2IVPROC, glUniform2iv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLUNIFORM3IVPROC, glUniform3iv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLUNIFORM4IVPROC, glUniform4iv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLDRAWBUFFERSPROC, glDrawBuffers, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETSHADERIVPROC, glGetShaderiv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLLINKPROGRAMPROC, glLinkProgram, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLATTACHSHADERPROC, glAttachShader, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLCREATESHADERPROC, glCreateShader, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLDELETESHADERPROC, glDeleteShader, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLDETACHSHADERPROC, glDetachShader, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETPROGRAMIVPROC, glGetProgramiv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETUNIFORMFVPROC, glGetUniformfv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETUNIFORMIVPROC, glGetUniformiv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLSHADERSOURCEPROC, glShaderSource, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLCOMPILESHADERPROC, glCompileShader, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLCREATEPROGRAMPROC, glCreateProgram, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLDELETEPROGRAMPROC, glDeleteProgram, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB1DPROC, glVertexAttrib1d, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB1FPROC, glVertexAttrib1f, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB1SPROC, glVertexAttrib1s, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB2DPROC, glVertexAttrib2d, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB2FPROC, glVertexAttrib2f, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB2SPROC, glVertexAttrib2s, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB3DPROC, glVertexAttrib3d, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB3FPROC, glVertexAttrib3f, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB3SPROC, glVertexAttrib3s, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4DPROC, glVertexAttrib4d, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4FPROC, glVertexAttrib4f, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4SPROC, glVertexAttrib4s, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETACTIVEATTRIBPROC, glGetActiveAttrib, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETSHADERSOURCEPROC, glGetShaderSource, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVALIDATEPROGRAMPROC, glValidateProgram, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB1DVPROC, glVertexAttrib1dv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB1FVPROC, glVertexAttrib1fv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB1SVPROC, glVertexAttrib1sv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB2DVPROC, glVertexAttrib2dv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB2FVPROC, glVertexAttrib2fv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB2SVPROC, glVertexAttrib2sv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB3DVPROC, glVertexAttrib3dv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB3FVPROC, glVertexAttrib3fv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB3SVPROC, glVertexAttrib3sv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4BVPROC, glVertexAttrib4bv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4DVPROC, glVertexAttrib4dv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4FVPROC, glVertexAttrib4fv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4IVPROC, glVertexAttrib4iv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4SVPROC, glVertexAttrib4sv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETACTIVEUNIFORMPROC, glGetActiveUniform, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETSHADERINFOLOGPROC, glGetShaderInfoLog, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLUNIFORMMATRIX2FVPROC, glUniformMatrix2fv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLUNIFORMMATRIX3FVPROC, glUniformMatrix3fv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLUNIFORMMATRIX4FVPROC, glUniformMatrix4fv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4NBVPROC, glVertexAttrib4Nbv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4NIVPROC, glVertexAttrib4Niv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4NSVPROC, glVertexAttrib4Nsv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4NUBPROC, glVertexAttrib4Nub, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4UBVPROC, glVertexAttrib4ubv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4UIVPROC, glVertexAttrib4uiv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4USVPROC, glVertexAttrib4usv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLSTENCILOPSEPARATEPROC, glStencilOpSeparate, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETATTRIBLOCATIONPROC, glGetAttribLocation, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETPROGRAMINFOLOGPROC, glGetProgramInfoLog, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETVERTEXATTRIBDVPROC, glGetVertexAttribdv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETVERTEXATTRIBFVPROC, glGetVertexAttribfv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETVERTEXATTRIBIVPROC, glGetVertexAttribiv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4NUBVPROC, glVertexAttrib4Nubv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4NUIVPROC, glVertexAttrib4Nuiv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4NUSVPROC, glVertexAttrib4Nusv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLBINDATTRIBLOCATIONPROC, glBindAttribLocation, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETATTACHEDSHADERSPROC, glGetAttachedShaders, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETUNIFORMLOCATIONPROC, glGetUniformLocation, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLSTENCILFUNCSEPARATEPROC, glStencilFuncSeparate, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLSTENCILMASKSEPARATEPROC, glStencilMaskSeparate, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBPOINTERPROC, glVertexAttribPointer, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLBLENDEQUATIONSEPARATEPROC, glBlendEquationSeparate, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLENABLEVERTEXATTRIBARRAYPROC, glEnableVertexAttribArray, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETVERTEXATTRIBPOINTERVPROC, glGetVertexAttribPointerv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLDISABLEVERTEXATTRIBARRAYPROC, glDisableVertexAttribArray, sym_loader);
+    LOAD_GL_FUNCTION(PFNGLISSHADERPROC, glIsShader);
+    LOAD_GL_FUNCTION(PFNGLISPROGRAMPROC, glIsProgram);
+    LOAD_GL_FUNCTION(PFNGLUNIFORM1FPROC, glUniform1f);
+    LOAD_GL_FUNCTION(PFNGLUNIFORM2FPROC, glUniform2f);
+    LOAD_GL_FUNCTION(PFNGLUNIFORM3FPROC, glUniform3f);
+    LOAD_GL_FUNCTION(PFNGLUNIFORM4FPROC, glUniform4f);
+    LOAD_GL_FUNCTION(PFNGLUNIFORM1IPROC, glUniform1i);
+    LOAD_GL_FUNCTION(PFNGLUNIFORM2IPROC, glUniform2i);
+    LOAD_GL_FUNCTION(PFNGLUNIFORM3IPROC, glUniform3i);
+    LOAD_GL_FUNCTION(PFNGLUNIFORM4IPROC, glUniform4i);
+    LOAD_GL_FUNCTION(PFNGLUSEPROGRAMPROC, glUseProgram);
+    LOAD_GL_FUNCTION(PFNGLUNIFORM1FVPROC, glUniform1fv);
+    LOAD_GL_FUNCTION(PFNGLUNIFORM2FVPROC, glUniform2fv);
+    LOAD_GL_FUNCTION(PFNGLUNIFORM3FVPROC, glUniform3fv);
+    LOAD_GL_FUNCTION(PFNGLUNIFORM4FVPROC, glUniform4fv);
+    LOAD_GL_FUNCTION(PFNGLUNIFORM1IVPROC, glUniform1iv);
+    LOAD_GL_FUNCTION(PFNGLUNIFORM2IVPROC, glUniform2iv);
+    LOAD_GL_FUNCTION(PFNGLUNIFORM3IVPROC, glUniform3iv);
+    LOAD_GL_FUNCTION(PFNGLUNIFORM4IVPROC, glUniform4iv);
+    LOAD_GL_FUNCTION(PFNGLDRAWBUFFERSPROC, glDrawBuffers);
+    LOAD_GL_FUNCTION(PFNGLGETSHADERIVPROC, glGetShaderiv);
+    LOAD_GL_FUNCTION(PFNGLLINKPROGRAMPROC, glLinkProgram);
+    LOAD_GL_FUNCTION(PFNGLATTACHSHADERPROC, glAttachShader);
+    LOAD_GL_FUNCTION(PFNGLCREATESHADERPROC, glCreateShader);
+    LOAD_GL_FUNCTION(PFNGLDELETESHADERPROC, glDeleteShader);
+    LOAD_GL_FUNCTION(PFNGLDETACHSHADERPROC, glDetachShader);
+    LOAD_GL_FUNCTION(PFNGLGETPROGRAMIVPROC, glGetProgramiv);
+    LOAD_GL_FUNCTION(PFNGLGETUNIFORMFVPROC, glGetUniformfv);
+    LOAD_GL_FUNCTION(PFNGLGETUNIFORMIVPROC, glGetUniformiv);
+    LOAD_GL_FUNCTION(PFNGLSHADERSOURCEPROC, glShaderSource);
+    LOAD_GL_FUNCTION(PFNGLCOMPILESHADERPROC, glCompileShader);
+    LOAD_GL_FUNCTION(PFNGLCREATEPROGRAMPROC, glCreateProgram);
+    LOAD_GL_FUNCTION(PFNGLDELETEPROGRAMPROC, glDeleteProgram);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB1DPROC, glVertexAttrib1d);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB1FPROC, glVertexAttrib1f);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB1SPROC, glVertexAttrib1s);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB2DPROC, glVertexAttrib2d);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB2FPROC, glVertexAttrib2f);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB2SPROC, glVertexAttrib2s);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB3DPROC, glVertexAttrib3d);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB3FPROC, glVertexAttrib3f);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB3SPROC, glVertexAttrib3s);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4DPROC, glVertexAttrib4d);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4FPROC, glVertexAttrib4f);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4SPROC, glVertexAttrib4s);
+    LOAD_GL_FUNCTION(PFNGLGETACTIVEATTRIBPROC, glGetActiveAttrib);
+    LOAD_GL_FUNCTION(PFNGLGETSHADERSOURCEPROC, glGetShaderSource);
+    LOAD_GL_FUNCTION(PFNGLVALIDATEPROGRAMPROC, glValidateProgram);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB1DVPROC, glVertexAttrib1dv);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB1FVPROC, glVertexAttrib1fv);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB1SVPROC, glVertexAttrib1sv);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB2DVPROC, glVertexAttrib2dv);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB2FVPROC, glVertexAttrib2fv);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB2SVPROC, glVertexAttrib2sv);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB3DVPROC, glVertexAttrib3dv);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB3FVPROC, glVertexAttrib3fv);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB3SVPROC, glVertexAttrib3sv);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4BVPROC, glVertexAttrib4bv);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4DVPROC, glVertexAttrib4dv);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4FVPROC, glVertexAttrib4fv);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4IVPROC, glVertexAttrib4iv);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4SVPROC, glVertexAttrib4sv);
+    LOAD_GL_FUNCTION(PFNGLGETACTIVEUNIFORMPROC, glGetActiveUniform);
+    LOAD_GL_FUNCTION(PFNGLGETSHADERINFOLOGPROC, glGetShaderInfoLog);
+    LOAD_GL_FUNCTION(PFNGLUNIFORMMATRIX2FVPROC, glUniformMatrix2fv);
+    LOAD_GL_FUNCTION(PFNGLUNIFORMMATRIX3FVPROC, glUniformMatrix3fv);
+    LOAD_GL_FUNCTION(PFNGLUNIFORMMATRIX4FVPROC, glUniformMatrix4fv);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4NBVPROC, glVertexAttrib4Nbv);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4NIVPROC, glVertexAttrib4Niv);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4NSVPROC, glVertexAttrib4Nsv);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4NUBPROC, glVertexAttrib4Nub);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4UBVPROC, glVertexAttrib4ubv);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4UIVPROC, glVertexAttrib4uiv);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4USVPROC, glVertexAttrib4usv);
+    LOAD_GL_FUNCTION(PFNGLSTENCILOPSEPARATEPROC, glStencilOpSeparate);
+    LOAD_GL_FUNCTION(PFNGLGETATTRIBLOCATIONPROC, glGetAttribLocation);
+    LOAD_GL_FUNCTION(PFNGLGETPROGRAMINFOLOGPROC, glGetProgramInfoLog);
+    LOAD_GL_FUNCTION(PFNGLGETVERTEXATTRIBDVPROC, glGetVertexAttribdv);
+    LOAD_GL_FUNCTION(PFNGLGETVERTEXATTRIBFVPROC, glGetVertexAttribfv);
+    LOAD_GL_FUNCTION(PFNGLGETVERTEXATTRIBIVPROC, glGetVertexAttribiv);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4NUBVPROC, glVertexAttrib4Nubv);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4NUIVPROC, glVertexAttrib4Nuiv);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIB4NUSVPROC, glVertexAttrib4Nusv);
+    LOAD_GL_FUNCTION(PFNGLBINDATTRIBLOCATIONPROC, glBindAttribLocation);
+    LOAD_GL_FUNCTION(PFNGLGETATTACHEDSHADERSPROC, glGetAttachedShaders);
+    LOAD_GL_FUNCTION(PFNGLGETUNIFORMLOCATIONPROC, glGetUniformLocation);
+    LOAD_GL_FUNCTION(PFNGLSTENCILFUNCSEPARATEPROC, glStencilFuncSeparate);
+    LOAD_GL_FUNCTION(PFNGLSTENCILMASKSEPARATEPROC, glStencilMaskSeparate);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBPOINTERPROC, glVertexAttribPointer);
+    LOAD_GL_FUNCTION(PFNGLBLENDEQUATIONSEPARATEPROC,
+      glBlendEquationSeparate);
+    LOAD_GL_FUNCTION(PFNGLENABLEVERTEXATTRIBARRAYPROC,
+      glEnableVertexAttribArray);
+    LOAD_GL_FUNCTION(PFNGLGETVERTEXATTRIBPOINTERVPROC,
+      glGetVertexAttribPointerv);
+    LOAD_GL_FUNCTION(PFNGLDISABLEVERTEXATTRIBARRAYPROC,
+      glDisableVertexAttribArray);
   }
 
-  void gl_functions::load_2_1(symbol_loader *sym_loader)
+  void gl_functions::load_2_1()
   {
     std::cout << "Loading OpenGL 2.1 Functions " << std::endl;
-    LOAD_GL_FUNCTION(PFNGLUNIFORMMATRIX2X3FVPROC, glUniformMatrix2x3fv,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLUNIFORMMATRIX3X2FVPROC, glUniformMatrix3x2fv,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLUNIFORMMATRIX2X4FVPROC, glUniformMatrix2x4fv,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLUNIFORMMATRIX4X2FVPROC, glUniformMatrix4x2fv,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLUNIFORMMATRIX3X4FVPROC, glUniformMatrix3x4fv,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLUNIFORMMATRIX4X3FVPROC, glUniformMatrix4x3fv,
-      sym_loader);
+    LOAD_GL_FUNCTION(PFNGLUNIFORMMATRIX2X3FVPROC, glUniformMatrix2x3fv);
+    LOAD_GL_FUNCTION(PFNGLUNIFORMMATRIX3X2FVPROC, glUniformMatrix3x2fv);
+    LOAD_GL_FUNCTION(PFNGLUNIFORMMATRIX2X4FVPROC, glUniformMatrix2x4fv);
+    LOAD_GL_FUNCTION(PFNGLUNIFORMMATRIX4X2FVPROC, glUniformMatrix4x2fv);
+    LOAD_GL_FUNCTION(PFNGLUNIFORMMATRIX3X4FVPROC, glUniformMatrix3x4fv);
+    LOAD_GL_FUNCTION(PFNGLUNIFORMMATRIX4X3FVPROC, glUniformMatrix4x3fv);
   }
 
-  void gl_functions::load_3_0(symbol_loader *sym_loader)
+  void gl_functions::load_3_0()
   {
     std::cout << "Loading OpenGL 3.0 Functions " << std::endl;
-    LOAD_GL_FUNCTION(PFNGLENABLEIPROC, glEnablei, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLDISABLEIPROC, glDisablei, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLCOLORMASKIPROC, glColorMaski, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLISENABLEDIPROC, glIsEnabledi, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLCLAMPCOLORPROC, glClampColor, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLUNIFORM1UIPROC, glUniform1ui, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLUNIFORM2UIPROC, glUniform2ui, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLUNIFORM3UIPROC, glUniform3ui, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLUNIFORM4UIPROC, glUniform4ui, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLUNIFORM1UIVPROC, glUniform1uiv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLUNIFORM2UIVPROC, glUniform2uiv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLUNIFORM3UIVPROC, glUniform3uiv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLUNIFORM4UIVPROC, glUniform4uiv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETBOOLEANI_VPROC, glGetBooleani_v, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETUNIFORMUIVPROC, glGetUniformuiv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLCLEARBUFFERIVPROC, glClearBufferiv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLCLEARBUFFERFVPROC, glClearBufferfv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLCLEARBUFFERFIPROC, glClearBufferfi, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLCLEARBUFFERUIVPROC, glClearBufferuiv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI1IPROC, glVertexAttribI1i, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI2IPROC, glVertexAttribI2i, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI3IPROC, glVertexAttribI3i, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI4IPROC, glVertexAttribI4i, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLTEXPARAMETERIIVPROC, glTexParameterIiv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI1UIPROC, glVertexAttribI1ui, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI2UIPROC, glVertexAttribI2ui, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI3UIPROC, glVertexAttribI3ui, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI4UIPROC, glVertexAttribI4ui, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI1IVPROC, glVertexAttribI1iv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI2IVPROC, glVertexAttribI2iv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI3IVPROC, glVertexAttribI3iv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI4IVPROC, glVertexAttribI4iv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI4BVPROC, glVertexAttribI4bv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI4SVPROC, glVertexAttribI4sv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLTEXPARAMETERIUIVPROC, glTexParameterIuiv, sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI1UIVPROC, glVertexAttribI1uiv,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI2UIVPROC, glVertexAttribI2uiv,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI3UIVPROC, glVertexAttribI3uiv,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI4UIVPROC, glVertexAttribI4uiv,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI4UBVPROC, glVertexAttribI4ubv,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI4USVPROC, glVertexAttribI4usv,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETVERTEXATTRIBIIVPROC, glGetVertexAttribIiv,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETTEXPARAMETERIIVPROC, glGetTexParameterIiv,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETVERTEXATTRIBIUIVPROC, glGetVertexAttribIuiv,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETFRAGDATALOCATIONPROC, glGetFragDataLocation,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLGETTEXPARAMETERIUIVPROC, glGetTexParameterIuiv,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLENDTRANSFORMFEEDBACKPROC, glEndTransformFeedback,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLENDCONDITIONALRENDERPROC, glEndConditionalRender,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBIPOINTERPROC, glVertexAttribIPointer,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLBINDFRAGDATALOCATIONPROC, glBindFragDataLocation,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLBEGINTRANSFORMFEEDBACKPROC, glBeginTransformFeedback,
-      sym_loader);
-    LOAD_GL_FUNCTION(PFNGLBEGINCONDITIONALRENDERPROC, glBeginConditionalRender,
-      sym_loader);
+    LOAD_GL_FUNCTION(PFNGLENABLEIPROC, glEnablei);
+    LOAD_GL_FUNCTION(PFNGLDISABLEIPROC, glDisablei);
+    LOAD_GL_FUNCTION(PFNGLCOLORMASKIPROC, glColorMaski);
+    LOAD_GL_FUNCTION(PFNGLISENABLEDIPROC, glIsEnabledi);
+    LOAD_GL_FUNCTION(PFNGLCLAMPCOLORPROC, glClampColor);
+    LOAD_GL_FUNCTION(PFNGLUNIFORM1UIPROC, glUniform1ui);
+    LOAD_GL_FUNCTION(PFNGLUNIFORM2UIPROC, glUniform2ui);
+    LOAD_GL_FUNCTION(PFNGLUNIFORM3UIPROC, glUniform3ui);
+    LOAD_GL_FUNCTION(PFNGLUNIFORM4UIPROC, glUniform4ui);
+    LOAD_GL_FUNCTION(PFNGLUNIFORM1UIVPROC, glUniform1uiv);
+    LOAD_GL_FUNCTION(PFNGLUNIFORM2UIVPROC, glUniform2uiv);
+    LOAD_GL_FUNCTION(PFNGLUNIFORM3UIVPROC, glUniform3uiv);
+    LOAD_GL_FUNCTION(PFNGLUNIFORM4UIVPROC, glUniform4uiv);
+    LOAD_GL_FUNCTION(PFNGLGETBOOLEANI_VPROC, glGetBooleani_v);
+    LOAD_GL_FUNCTION(PFNGLGETUNIFORMUIVPROC, glGetUniformuiv);
+    LOAD_GL_FUNCTION(PFNGLCLEARBUFFERIVPROC, glClearBufferiv);
+    LOAD_GL_FUNCTION(PFNGLCLEARBUFFERFVPROC, glClearBufferfv);
+    LOAD_GL_FUNCTION(PFNGLCLEARBUFFERFIPROC, glClearBufferfi);
+    LOAD_GL_FUNCTION(PFNGLCLEARBUFFERUIVPROC, glClearBufferuiv);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI1IPROC, glVertexAttribI1i);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI2IPROC, glVertexAttribI2i);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI3IPROC, glVertexAttribI3i);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI4IPROC, glVertexAttribI4i);
+    LOAD_GL_FUNCTION(PFNGLTEXPARAMETERIIVPROC, glTexParameterIiv);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI1UIPROC, glVertexAttribI1ui);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI2UIPROC, glVertexAttribI2ui);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI3UIPROC, glVertexAttribI3ui);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI4UIPROC, glVertexAttribI4ui);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI1IVPROC, glVertexAttribI1iv);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI2IVPROC, glVertexAttribI2iv);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI3IVPROC, glVertexAttribI3iv);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI4IVPROC, glVertexAttribI4iv);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI4BVPROC, glVertexAttribI4bv);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI4SVPROC, glVertexAttribI4sv);
+    LOAD_GL_FUNCTION(PFNGLTEXPARAMETERIUIVPROC, glTexParameterIuiv);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI1UIVPROC, glVertexAttribI1uiv);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI2UIVPROC, glVertexAttribI2uiv);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI3UIVPROC, glVertexAttribI3uiv);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI4UIVPROC, glVertexAttribI4uiv);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI4UBVPROC, glVertexAttribI4ubv);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBI4USVPROC, glVertexAttribI4usv);
+    LOAD_GL_FUNCTION(PFNGLGETVERTEXATTRIBIIVPROC, glGetVertexAttribIiv);
+    LOAD_GL_FUNCTION(PFNGLGETTEXPARAMETERIIVPROC, glGetTexParameterIiv);
+    LOAD_GL_FUNCTION(PFNGLGETVERTEXATTRIBIUIVPROC, glGetVertexAttribIuiv);
+    LOAD_GL_FUNCTION(PFNGLGETFRAGDATALOCATIONPROC, glGetFragDataLocation);
+    LOAD_GL_FUNCTION(PFNGLGETTEXPARAMETERIUIVPROC, glGetTexParameterIuiv);
+    LOAD_GL_FUNCTION(PFNGLENDTRANSFORMFEEDBACKPROC, glEndTransformFeedback);
+    LOAD_GL_FUNCTION(PFNGLENDCONDITIONALRENDERPROC, glEndConditionalRender);
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBIPOINTERPROC, glVertexAttribIPointer);
+    LOAD_GL_FUNCTION(PFNGLBINDFRAGDATALOCATIONPROC, glBindFragDataLocation);
+    LOAD_GL_FUNCTION(PFNGLBEGINTRANSFORMFEEDBACKPROC,
+      glBeginTransformFeedback);
+    LOAD_GL_FUNCTION(PFNGLBEGINCONDITIONALRENDERPROC,
+      glBeginConditionalRender);
     LOAD_GL_FUNCTION(PFNGLTRANSFORMFEEDBACKVARYINGSPROC,
-      glTransformFeedbackVaryings, sym_loader);
+      glTransformFeedbackVaryings);
     LOAD_GL_FUNCTION(PFNGLGETTRANSFORMFEEDBACKVARYINGPROC,
-      glGetTransformFeedbackVarying, sym_loader);
+      glGetTransformFeedbackVarying);
+  }
+
+  void gl_functions::load_3_1()
+  {
+    LOAD_GL_FUNCTION(PFNGLDRAWARRAYSINSTANCEDPROC,
+      glDrawArraysInstanced);
+    LOAD_GL_FUNCTION(PFNGLDRAWELEMENTSINSTANCEDPROC,
+      glDrawElementsInstanced);
+    LOAD_GL_FUNCTION(PFNGLPRIMITIVERESTARTINDEXPROC,
+      glPrimitiveRestartIndex);
+    LOAD_GL_FUNCTION(PFNGLTEXBUFFERPROC, glTexBuffer);
+  }
+
+  void gl_functions::load_3_2()
+  {
+    LOAD_GL_FUNCTION(PFNGLFRAMEBUFFERTEXTUREPROC,
+      glFramebufferTexture);
+    LOAD_GL_FUNCTION(PFNGLGETBUFFERPARAMETERI64VPROC,
+      glGetBufferParameteri64v);
+    LOAD_GL_FUNCTION(PFNGLGETINTEGER64I_VPROC,
+      glGetInteger64i_v);
+    LOAD_GL_FUNCTION(PFNGLGENVERTEXARRAYSPROC,
+      glGenVertexArrays);
+    LOAD_GL_FUNCTION(PFNGLBINDVERTEXARRAYPROC,
+      glBindVertexArray);
+  }
+
+  void gl_functions::load_3_3()
+  {
+    LOAD_GL_FUNCTION(PFNGLVERTEXATTRIBDIVISORPROC,
+      glVertexAttribDivisor);
+  }
+
+  void gl_functions::load_4_0()
+  {
+    LOAD_GL_FUNCTION(PFNGLBLENDEQUATIONSEPARATEIPROC,
+      glBlendEquationSeparatei);
+    LOAD_GL_FUNCTION(PFNGLBLENDEQUATIONIPROC,
+      glBlendEquationi);
+    LOAD_GL_FUNCTION(PFNGLBLENDFUNCSEPARATEIPROC,
+      glBlendFuncSeparatei);
+    LOAD_GL_FUNCTION(PFNGLBLENDFUNCIPROC,
+      glBlendFunci);
+    LOAD_GL_FUNCTION(PFNGLMINSAMPLESHADINGPROC,
+      glMinSampleShading);
+  }
+
+  void gl_functions::load_4_1()
+  {
+  }
+
+  void gl_functions::load_4_2()
+  {
+  }
+
+  void gl_functions::load_4_3()
+  {
+  }
+
+  void gl_functions::load_4_4()
+  {
+  }
+
+  void gl_functions::load_4_5()
+  {
+    LOAD_GL_FUNCTION(PFNGLGETGRAPHICSRESETSTATUSPROC,
+      glGetGraphicsResetStatus);
   }
 }

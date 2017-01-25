@@ -14,33 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef SYMBOL_LOADER_H_INCLUDED
-#define SYMBOL_LOADER_H_INCLUDED
 
-#include "opengl_core/core/non_copyable.h"
-
+#include <cassert>
 #include <iostream>
 
-namespace opengl_core
-{
-  class OPENGL_CORE_API symbol_loader : public non_copyable
-  {
-  private:
-    void *m_handle;
-    const char *m_lib_name;
-    bool m_good;
+#define DEBUG_GL 1
 
-  public:
-    explicit symbol_loader(const char *lib_name);
-    ~symbol_loader();
-
-    bool get_good() const { return m_good; }
-
-    void *load(const char *symb_name);
-
-  private:
-    void print_error();
-  };
-}
-
+#if DEBUG_GL
+#define GL_OUTPUT(func) \
+  std::cout << "file = " << __FILE__ \
+    << " line = " << __LINE__ \
+    << " error = " << error \
+    << " opengl function = " << #func \
+    << std::endl << std::flush;
+#else
+#define GL_OUTPUT {int x = 0; x = x;}
 #endif
+
+#define GL_CALL(func) do { \
+    GLint error; \
+    while ((error = glGetError()) != 0) { \
+      GL_OUTPUT(func) \
+    } \
+  } while(false);

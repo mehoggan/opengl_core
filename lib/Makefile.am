@@ -8,14 +8,12 @@ pkginclude_HEADERS = \
 	$(top_builddir)/include/opengl_core/core/init.h \
 	$(top_builddir)/include/opengl_core/core/non_copyable.h \
 	$(top_builddir)/include/opengl_core/core/platform.h \
-	$(top_builddir)/include/opengl_core/core/standard_renderer.h \
-	$(top_builddir)/include/opengl_core/core/symbol_loader.h
+	$(top_builddir)/include/opengl_core/core/standard_renderer.h
 
 ACLOCAL_AMFLAGS = -I m4
 AUTOMAKE_OPTIONS = subdir-objects
 
-libopengl_core_la_SOURCES = \
-	posix_symbol_loader.cpp
+libopengl_core_la_SOURCES =
 
 if LINUX
 libopengl_core_la_SOURCES += \

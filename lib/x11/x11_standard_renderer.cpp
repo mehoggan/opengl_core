@@ -16,9 +16,10 @@
  */
 #include "opengl_core/core/standard_renderer.h"
 
-#include "opengl_core/core/x11/x11_display.h"
 #include "opengl_core/core/draw_buffer_context.h"
 #include "opengl_core/core/draw_buffer_window.h"
+#include "opengl_core/core/gl_utils.h"
+#include "opengl_core/core/x11/x11_display.h"
 
 #include <cstring>
 #include <iostream>
@@ -245,7 +246,9 @@ namespace opengl_core
         auto *init = (init_callback *)pthread_getspecific(
           pthread_init_callback_key);
         if (init) {
-          (*init)();
+          opengl_core::draw_buffer_context_make_current(ctx, win);
+          (*init)(win, ctx);
+          opengl_core::draw_buffer_context_make_not_current(ctx);
         }
       }
       while (!terminate) {
@@ -270,7 +273,7 @@ namespace opengl_core
           auto *pre_render = (pre_render_callback *)pthread_getspecific(
             pthread_pre_render_callback_key);
           if (pre_render) {
-            (*pre_render)();
+            (*pre_render)(win, ctx);
           }
         }
         {
@@ -278,7 +281,8 @@ namespace opengl_core
             auto *render = (render_callback *)pthread_getspecific(
               pthread_render_callback_key);
             if (render) {
-              (*render)();
+              GL_CALL(null)
+              (*render)(win, ctx);
             }
           }
           opengl_core::swap_buffers(win);
@@ -286,7 +290,7 @@ namespace opengl_core
             auto *post_render = (post_render_callback *)pthread_getspecific(
               pthread_post_render_callback_key);
             if (post_render) {
-              (*post_render)();
+              (*post_render)(win, ctx);
             }
           }
         }
@@ -297,7 +301,7 @@ namespace opengl_core
         auto *close = (close_callback *)pthread_getspecific(
           pthread_close_callback_key);
         if (close) {
-          (*close)();
+          (*close)(win, ctx);
         }
       }
       x11_display_thread_specific_release();
