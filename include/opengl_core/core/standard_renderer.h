@@ -19,6 +19,8 @@
 
 #include "declspec.h"
 
+#include "opengl_core/core/draw_buffer_context.h"
+#include "opengl_core/core/draw_buffer_window_config.h"
 #include "opengl_core/core/platform.h"
 
 #include <functional>
@@ -54,8 +56,9 @@ namespace opengl_core
     OPENGL_CORE_API void set_thread_local_close_callback(
       const close_callback &cb);
 
-    OPENGL_CORE_API void standard_event_loop_run(draw_buffer_window& win,
-      draw_buffer_context &ctx);
+    OPENGL_CORE_API void standard_event_loop_run(
+      const gl_version &ctx_ver,
+      const draw_buffer_window_config &win_conf);
   }
 }
 

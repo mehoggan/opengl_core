@@ -1,6 +1,5 @@
-#include "opengl_core/core/draw_buffer_config.h"
 #include "opengl_core/core/draw_buffer_context.h"
-#include "opengl_core/core/draw_buffer_window.h"
+#include "opengl_core/core/draw_buffer_window_config.h"
 #include "opengl_core/core/init.h"
 #include "opengl_core/core/standard_renderer.h"
 #include "opengl_core/core/x11/x11_gl_functions.h"
@@ -47,36 +46,12 @@ void render(opengl_core::draw_buffer_window &win,
 void thread_func(int x, int y, int w, int h)
 {
   const opengl_core::gl_version ctx_ver = {4, 2};
-
-  opengl_core::draw_buffer_config fbc =
-    opengl_core::choose_best_draw_buffer_config();
-  opengl_core::draw_buffer_window win =
-    opengl_core::draw_buffer_window_create(fbc, x, y, w, h);
-  opengl_core::draw_buffer_window_show(win);
-  opengl_core::draw_buffer_context ctx =
-    opengl_core::draw_buffer_context_create(fbc, ctx_ver);
-
   opengl_core::set_thread_local_init_callback(std::bind(&init,
     std::placeholders::_1, std::placeholders::_2));
   opengl_core::set_thread_local_render_callback(std::bind(&render,
     std::placeholders::_1, std::placeholders::_2));
-
-  opengl_core::draw_buffer_context_make_current(ctx, win);
-  opengl_core::gl_functions::configure(ctx_ver);
-  opengl_core::gl_version v =
-    opengl_core::draw_buffer_context_version(ctx, win);
-  std::cout << "New Query Returns: " << v.major << "." << v.minor
-    << std::endl << std::flush;
-  const GLubyte *ver_str = glGetString(GL_VERSION);
-  std::cout << "Old Query Returns: " << std::string((char *)ver_str)
-    << std::endl;
-  opengl_core::draw_buffer_context_make_not_current(ctx);
-
-  opengl_core::standard_event_loop_run(win, ctx);
-
-  opengl_core::draw_buffer_context_free(ctx);
-  opengl_core::draw_buffer_window_free(win);
-  opengl_core::draw_buffer_config_free(fbc);
+  opengl_core::standard_event_loop_run(ctx_ver,
+    opengl_core::draw_buffer_window_config(x, y, w, h));
 }
 
 GLuint vao;

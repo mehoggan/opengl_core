@@ -1,4 +1,4 @@
- /* Copyright (C)
+/* Copyright (C)
  *
  * Copyright 2013 Matthew Everett Hoggan
  *
@@ -16,10 +16,10 @@
  */
 #include "opengl_core/core/standard_renderer.h"
 
-#include "opengl_core/core/draw_buffer_context.h"
 #include "opengl_core/core/draw_buffer_window.h"
 #include "opengl_core/core/gl_utils.h"
 #include "opengl_core/core/x11/x11_display.h"
+#include "opengl_core/core/x11/x11_gl_functions.h"
 
 #include <cstring>
 #include <iostream>
@@ -224,8 +224,8 @@ namespace opengl_core
       }
     }
 
-    void standard_event_loop_run(draw_buffer_window& win,
-        draw_buffer_context &ctx)
+    void standard_event_loop_run(const gl_version &ctx_ver,
+      const draw_buffer_window_config &win_conf)
     {
       Display *display = x11_display_thread_specific_acquire();
 
@@ -233,6 +233,16 @@ namespace opengl_core
       bool exposed = false;
       XEvent x_event;
       Atom close_window;
+
+      draw_buffer_config fbc = choose_best_draw_buffer_config();
+      draw_buffer_window win = draw_buffer_window_create(fbc,
+        win_conf.upper_left_x(), win_conf.upper_left_y(),
+        win_conf.width(), win_conf.height());
+      draw_buffer_window_show(win);
+      draw_buffer_context ctx = draw_buffer_context_create(fbc, ctx_ver);
+      draw_buffer_context_make_current(ctx, win);
+      gl_functions::configure(ctx_ver);
+      draw_buffer_context_make_not_current(ctx);
 
       close_window = XInternAtom(display, "WM_DELETE_WINDOW", False);
       if (!::XSetWMProtocols(display, win, &close_window, 1)) {
@@ -304,6 +314,10 @@ namespace opengl_core
           (*close)(win, ctx);
         }
       }
+
+      opengl_core::draw_buffer_context_free(ctx);
+      opengl_core::draw_buffer_window_free(win);
+      opengl_core::draw_buffer_config_free(fbc);
       x11_display_thread_specific_release();
     }
   }

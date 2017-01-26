@@ -5,15 +5,19 @@ pkginclude_HEADERS = \
 	$(top_builddir)/include/opengl_core/core/draw_buffer_config.h \
 	$(top_builddir)/include/opengl_core/core/draw_buffer_context.h \
 	$(top_builddir)/include/opengl_core/core/draw_buffer_window.h \
+	$(top_builddir)/include/opengl_core/core/draw_buffer_window_config.h \
 	$(top_builddir)/include/opengl_core/core/init.h \
 	$(top_builddir)/include/opengl_core/core/non_copyable.h \
 	$(top_builddir)/include/opengl_core/core/platform.h \
-	$(top_builddir)/include/opengl_core/core/standard_renderer.h
+	$(top_builddir)/include/opengl_core/core/standard_renderer.h \
+	$(top_builddir)/include/opengl_core/core/spin_lock.h
 
 ACLOCAL_AMFLAGS = -I m4
 AUTOMAKE_OPTIONS = subdir-objects
 
-libopengl_core_la_SOURCES =
+libopengl_core_la_SOURCES = \
+	draw_buffer_window_config.cpp \
+	spin_lock.cpp
 
 if LINUX
 libopengl_core_la_SOURCES += \
